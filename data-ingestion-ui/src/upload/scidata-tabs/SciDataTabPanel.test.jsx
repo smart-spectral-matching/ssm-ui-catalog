@@ -1,37 +1,40 @@
 import React from "react";
 import { mount } from "enzyme";
-import SciDataTabPanel from "./SciDataTab";
+import SciDataTabPanel from "./SciDataTabPanel";
 
 describe("SciDataTabPanel", () => {
   let props;
-  let mountedSciDataTab;
-  const scidataTab = () => {
-    if (!mountedSciDataTab) {
-      mountedSciDataTab = mount(<SciDataTab {...props} />);
+  let mountedSciDataTabPanel;
+  const scidataTabPanel = () => {
+    if (!mountedSciDataTabPanel) {
+      mountedSciDataTabPanel = mount(<SciDataTabPanel {...props} />);
     }
-    return mountedSciDataTab;
+    return mountedSciDataTabPanel;
   };
 
   beforeEach(() => {
     props = {
-      name: undefined,
-      title: undefined,
-      isActive: undefined,
-      changeTab: undefined,
-      removeTab: undefined
+      display: undefined,
+      activeItem: undefined,
+      changeChildTab: undefined
     };
-    mountedSciDataTab = undefined;
+    mountedSciDataTabPanel = undefined;
   });
 
-  it("always renders a Menu.Item", () => {
-      const menuItem = scidataTab().find("MenuItem");
-      expect(menuItem.length).toBeGreaterThan(0);
+  it("always renders a div", () => {
+      const divs = scidataTabPanel().find("div");
+      expect(divs.length).toBeGreaterThan(0);
   });
 
-  describe("rendered Menu.Item", () => {
-    it("has 4 props", () => {
-      const menuItem = scidataTab().find("MenuItem");
-      expect(Object.keys(menuItem.props()).length).toBe(4);
+  it("always renders a Menu", () => {
+    const menu = scidataTabPanel().find("Menu");
+    expect(menu.length).toBeGreaterThan(0);
+  });
+
+  describe("rendered Menu", () => {
+    it("always renders two MenuItem tabs", () => {
+      const menuItems = scidataTabPanel().find("MenuItem");
+      expect(menuItems.length).toBe(2);
     });
   });
 
