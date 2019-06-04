@@ -1,0 +1,14 @@
+{
+  "title": "Order",
+  "type": "object",
+  "properties": {
+    "addressId": {
+      "type": "string",
+      "label": "Address Type",
+      "enum": ["Home Address 1", "Home Address 2", "Workplace"]
+    },
+    "street": { "type": "string" },
+    "city": { "type": "string" },
+    "zipCode": { "type": "string" }
+  }
+}

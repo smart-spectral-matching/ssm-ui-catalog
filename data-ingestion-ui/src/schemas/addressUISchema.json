@@ -1,0 +1,32 @@
+{
+  "type": "Group",
+  "label": "Address",
+  "elements": [
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/addressId"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/street"
+        }
+      ]
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/city"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/zipCode"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "type": "Group",
+  "label": "Person",
+  "elements": [
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/firstName"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/lastName"
+        }
+      ]
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/age"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/shippingAddress"
+        }
+      ]
+    }
+  ]
+}
