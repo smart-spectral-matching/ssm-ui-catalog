@@ -8,9 +8,7 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
-COPY ./data-ingestion-ui/package.json /app/package.json
-RUN yarn install
-
-# start app
-CMD ["yarn", "start"]
+COPY . /app
+RUN cd data-ingestion-ui && \
+    yarn install
 
