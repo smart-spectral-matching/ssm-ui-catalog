@@ -22,6 +22,7 @@ dockerbuild:
 dockertest:
     stage: dockertest
     script:
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
         - docker run $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "cd /app/data-ingestion-ui && yarn test --ci"
     tags:
