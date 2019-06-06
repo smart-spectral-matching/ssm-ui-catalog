@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Dropzone from "../dropzone/Dropzone";
-import "./Upload.css";
+//import "./Upload.css";
 import Progress from "../progress/Progress";
 import { Input, Grid, Segment, Label } from "semantic-ui-react";
 
@@ -29,6 +29,20 @@ class Upload extends Component {
     }));
   }
 
+  fakeRetrieveFile(file) {
+    file["schema"] = personSchema;
+    file["uischema"] = personUISchema;
+    file["path"] = "person"; //TODO: gotta change this to be unique
+    return file;
+  }
+
+  fakeRetrieveFiles() {
+    const files = this.state.files;
+    // files -> datasets
+    const datasets = files.map(file => this.fakeRetrieveFile(file));
+    console.log(datasets);
+  } 
+  
   async uploadFiles() {
     this.setState({ uploadProgress: {}, uploading: true });
     const promises = [];
@@ -44,20 +58,6 @@ class Upload extends Component {
       this.setState({ successfullUploaded: true, uploading: false });
     }
     this.fakeRetrieveFiles();
-  }
-
-  fakeRetrieveFiles() {
-    const files = this.state.files;
-    // files -> datasets
-    const datasets = files.map(file => this.fakeRetrieveFile(file));
-    console.log(datasets);
-  }
-
-  fakeRetrieveFile(file) {
-    file["schema"] = personSchema;
-    file["uischema"] = personUISchema;
-    file["path"] = "person"; //TODO: gotta change this to be unique
-    return file;
   }
 
   sendRequest(file) {
