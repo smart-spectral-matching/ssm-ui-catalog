@@ -9,6 +9,6 @@ ENV PATH /app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
 COPY . /app
-RUN cd data-ingestion-ui && \
+RUN cd data-ingestion && \
     yarn install
 
