@@ -1,0 +1,90 @@
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.detail {
+
+  nav {
+    height: 90px;
+    padding-top: 10px;
+    margin-bottom: 15px;
+  
+
+  form  {
+    position: relative;
+    width: 95%;
+    left: -30px;
+
+    .main-search-input {
+      border: 1px solid #ccc;
+      border-radius: 24px;
+      padding: 0 15px;
+
+      &:not(.browser-default):focus:not([readonly]) {
+        border-bottom: 1px solid #000;
+        box-shadow: 0 1px 0 0 #000;
+      }
+    }
+
+    button {
+      position: absolute;
+      top: 12px;
+      font-size: 1.5em;
+      background: none;
+      border: none;
+      right: -29px;
+      cursor: pointer;
+
+      i {
+        line-height: 40px
+      }
+    }
+  }
+    
+  .brand-logo img {width: 100px}
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .card .card-content {
+    padding: 10px;
+
+    h5 {
+      padding-top: 0;
+      margin-top: 0;
+    }
+  }
+
+  .card .card-image {
+    padding: 5px;
+    video {
+      border-radius: 10px;
+    }
+  }
+  
+  
+
+  .collection {
+    border-radius: 10px;
+
+    &:not(.browser-default) > li {
+      padding: 10px;
+      border-bottom: 1px solid #dddddd;
+  
+      &:last-child {
+        border: 0;
+      }
+    }
+  }
+ 
+}
+  
