@@ -1,5 +1,5 @@
-import "../node_modules/materialize-css/dist/js/materialize";
-import "../node_modules/materialize-css/dist/css/materialize";
+import 'materialize-css'; // It installs the JS asset only
+import 'materialize-css/dist/css/materialize.min.css';
 import "../styles/detail";
 
 document.addEventListener("DOMContentLoaded", function() {
