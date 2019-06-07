@@ -22,8 +22,7 @@
     "parcel-bundler": "^1.12.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-hot-loader": "^4.9.0",
-    "sass": "^1.20.1"
+    "react-hot-loader": "^4.9.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.4.5",
@@ -32,7 +31,7 @@
     "@jsonforms/material-renderers": "^2.2.3",
     "@jsonforms/react": "^2.2.3",
     "assemble": "~0.3.11",
-    "autoprefixer": "^7.2.1",
+    "autoprefixer": "^9.6.0",
     "gh-pages": "^2.0.1",
     "grunt": "~0.4.0",
     "import-jquery": "^1.0.1",
@@ -53,7 +52,8 @@
     "build": "cross-env NODE_ENV=production parcel build index.html --no-minify --public-url ./",
     "lint": "eslint .",
     "test": "react-scripts test",
-    "test-ci": "CI=TRUE react-scripts test"
+    "test-ci": "CI=TRUE react-scripts test",
+    "clean": "rm -rf node_modules dist .cache yarn.lock"
   },
   "eslintConfig": {
     "extends": "react-app"
