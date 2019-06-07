@@ -64,7 +64,7 @@ yarnbuild:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
         - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn run build"
-        - ls data-ingestion/
+        - ls data-ingestion-ui/
     after_script:
         - sudo chown -R gitlab-runner .
     tags:
