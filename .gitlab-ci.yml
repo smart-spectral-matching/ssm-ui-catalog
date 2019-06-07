@@ -34,7 +34,7 @@ yarninstall:
     script:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
-        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn install"
+        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion && yarn install"
     after_script:
         - sudo chown -R gitlab-runner .
     tags:
@@ -47,7 +47,8 @@ yarntest:
     script:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
-        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn test-ci"
+        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion && yarn test-ci"
+    allow_failure: true
     after_script:
         - sudo chown -R gitlab-runner .
     tags:
@@ -62,7 +63,7 @@ yarnbuild:
     script:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
-        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn run build"
+        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion && yarn run build"
     after_script:
         - sudo chown -R gitlab-runner .
     tags:
