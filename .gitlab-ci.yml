@@ -1,29 +1,61 @@
 stages:
-    - dockerbuild
-    - dockertest
+    - dockerreset
+    - carbonbuild
+    - yarninstall
+    - yarntest
+    - frontendbuild
 
 variables:
     V_NUM: "v0.0.1"
-    CONTAINER_URL: "code.ornl.gov:4567/rse/datastreams/nuclear-datastreams/frontend"
+    CARBON_URL: "code.ornl.gov:4567/rse/datastreams/nuclear-datastreams/carbon"
+    FRONTEND_URL: "code.ornl.gov:4567/rse/datastreams/nuclear-datastreams/frontend"
 
-dockerbuild:
-    stage: dockerbuild
+dockerreset:
+    stage: dockerreset
     script:
         - sudo systemctl stop docker
         - sudo rm -rf /var/lib/docker
         - sudo systemctl start docker
-        - sudo docker rmi -f $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
-        - docker build -t $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM .
+        - sudo docker rmi -f $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM
+        - sudo docker rmi -f $FRONTEND_URL/$CI_COMMIT_REF_NAME:$V_NUM
+
+carbonbuild:
+    stage: carbonbuild
+    script:
+        - docker build -f Dockerfile-carbon -t $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM .
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - docker push $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
+        - docker push $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM
     tags:
         - rse-nds-builder
 
-dockertest:
-    stage: dockertest
+yarninstall:
+    stage: yarninstall
+    artifacts:
+        untracked: true
     script:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
-        - docker run $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn test-ci"
+        - docker pull $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM
+        - docker run -v $PWD:/app $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn install"
     tags:
         - rse-nds-builder
+
+yarntest:
+    stage: yarntest
+    dependencies: 
+        - build
+    script:
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker pull $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM
+        - docker run -v $PWD:/app $CARBON_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn test-ci"
+    tags:
+        - rse-nds-builder
+
+frontendbuild:
+    stage: frontendbuild
+    script:
+        - docker build -f Dockerfile-frontend -t $FRONTEND_URL/$CI_COMMIT_REF_NAME:$V_NUM .
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker push $FRONTEND_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    tags:
+        - rse-nds-builder
+
