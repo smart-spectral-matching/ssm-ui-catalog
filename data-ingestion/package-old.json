@@ -1,5 +1,5 @@
 {
-  "name": "react-tabs-intro",
+  "name": "nuclear-datastreams-frontend",
   "version": "0.1.0",
   "private": true,
   "homepage": "http://rse-dev1.ornl.gov:8080/datastreams/data-ingestion-ui",
@@ -45,6 +45,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "babel-core": "^6.26.3",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0"
   }

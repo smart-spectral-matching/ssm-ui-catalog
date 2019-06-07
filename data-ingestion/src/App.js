@@ -7,6 +7,8 @@ import { SpectroscopyTypeDropdown } from "./selection/experimental/types/spectro
 import { AtomisticQuantumTypeDropdown } from "./selection/calculation/types/atomisticQuantum";
 import MainTabs from "./upload/main/MainTabs";
 
+//import "semantic-ui-css/semantic.css";
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -23,7 +25,7 @@ class App extends React.Component {
     return (
       <Form>
         <Form.Field>
-          <Label color="red">{title}: </Label> {dropdown}
+          <Label key={title} color="red">{title}: </Label> {dropdown}
         </Form.Field>
       </Form>
     );
@@ -105,7 +107,7 @@ class App extends React.Component {
     newDisplay.push(
       <div>
         {" "}
-        <MainTabs />{" "}
+        <MainTabs/>{" "}
       </div>
     );
     this.setState({

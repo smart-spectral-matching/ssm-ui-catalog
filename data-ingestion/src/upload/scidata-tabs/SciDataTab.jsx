@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Menu, Icon } from "semantic-ui-react";
 
-import "semantic-ui-css/semantic.min.css";
+//import "semantic-ui-css/semantic.min.css";
 
 // Tab Component
 export default class  SciDataTab extends React.Component {

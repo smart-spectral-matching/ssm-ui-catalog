@@ -6,7 +6,7 @@ import { getData } from "@jsonforms/core";
 
 import SciDataTab from "./SciDataTab";
 import SciDataTabPanel from "./SciDataTabPanel";
-import "semantic-ui-css/semantic.min.css";
+//import "semantic-ui-css/semantic.min.css";
 
 import * as Data from "../../constants/InitialDatasets";
 

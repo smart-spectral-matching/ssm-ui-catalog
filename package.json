@@ -3,20 +3,72 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "homepage": "http://rse-dev1.ornl.gov:8080/datastreams/",
   "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "@ljharb/eslint-config": "^13.1.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.1.1",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-dev": "^2.0.0",
     "parcel-bundler": "^1.12.3",
-    "sass": "^1.20.1"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-hot-loader": "^4.9.0",
+    "sass": "^1.21.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.4.5",
+    "@jsonforms/core": "^2.2.3",
+    "@jsonforms/examples": "^2.2.3",
+    "@jsonforms/material-renderers": "^2.2.3",
+    "@jsonforms/react": "^2.2.3",
     "assemble": "~0.3.11",
+    "autoprefixer": "^9.6.0",
+    "gh-pages": "^2.0.1",
     "grunt": "~0.4.0",
     "import-jquery": "^1.0.1",
     "jquery-ui-dist": "^1.12.1",
     "materialize-css": "^1.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-redux": "^7.0.3",
+    "react-scripts": "3.0.1",
+    "redux": "^4.0.1",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.87.1",
     "styles": "^0.2.1"
   },
   "scripts": {
     "dev": "parcel *.html  --no-cache",
-    "build": "parcel build *.html"
+    "start": "cross-env NODE_ENV=development parcel index.html ",
+    "build": "cross-env NODE_ENV=production parcel build index.html --no-minify --public-url ./",
+    "lint": "eslint .",
+    "test": "react-scripts test",
+    "test-ci": "CI=TRUE react-scripts test",
+    "clean": "rm -rf node_modules dist .cache yarn.lock"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
