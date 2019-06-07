@@ -26,6 +26,8 @@ yarninstall:
     stage: yarninstall
     artifacts:
         untracked: true
+    before_script:
+        - sudo rm -rf data-ingestion-ui/node_modules/
     script:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
