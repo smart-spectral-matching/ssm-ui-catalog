@@ -2,6 +2,7 @@ stages:
     - carbonbuild
     - yarninstall
     - yarntest
+    - yarnbuild
     - frontendbuild
 
 variables:
@@ -46,10 +47,23 @@ yarntest:
     tags:
         - rse-nds-builder
 
+yarnbuild:
+    stage: yarnbuild
+    artifacts:
+        untracked: true
+    dependencies:
+        - yarninstall
+    script:
+        - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
+        - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn run build"
+    tags:
+        - rse-nds-builder
+
 frontendbuild:
     stage: frontendbuild
     dependencies: 
-        - yarninstall
+        - yarnbuild
     before_script:
         - sudo systemctl stop docker
         - sudo rm -rf /var/lib/docker
