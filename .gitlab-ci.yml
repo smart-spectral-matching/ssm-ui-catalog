@@ -4,7 +4,6 @@ stages:
     - yarntest
     - yarnbuild
     - frontendbuild
-    - cleanup
 
 variables:
     V_NUM: "v0.0.1"
@@ -21,6 +20,8 @@ carbonbuild:
         - docker build -f Dockerfile-carbon -t $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM .
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker push $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    after_script:
+        - sudo chown -R gitlab-runner .
     tags:
         - rse-nds-builder
 
@@ -34,6 +35,8 @@ yarninstall:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
         - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn install"
+    after_script:
+        - sudo chown -R gitlab-runner .
     tags:
         - rse-nds-builder
 
@@ -45,6 +48,8 @@ yarntest:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
         - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn test-ci"
+    after_script:
+        - sudo chown -R gitlab-runner .
     tags:
         - rse-nds-builder
 
@@ -58,6 +63,8 @@ yarnbuild:
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker pull $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
         - docker run -v $PWD:/app $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM bash -c "cd data-ingestion-ui && yarn run build"
+    after_script:
+        - sudo chown -R gitlab-runner .
     tags:
         - rse-nds-builder
 
@@ -74,12 +81,7 @@ frontendbuild:
         - docker build -f Dockerfile-frontend -t $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM .
         - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker push $CONTAINER_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    tags:
-        - rse-nds-builder
-
-cleanup:
-    stage: cleanup
-    script:
+    after_script:
         - sudo chown -R gitlab-runner .
     tags:
         - rse-nds-builder
