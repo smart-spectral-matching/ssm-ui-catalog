@@ -30,10 +30,6 @@ class MainTabs extends React.Component {
     );
   }
 
-  renderFileUploadOld() {
-    return <button onClick={this.addDataset}> Add Dataset 3</button>;
-  }
-
   renderFileUpload() {
     return (
       <div className="App">
@@ -49,7 +45,7 @@ class MainTabs extends React.Component {
     if (name === "File Upload") {
       display = this.renderFileUpload();
     } else if (name === "SciData") {
-      display = this.renderSciDataTab(this.state.datasets);
+      display = this.renderSciDataTab([]);
     }
     this.setState({
       activeItem: name,
