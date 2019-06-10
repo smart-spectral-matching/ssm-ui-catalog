@@ -1,11 +1,16 @@
 import React, { Component } from "react";
-//import "./Dropzone.css";
+import mergeStyles from "../../../utils/MergeStyles";
+import dropzoneStyles from "./DropzoneStyles";
+
+import uploadImage from "../../../images/baseline-cloud_upload-24px.svg";
 
 class Dropzone extends Component {
   constructor(props) {
     super(props);
     this.state = { hightlight: false };
     this.fileInputRef = React.createRef();
+
+    this.styles = dropzoneStyles;
 
     this.openFileDialog = this.openFileDialog.bind(this);
     this.onFilesAdded = this.onFilesAdded.bind(this);
@@ -64,25 +69,24 @@ class Dropzone extends Component {
   render() {
     return (
       <div
-        className={`Dropzone ${this.state.hightlight ? "Highlight" : ""}`}
+        style={mergeStyles([
+          this.styles.dropzone,
+          { highlith: this.state.hightlight ? this.styles.highlight : ""},
+          { cursor: this.props.disabled ? "default" : "pointer" }
+        ])}
         onDragOver={this.onDragOver}
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
         onClick={this.openFileDialog}
-        style={{ cursor: this.props.disabled ? "default" : "pointer" }}
       >
         <input
           ref={this.fileInputRef}
-          className="FileInput"
+          style={this.styles.fileInput}
           type="file"
           multiple
           onChange={this.onFilesAdded}
         />
-        <img
-          alt="upload"
-          className="Icon"
-          src="baseline-cloud_upload-24px.svg"
-        />
+        <img alt="upload" style={this.styles.icon} src={uploadImage} />
         <span>Upload Files</span>
       </div>
     );

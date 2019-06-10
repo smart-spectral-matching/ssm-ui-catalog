@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import Dropzone from "../dropzone/Dropzone";
-//import "./Upload.css";
 import Progress from "../progress/Progress";
 import { Input, Grid, Segment, Label } from "semantic-ui-react";
 
+import uploadStyles from "./UploadStyles";
+import checkIconImage from "../../../images/baseline-check_circle_outline-24px.svg";
+
 import personSchema from "../../schemas/personSchema";
 import personUISchema from "../../schemas/personUISchema";
+import mergeStyles from "../../../utils/MergeStyles";
 
 class Upload extends Component {
   constructor(props) {
@@ -16,6 +19,8 @@ class Upload extends Component {
       uploadProgress: {},
       successfullUploaded: false
     };
+
+    this.styles = uploadStyles;
 
     this.onFilesAdded = this.onFilesAdded.bind(this);
     this.uploadFiles = this.uploadFiles.bind(this);
@@ -41,8 +46,8 @@ class Upload extends Component {
     // files -> datasets
     const datasets = files.map(file => this.fakeRetrieveFile(file));
     console.log(datasets);
-  } 
-  
+  }
+
   async uploadFiles() {
     this.setState({ uploadProgress: {}, uploading: true });
     const promises = [];
@@ -101,16 +106,15 @@ class Upload extends Component {
     const uploadProgress = this.state.uploadProgress[file.name];
     if (this.state.uploading || this.state.successfullUploaded) {
       return (
-        <div className="ProgressWrapper">
+        <div style={this.styles.progressWrapper}>
           <Progress progress={uploadProgress ? uploadProgress.percentage : 0} />
           <img
-            className="CheckIcon"
             alt="done"
-            src="baseline-check_circle_outline-24px.svg"
-            style={{
-              opacity:
-                uploadProgress && uploadProgress.state === "done" ? 0.5 : 0
-            }}
+            src={checkIconImage}
+            style={mergeStyles([
+              this.styles.checkIcon,
+              { opacity: uploadProgress && uploadProgress.state === "done" ? 0.5 : 0 }
+            ])}
           />
         </div>
       );
@@ -121,6 +125,7 @@ class Upload extends Component {
     if (this.state.successfullUploaded) {
       return (
         <button
+          style={this.styles.button}
           onClick={() =>
             this.setState({ files: [], successfullUploaded: false })
           }
@@ -131,6 +136,7 @@ class Upload extends Component {
     } else {
       return (
         <button
+          style={this.styles.button}
           disabled={this.state.files.length < 0 || this.state.uploading}
           onClick={this.uploadFiles}
         >
@@ -166,19 +172,19 @@ class Upload extends Component {
 
   render() {
     return (
-      <div className="Upload">
-        <span className="Title">Upload Files</span>
-        <div className="Content">
+      <div styles={this.styles.upload}>
+        <span tyle={this.styles.title}>Upload Files</span>
+        <div style={this.styles.content}>
           <div>
             <Dropzone
               onFilesAdded={this.onFilesAdded}
               disabled={this.state.uploading || this.state.successfullUploaded}
             />
           </div>
-          <div className="Files">
+          <div style={this.styles.files}>
             {this.state.files.map(file => {
               return (
-                <div key={file.fileObj.name} className="Row">
+                <div key={file.fileObj.name} style={this.styles.row}>
                   <Segment>
                     <Grid columns={2} relaxed="very">
                       <Grid.Column>
@@ -202,7 +208,7 @@ class Upload extends Component {
             })}
           </div>
         </div>
-        <div className="Actions">{this.renderActions()}</div>
+        <div style={this.styles.actions}>{this.renderActions()}</div>
       </div>
     );
   }
