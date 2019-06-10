@@ -7,9 +7,7 @@ import { SpectroscopyTypeDropdown } from "./selection/experimental/types/spectro
 import { AtomisticQuantumTypeDropdown } from "./selection/calculation/types/atomisticQuantum";
 import MainTabs from "./upload/main/MainTabs";
 
-import logoIcon from "../../images/logo.png";
-
-//import "semantic-ui-css/semantic.css";
+import logoImage from "../../images/logo.png";
 
 class App extends React.Component {
   constructor(props) {
@@ -122,7 +120,7 @@ class App extends React.Component {
     return (
       <div>
         <Header as="h2" icon textAlign="center">
-          <img src={logoIcon} alt="" />
+          <img src={logoImage} alt="" />
           Data Ingestion
           <Header.Subheader>
             Upload files from multi-method data sources

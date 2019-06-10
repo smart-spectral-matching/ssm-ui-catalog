@@ -1,17 +1,21 @@
 import React, { Component } from "react";
-//import "./Progress.css";
+import progressStyles from "./ProgressStyles";
+import mergeStyles from "../../../utils/MergeStyles";
 
 class Progress extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.styles = progressStyles;
   }
   render() {
     return (
-      <div className="ProgressBar">
+      <div style={this.styles.progressStyles}>
         <div
-          className="Progress"
-          style={{ width: this.props.progress + "%" }}
+          style={mergeStyles([
+            this.styles.progress,
+            { width: this.props.progress + "%" }
+          ])}
         />
       </div>
     );

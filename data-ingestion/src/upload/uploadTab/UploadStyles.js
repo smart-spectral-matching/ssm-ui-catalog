@@ -1,27 +1,43 @@
-.Upload {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  align-items: flex-start;
-  text-align: left;
-  overflow: hidden;
+const uploadStyles = {
+  upload: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    alignItems: 'flex-start',
+    textAlign: 'left',
+    overflow: 'hidden'
+  },
+  content: {
+    display: 'flex',
+    flexDirection: 'row',
+    paddingTop: 16,
+    boxSizing: 'border-box',
+    width: 1
+  },
+  title: {
+    marginBottom: 32,
+    color: '#555'
+  },
+  files: {
+    marginLeft: 32,
+    alignItems: 'flex-start',
+    justifyItems: 'flex-start',
+    flex: 1
+  }
 }
 
-.Content {
-  display: flex;
-  flex-direction: row;
-  padding-top: 16px;
-  box-sizing: border-box;
-  width: 100%;
-}
+export default uploadStyles;
 
-.Files {
-  margin-left: 32px;
-  align-items: flex-start;
-  justify-items: flex-start;
-  flex: 1;
-  overflow-y: auto;
-}
+/*
+  files: {
+    marginLeft: 32,
+    alignItems: 'flex-start',
+    justifyItems: 'flex-start',
+    flex: 1,
+    overflowY: 'auto'
+  }
+
+
 
 .Actions {
   display: flex;
@@ -32,10 +48,6 @@
   margin-top: 32px;
 }
 
-.Title {
-  margin-bottom: 32px;
-  color: #555;
-}
 
 .Filename {
   display: flex;
@@ -98,3 +110,4 @@ button:disabled {
   background: rgb(189, 189, 189);
   cursor: default;
 }
+*/

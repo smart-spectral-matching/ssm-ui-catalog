@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import Dropzone from "../dropzone/Dropzone";
-//import "./Upload.css";
 import Progress from "../progress/Progress";
 import { Input, Grid, Segment, Label } from "semantic-ui-react";
+
+import uploadStyles from "./UploadStyles";
 
 import personSchema from "../../schemas/personSchema";
 import personUISchema from "../../schemas/personUISchema";
@@ -16,6 +17,8 @@ class Upload extends Component {
       uploadProgress: {},
       successfullUploaded: false
     };
+
+    this.styles = uploadStyles;
 
     this.onFilesAdded = this.onFilesAdded.bind(this);
     this.uploadFiles = this.uploadFiles.bind(this);
@@ -166,16 +169,16 @@ class Upload extends Component {
 
   render() {
     return (
-      <div className="Upload">
-        <span className="Title">Upload Files</span>
-        <div className="Content">
+      <div styles={this.styles.upload}>
+        <span tyle={this.styles.title}>Upload Files</span>
+        <div style={this.styles.content}>
           <div>
             <Dropzone
               onFilesAdded={this.onFilesAdded}
               disabled={this.state.uploading || this.state.successfullUploaded}
             />
           </div>
-          <div className="Files">
+          <div style={this.styles.files}>
             {this.state.files.map(file => {
               return (
                 <div key={file.fileObj.name} className="Row">
