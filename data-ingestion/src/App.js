@@ -7,6 +7,8 @@ import { SpectroscopyTypeDropdown } from "./selection/experimental/types/spectro
 import { AtomisticQuantumTypeDropdown } from "./selection/calculation/types/atomisticQuantum";
 import MainTabs from "./upload/main/MainTabs";
 
+import logoIcon from "../../images/logo.png";
+
 //import "semantic-ui-css/semantic.css";
 
 class App extends React.Component {
@@ -23,8 +25,8 @@ class App extends React.Component {
 
   renderDropDown = (title, dropdown) => {
     return (
-      <Form>
-        <Form.Field>
+      <Form key={title}>
+        <Form.Field key={title}>
           <Label key={title} color="red">{title}: </Label> {dropdown}
         </Form.Field>
       </Form>
@@ -120,7 +122,7 @@ class App extends React.Component {
     return (
       <div>
         <Header as="h2" icon textAlign="center">
-          <img src="logo.6023b87e.png" alt="" />
+          <img src={logoIcon} alt="" />
           Data Ingestion
           <Header.Subheader>
             Upload files from multi-method data sources
