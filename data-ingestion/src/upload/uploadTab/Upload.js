@@ -55,7 +55,7 @@ class Upload extends Component {
     const files = this.state.files;
     // files -> datasets
     const datasets = files.map(file => this.fakeRetrieveFile(file));
-    console.log("FakeRetrieveFiles Datasets:", datasets);
+    return datasets;
   }
 
   async uploadFiles() {
@@ -72,7 +72,8 @@ class Upload extends Component {
       // Not Production ready! Do some error handling here instead...
       this.setState({ successfullUploaded: true, uploading: false });
     }
-    this.fakeRetrieveFiles();
+    const newDatasets = this.fakeRetrieveFiles();
+    this.props.handleUpdateDatasets(newDatasets);
   }
 
   sendRequest(file) {

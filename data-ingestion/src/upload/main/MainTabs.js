@@ -2,7 +2,6 @@ import React from "react";
 import { Menu, Segment } from "semantic-ui-react";
 import Upload from "../uploadTab/Upload";
 import SciDataTabs from "../scidata-tabs/SciDataTabs";
-import * as Data from "../../constants/InitialDatasets";
 
 // Tabs
 class MainTabs extends React.Component {
@@ -12,12 +11,12 @@ class MainTabs extends React.Component {
     this.state = {
       activeItem: "File Upload",
       display: this.renderFileUpload(),
-      datasets: Data.initialDatasets
+      datasets: []
     };
 
     this.changeTab = this.changeTab.bind(this);
     this.updateDatasets = this.updateDatasets.bind(this);
-    this.addDataset = this.addDataset.bind(this);
+    this.renderSciDataTab = this.renderSciDataTab.bind(this);
     this.setState = this.setState.bind(this);
   }
 
@@ -30,22 +29,26 @@ class MainTabs extends React.Component {
     );
   }
 
-  renderFileUpload() {
+  renderFileUpload(datasets) {
     return (
       <div className="App">
         <div className="Card">
-          <Upload />
+          <Upload
+            datasets={datasets}
+            handleUpdateDatasets={this.updateDatasets}
+          />
         </div>
       </div>
     );
   }
 
   changeTab(name) {
+    const datasets = this.state.datasets;
     var display;
     if (name === "File Upload") {
-      display = this.renderFileUpload();
+      display = this.renderFileUpload(datasets);
     } else if (name === "SciData") {
-      display = this.renderSciDataTab([]);
+      display = this.renderSciDataTab(datasets);
     }
     this.setState({
       activeItem: name,
@@ -58,14 +61,6 @@ class MainTabs extends React.Component {
     this.setState({
       datasets: datasets,
       display: display
-    });
-  }
-
-  addDataset() {
-    const datasets = this.state.datasets;
-    datasets.push(Data.DatasetThree);
-    this.setState({
-      datasets: datasets
     });
   }
 
