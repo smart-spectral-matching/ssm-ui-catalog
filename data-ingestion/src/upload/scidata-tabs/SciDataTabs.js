@@ -7,22 +7,15 @@ import { getData } from "@jsonforms/core";
 import SciDataTab from "./SciDataTab";
 import SciDataTabPanel from "./SciDataTabPanel";
 
-import * as Data from "../../constants/InitialDatasets";
-
 // Tabs Component
 class SciDataTabs extends Component {
   constructor(props) {
     super(props);
 
-    const name = Data.DatasetOne.name;
-    const schema = Data.DatasetOne.schema;
-    const uischema = Data.DatasetOne.uischema;
-    const path = Data.DatasetOne.path;
-
     this.state = {
-      activeItem: name,
+      activeItem: "",
       childActiveItem: "Input",
-      childDisplay: this.renderJsonForm(schema, uischema, path)
+      childDisplay: this.renderJsonForm({}, {}, "")
     };
 
     this.defaultDisplay = <h1> </h1>;

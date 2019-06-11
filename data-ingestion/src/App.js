@@ -15,7 +15,9 @@ class App extends React.Component {
     this.state = {
       display: [this.renderMethodDropDown()],
       methodSelected: false,
-      techniqueSelected: false
+      techniqueSelected: false,
+      schema: {},
+      uischema: {}
     };
 
     this.handleMethodChange = this.handleMethodChange.bind(this);
@@ -74,9 +76,6 @@ class App extends React.Component {
   };
 
   handleTechniqueChange = value => {
-    console.log("handleTechniqueChange");
-    console.log(value);
-
     var newDisplay = this.state.display;
     if (value === "Spectroscopy") {
       newDisplay.push(
@@ -101,13 +100,21 @@ class App extends React.Component {
     });
   };
 
-  handleTypeChange = value => {
-    console.log(value);
+  handleTypeChange = (value, options) => {
+    console.log('handleTypeChange:', value, options);
+    const valueOptionsArray = options.filter(obj => obj.value === value);
+    const valueOptions = valueOptionsArray[0];
+    const schema = valueOptions.schema;
+    const uischema = valueOptions.uischema;
+
     var newDisplay = this.state.display;
     newDisplay.push(
       <div key={value}>
         {" "}
-        <MainTabs/>{" "}
+        <MainTabs
+          schema={schema}
+          uischema={uischema}
+        />{" "}
       </div>
     );
     this.setState({

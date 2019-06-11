@@ -1,7 +1,10 @@
 import React from "react";
+import { getSchema, Actions } from "@jsonforms/core";
 import { Menu, Segment } from "semantic-ui-react";
 import Upload from "../uploadTab/Upload";
 import SciDataTabs from "../scidata-tabs/SciDataTabs";
+
+import store from "../../store";
 
 // Tabs
 class MainTabs extends React.Component {
@@ -10,38 +13,18 @@ class MainTabs extends React.Component {
 
     this.setState = this.setState.bind(this);
     this.changeTab = this.changeTab.bind(this);
-    this.updateDatasets = this.updateDatasets.bind(this);
-    this.updateDatasetsSciDataTab = this.updateDatasetsSciDataTab.bind(this);
+    this.handleUpdateDatasets = this.handleUpdateDatasets.bind(this);
+    this.handleUpdateDatasetsSciDataTab = this.handleUpdateDatasetsSciDataTab.bind(
+      this
+    );
     this.renderSciDataTab = this.renderSciDataTab.bind(this);
-    this.renderFileUpload= this.renderFileUpload.bind(this);
+    this.renderFileUpload = this.renderFileUpload.bind(this);
 
     this.state = {
       activeItem: "File Upload",
       display: this.renderFileUpload([]),
       datasets: []
     };
-  }
-
-  renderSciDataTab(datasets) {
-    return (
-      <SciDataTabs
-        datasets={datasets}
-        handleUpdateDatasets={this.updateDatasetsSciDataTab}
-      />
-    );
-  }
-
-  renderFileUpload(datasets) {
-    return (
-      <div className="App">
-        <div className="Card">
-          <Upload
-            datasets={datasets}
-            handleUpdateDatasets={this.updateDatasets}
-          />
-        </div>
-      </div>
-    );
   }
 
   changeTab(name) {
@@ -58,13 +41,15 @@ class MainTabs extends React.Component {
     });
   }
 
-  updateDatasets(datasets) {
+  handleUpdateDatasets(datasets) {
+    console.log("handleUpdateDatasets")
+    const newDatasets = this.addFormForDatasets(datasets);
     this.setState({
-      datasets: datasets
+      datasets: newDatasets
     });
   }
 
-  updateDatasetsSciDataTab(datasets) {
+  handleUpdateDatasetsSciDataTab(datasets) {
     const display = this.renderSciDataTab(datasets);
     this.setState({
       datasets: datasets,
@@ -72,10 +57,70 @@ class MainTabs extends React.Component {
     });
   }
 
+  addFormForDatasets(datasets) {
+    console.log("addFormForDatasets", datasets)
+    var newDatasets = [];
+    for (var i = 0; i < datasets.length; i++) {
+      console.log("i", i, "dataset:", datasets[i])
+      newDatasets.push(this.addFormForDataset(datasets[i]));
+    }
+    console.log(newDatasets)
+    return newDatasets
+  }
+
+  addFormForDataset(dataset) {
+    var newDataset = dataset;
+    newDataset.schema = this.props.schema;
+    newDataset.uischema = this.props.uischema;
+    newDataset.path = dataset.name;
+
+    var schema = getSchema(store.getState());
+    console.log(schema)
+
+    // necessary to see if we defined a schema yet
+    if(schema.hasOwnProperty("properties")) {
+      schema.properties[newDataset.path] = newDataset.schema;
+    } else {
+      // Initialize store
+      const initSchema = {
+        type: "object",
+        properties: {
+          path: schema
+        }
+      };
+      store.dispatch(Actions.init({}, initSchema));
+    }
+    console.log(store.getState());
+    return newDataset
+  }
+
+  renderSciDataTab(datasets) {
+    return (
+      <SciDataTabs
+        datasets={datasets}
+        handleUpdateDatasets={this.handleUpdateDatasetsSciDataTab}
+      />
+    );
+  }
+
+  renderFileUpload(datasets) {
+    return (
+      <div className="App">
+        <div className="Card">
+          <Upload
+            datasets={datasets}
+            handleUpdateDatasets={this.handleUpdateDatasets}
+            schema={this.schema}
+            uischema={this.uischema}
+          />
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const activeItem = this.state.activeItem;
     const display = this.state.display;
-
     return (
       <div>
         <Menu tabular>
@@ -98,3 +143,12 @@ class MainTabs extends React.Component {
 }
 
 export default MainTabs;
+/*
+function mapDispatchToProps(dispatch) {
+  return({
+      sendTheAlert: () => {dispatch(ALERT_ACTION)}
+  })
+}
+
+export default connect(mapDispatchToProps)(MainTabs);
+*/

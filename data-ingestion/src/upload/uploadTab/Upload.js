@@ -6,10 +6,6 @@ import { Input, Grid, Segment, Label } from "semantic-ui-react";
 import uploadStyles from "./UploadStyles";
 import checkIconImage from "../../../images/baseline-check_circle_outline-24px.svg";
 
-import personSchema from "../../schemas/personSchema";
-import personUISchema from "../../schemas/personUISchema";
-import addressSchema from "../../schemas/addressSchema";
-import addressUISchema from "../../schemas/addressUISchema";
 import mergeStyles from "../../../utils/MergeStyles";
 
 class Upload extends Component {
@@ -38,8 +34,13 @@ class Upload extends Component {
 
   fakeRetrieveFile(file) {
     
+    // If name doesn't change, it is undefined
+    if(file['name'] === undefined) {
+      file['name'] = file['title']
+    }
+
     //TODO: gotta change this to be unique
-    file['name'] = file['title'];
+    /*
     if(file['title'] === 'argon.gr') {
       file["schema"] = personSchema;
       file["uischema"] = personUISchema;
@@ -49,6 +50,7 @@ class Upload extends Component {
       file["uischema"] = addressUISchema;
       file["path"] = "address"; 
     }
+    */
     return file;
   }
 
@@ -74,6 +76,7 @@ class Upload extends Component {
       this.setState({ successfullUploaded: true, uploading: false });
     }
     const newDatasets = this.fakeRetrieveFiles();
+    console.log("fakeRetrieveFiles", newDatasets)
     this.props.handleUpdateDatasets(newDatasets);
   }
 
@@ -169,7 +172,8 @@ class Upload extends Component {
       if (files[i].title === filename) {
         newFiles[i] = {
           fileObj: files[i].fileObj,
-          title: value
+          title: value,
+          name: filename
         };
       } else {
         newFiles[i] = files[i];
