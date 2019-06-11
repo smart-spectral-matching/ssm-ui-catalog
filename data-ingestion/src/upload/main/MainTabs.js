@@ -42,7 +42,6 @@ class MainTabs extends React.Component {
   }
 
   handleUpdateDatasets(datasets) {
-    console.log("handleUpdateDatasets")
     const newDatasets = this.addFormForDatasets(datasets);
     this.setState({
       datasets: newDatasets
@@ -58,13 +57,10 @@ class MainTabs extends React.Component {
   }
 
   addFormForDatasets(datasets) {
-    console.log("addFormForDatasets", datasets)
     var newDatasets = [];
     for (var i = 0; i < datasets.length; i++) {
-      console.log("i", i, "dataset:", datasets[i])
       newDatasets.push(this.addFormForDataset(datasets[i]));
     }
-    console.log(newDatasets)
     return newDatasets
   }
 
@@ -75,7 +71,6 @@ class MainTabs extends React.Component {
     newDataset.path = dataset.name;
 
     var schema = getSchema(store.getState());
-    console.log(schema)
 
     // necessary to see if we defined a schema yet
     if(schema.hasOwnProperty("properties")) {
@@ -90,7 +85,6 @@ class MainTabs extends React.Component {
       };
       store.dispatch(Actions.init({}, initSchema));
     }
-    console.log(store.getState());
     return newDataset
   }
 

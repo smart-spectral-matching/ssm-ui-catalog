@@ -76,7 +76,6 @@ class Upload extends Component {
       this.setState({ successfullUploaded: true, uploading: false });
     }
     const newDatasets = this.fakeRetrieveFiles();
-    console.log("fakeRetrieveFiles", newDatasets)
     this.props.handleUpdateDatasets(newDatasets);
   }
 

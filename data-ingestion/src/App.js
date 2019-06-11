@@ -101,7 +101,6 @@ class App extends React.Component {
   };
 
   handleTypeChange = (value, options) => {
-    console.log('handleTypeChange:', value, options);
     const valueOptionsArray = options.filter(obj => obj.value === value);
     const valueOptions = valueOptionsArray[0];
     const schema = valueOptions.schema;
