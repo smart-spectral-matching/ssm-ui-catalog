@@ -105,7 +105,7 @@ class App extends React.Component {
     console.log(value);
     var newDisplay = this.state.display;
     newDisplay.push(
-      <div>
+      <div key={value}>
         {" "}
         <MainTabs/>{" "}
       </div>
