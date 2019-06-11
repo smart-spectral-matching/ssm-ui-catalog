@@ -1,11 +1,11 @@
 {
-  "title": "Person",
+  "title": "X-ray (Emission)",
   "type": "object",
   "properties": {
     "firstName": { "type": "string" },
     "lastName": { "type": "string" },
     "age": {
-      "description": "Age in years",
+      "description": "Age in months",
       "type": "integer",
       "minimum": 0
     },
