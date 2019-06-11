@@ -8,23 +8,25 @@ class MainTabs extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      activeItem: "File Upload",
-      display: this.renderFileUpload(),
-      datasets: []
-    };
-
+    this.setState = this.setState.bind(this);
     this.changeTab = this.changeTab.bind(this);
     this.updateDatasets = this.updateDatasets.bind(this);
+    this.updateDatasetsSciDataTab = this.updateDatasetsSciDataTab.bind(this);
     this.renderSciDataTab = this.renderSciDataTab.bind(this);
-    this.setState = this.setState.bind(this);
+    this.renderFileUpload= this.renderFileUpload.bind(this);
+
+    this.state = {
+      activeItem: "File Upload",
+      display: this.renderFileUpload([]),
+      datasets: []
+    };
   }
 
   renderSciDataTab(datasets) {
     return (
       <SciDataTabs
         datasets={datasets}
-        handleUpdateDatasets={this.updateDatasets}
+        handleUpdateDatasets={this.updateDatasetsSciDataTab}
       />
     );
   }
@@ -57,6 +59,12 @@ class MainTabs extends React.Component {
   }
 
   updateDatasets(datasets) {
+    this.setState({
+      datasets: datasets
+    });
+  }
+
+  updateDatasetsSciDataTab(datasets) {
     const display = this.renderSciDataTab(datasets);
     this.setState({
       datasets: datasets,

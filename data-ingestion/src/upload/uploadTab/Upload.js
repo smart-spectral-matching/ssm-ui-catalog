@@ -39,6 +39,7 @@ class Upload extends Component {
   fakeRetrieveFile(file) {
     
     //TODO: gotta change this to be unique
+    file['name'] = file['title'];
     if(file['title'] === 'argon.gr') {
       file["schema"] = personSchema;
       file["uischema"] = personUISchema;

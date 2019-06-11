@@ -75,10 +75,10 @@ class SciDataTabs extends Component {
   }
 
   renderJsonForm(dataset) {
-    console.log("Datasets:", this.props.datasets)
     return (
       <div>
         <JsonForms
+          key={dataset.name}
           schema={dataset.schema}
           uischema={dataset.uischema}
           path={dataset.path}
