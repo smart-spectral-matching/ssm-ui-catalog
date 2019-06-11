@@ -2,54 +2,55 @@ import React from "react";
 import { Menu, Segment } from "semantic-ui-react";
 import Upload from "../uploadTab/Upload";
 import SciDataTabs from "../scidata-tabs/SciDataTabs";
-import * as Data from "../../constants/InitialDatasets";
 
 // Tabs
 class MainTabs extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      activeItem: "File Upload",
-      display: this.renderFileUpload(),
-      datasets: Data.initialDatasets
-    };
-
+    this.setState = this.setState.bind(this);
     this.changeTab = this.changeTab.bind(this);
     this.updateDatasets = this.updateDatasets.bind(this);
-    this.addDataset = this.addDataset.bind(this);
-    this.setState = this.setState.bind(this);
+    this.updateDatasetsSciDataTab = this.updateDatasetsSciDataTab.bind(this);
+    this.renderSciDataTab = this.renderSciDataTab.bind(this);
+    this.renderFileUpload= this.renderFileUpload.bind(this);
+
+    this.state = {
+      activeItem: "File Upload",
+      display: this.renderFileUpload([]),
+      datasets: []
+    };
   }
 
   renderSciDataTab(datasets) {
     return (
       <SciDataTabs
         datasets={datasets}
-        handleUpdateDatasets={this.updateDatasets}
+        handleUpdateDatasets={this.updateDatasetsSciDataTab}
       />
     );
   }
 
-  renderFileUploadOld() {
-    return <button onClick={this.addDataset}> Add Dataset 3</button>;
-  }
-
-  renderFileUpload() {
+  renderFileUpload(datasets) {
     return (
       <div className="App">
         <div className="Card">
-          <Upload />
+          <Upload
+            datasets={datasets}
+            handleUpdateDatasets={this.updateDatasets}
+          />
         </div>
       </div>
     );
   }
 
   changeTab(name) {
+    const datasets = this.state.datasets;
     var display;
     if (name === "File Upload") {
-      display = this.renderFileUpload();
+      display = this.renderFileUpload(datasets);
     } else if (name === "SciData") {
-      display = this.renderSciDataTab(this.state.datasets);
+      display = this.renderSciDataTab(datasets);
     }
     this.setState({
       activeItem: name,
@@ -58,18 +59,16 @@ class MainTabs extends React.Component {
   }
 
   updateDatasets(datasets) {
+    this.setState({
+      datasets: datasets
+    });
+  }
+
+  updateDatasetsSciDataTab(datasets) {
     const display = this.renderSciDataTab(datasets);
     this.setState({
       datasets: datasets,
       display: display
-    });
-  }
-
-  addDataset() {
-    const datasets = this.state.datasets;
-    datasets.push(Data.DatasetThree);
-    this.setState({
-      datasets: datasets
     });
   }
 

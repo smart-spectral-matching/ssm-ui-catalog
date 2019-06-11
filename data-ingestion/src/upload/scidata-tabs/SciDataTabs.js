@@ -6,7 +6,6 @@ import { getData } from "@jsonforms/core";
 
 import SciDataTab from "./SciDataTab";
 import SciDataTabPanel from "./SciDataTabPanel";
-//import "semantic-ui-css/semantic.min.css";
 
 import * as Data from "../../constants/InitialDatasets";
 
@@ -79,6 +78,7 @@ class SciDataTabs extends Component {
     return (
       <div>
         <JsonForms
+          key={dataset.name}
           schema={dataset.schema}
           uischema={dataset.uischema}
           path={dataset.path}
@@ -95,6 +95,7 @@ class SciDataTabs extends Component {
   renderActiveTabPanel() {
     const activeItem = this.state.activeItem;
     const datasets = this.props.datasets;
+    if(datasets.length == 0) return;
     const activeDatasetArray = datasets.filter(obj => activeItem === obj.name);
     const dataset = activeDatasetArray[0];
 

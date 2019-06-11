@@ -8,6 +8,8 @@ import checkIconImage from "../../../images/baseline-check_circle_outline-24px.s
 
 import personSchema from "../../schemas/personSchema";
 import personUISchema from "../../schemas/personUISchema";
+import addressSchema from "../../schemas/addressSchema";
+import addressUISchema from "../../schemas/addressUISchema";
 import mergeStyles from "../../../utils/MergeStyles";
 
 class Upload extends Component {
@@ -35,9 +37,18 @@ class Upload extends Component {
   }
 
   fakeRetrieveFile(file) {
-    file["schema"] = personSchema;
-    file["uischema"] = personUISchema;
-    file["path"] = "person"; //TODO: gotta change this to be unique
+    
+    //TODO: gotta change this to be unique
+    file['name'] = file['title'];
+    if(file['title'] === 'argon.gr') {
+      file["schema"] = personSchema;
+      file["uischema"] = personUISchema;
+      file["path"] = "person"; 
+    } else {
+      file["schema"] = addressSchema;
+      file["uischema"] = addressUISchema;
+      file["path"] = "address"; 
+    }
     return file;
   }
 
@@ -45,7 +56,7 @@ class Upload extends Component {
     const files = this.state.files;
     // files -> datasets
     const datasets = files.map(file => this.fakeRetrieveFile(file));
-    console.log(datasets);
+    return datasets;
   }
 
   async uploadFiles() {
@@ -62,7 +73,8 @@ class Upload extends Component {
       // Not Production ready! Do some error handling here instead...
       this.setState({ successfullUploaded: true, uploading: false });
     }
-    this.fakeRetrieveFiles();
+    const newDatasets = this.fakeRetrieveFiles();
+    this.props.handleUpdateDatasets(newDatasets);
   }
 
   sendRequest(file) {
