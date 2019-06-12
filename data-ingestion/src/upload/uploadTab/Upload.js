@@ -33,24 +33,13 @@ class Upload extends Component {
   }
 
   fakeRetrieveFile(file) {
+    // Remove "bad" characters
+    file['title'] = file['title'].replace(".", "_")
     
     // If name doesn't change, it is undefined
     if(file['name'] === undefined) {
       file['name'] = file['title']
     }
-
-    //TODO: gotta change this to be unique
-    /*
-    if(file['title'] === 'argon.gr') {
-      file["schema"] = personSchema;
-      file["uischema"] = personUISchema;
-      file["path"] = "person"; 
-    } else {
-      file["schema"] = addressSchema;
-      file["uischema"] = addressUISchema;
-      file["path"] = "address"; 
-    }
-    */
     return file;
   }
 
