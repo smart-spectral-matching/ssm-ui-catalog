@@ -137,12 +137,4 @@ class MainTabs extends React.Component {
 }
 
 export default MainTabs;
-/*
-function mapDispatchToProps(dispatch) {
-  return({
-      sendTheAlert: () => {dispatch(ALERT_ACTION)}
-  })
-}
 
-export default connect(mapDispatchToProps)(MainTabs);
-*/
