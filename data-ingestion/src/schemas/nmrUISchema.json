@@ -1,17 +1,17 @@
 {
   "type": "Group",
-  "label": "Person",
+  "label": "NMR",
   "elements": [
     {
       "type": "HorizontalLayout",
       "elements": [
         {
           "type": "Control",
-          "scope": "#/properties/firstName"
+          "scope": "#/properties/addressId"
         },
         {
           "type": "Control",
-          "scope": "#/properties/lastName"
+          "scope": "#/properties/street"
         }
       ]
     },
@@ -20,11 +20,11 @@
       "elements": [
         {
           "type": "Control",
-          "scope": "#/properties/age"
+          "scope": "#/properties/city"
         },
         {
           "type": "Control",
-          "scope": "#/properties/shippingAddress"
+          "scope": "#/properties/zipCode"
         }
       ]
     }

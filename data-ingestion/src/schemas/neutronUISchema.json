@@ -1,17 +1,17 @@
 {
   "type": "Group",
-  "label": "Address",
+  "label": "Neutron",
   "elements": [
     {
       "type": "HorizontalLayout",
       "elements": [
         {
           "type": "Control",
-          "scope": "#/properties/addressId"
+          "scope": "#/properties/firstName"
         },
         {
           "type": "Control",
-          "scope": "#/properties/street"
+          "scope": "#/properties/lastName"
         }
       ]
     },
@@ -20,11 +20,11 @@
       "elements": [
         {
           "type": "Control",
-          "scope": "#/properties/city"
+          "scope": "#/properties/age"
         },
         {
           "type": "Control",
-          "scope": "#/properties/zipCode"
+          "scope": "#/properties/shippingAddress"
         }
       ]
     }
