@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Grid, Menu, Button } from "semantic-ui-react";
 import { JsonForms } from "@jsonforms/react";
@@ -26,6 +27,30 @@ class SciDataTabs extends Component {
     this.renderTabFromDataset = this.renderTabFromDataset.bind(this);
     this.renderTabs = this.renderTabs.bind(this);
   }
+
+  static propTypes = {
+    datasets: PropTypes.arrayOf(
+      PropTypes.shape({
+        fileObj: PropTypes.instanceOf(File),
+        fileType: PropTypes.string,
+        name: PropTypes.string,
+        path: PropTypes.string,
+        title: PropTypes.string,
+        schema: PropTypes.shape({
+          properties: PropTypes.object,
+          title: PropTypes.string,
+          type: PropTypes.string
+        }),
+        uischema: PropTypes.shape({
+          elements: PropTypes.arrayOf(PropTypes.object),
+          label: PropTypes.string,
+          type: PropTypes.string
+
+        })
+      })
+    ),
+    handleUpdateDatasets: PropTypes.func
+  };
 
   changeTab(tabName) {
     this.setState({
