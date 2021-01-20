@@ -35,6 +35,8 @@ Removing dependencies: `yarn remove <dependency>`
 
 If you want to customize values for your own dev environment, create a file called `.env.local.development`
 
+The application is available on `localhost:3000` by default and should refresh if you change files, even if you run the application in Docker.
+
 ## Testing
 
 `yarn test` runs the Jest unit tests.
