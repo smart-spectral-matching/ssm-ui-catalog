@@ -39,7 +39,7 @@ yarntest_lint:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run assert-no-warnings"
+    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn run assert-no-warnings"
   after_script:
     - docker stop $NODE_IMAGE_NAME
     - docker rm $NODE_IMAGE_NAME
@@ -55,7 +55,7 @@ yarntest_jest:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn test"
+    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn test"
   after_script:
     - docker stop $NODE_IMAGE_NAME
     - docker rm $NODE_IMAGE_NAME
