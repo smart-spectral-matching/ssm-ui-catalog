@@ -23,7 +23,7 @@ The Docker environment will include `git`, please commit from there so the forma
 
 ## Adding dependencies
 
-`yarn add <dependency>` or `yarn add -D <dependency>`
+`yarn add <dependency>` (dependencies) or `yarn add -D <dependency>` (devDependencies)
 
 Note that it doesn't strictly matter whether a dependency is `dev` or not when packaging for a static website, but it's best to put development tools in `devDependencies` and application tools in `dependencies` for organizational purposes anyways. `react-scripts` is the one exception to this.
 
@@ -39,9 +39,7 @@ The application is available on `localhost:3000` by default and should refresh i
 
 ## Testing
 
-`yarn test` runs the Jest unit tests.
-
-If you want to customize values for your own dev environment, create a file called `.env.local.test`
+`yarn test` runs the Jest unit tests. All Jest unit tests should go in `src/__tests__`
 
 ## Using NGINX environment
 

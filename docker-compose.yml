@@ -16,7 +16,7 @@ services:
       # note that if you are using Docker, do not set PORT in any env file.
       - '3000:3000'
       # websocket port
-      - '35729:35729'
+      #- '35729:35729'
     # this is needed so `yarn start` can open the browser
     stdin_open: true
     tty: true
