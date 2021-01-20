@@ -6,6 +6,8 @@ node_modules
 /.pnp
 .pnp.js
 .cache
+# only allow Yarn lockfiles to be checked in
+package-lock.json
 
 # testing
 */coverage
@@ -15,6 +17,7 @@ build
 dist
 */build
 */dist
+.ci/build
 
 # misc
 .DS_Store
@@ -26,8 +29,11 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
 
+*.sublime*
 .vscode
+.eslintcache
 
 # coverage report
 coverage/
