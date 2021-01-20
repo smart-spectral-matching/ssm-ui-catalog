@@ -39,7 +39,7 @@ yarntest_lint:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn run assert-no-warnings"
+    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run assert-no-warnings"
   after_script:
     - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
@@ -54,7 +54,7 @@ yarntest_jest:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn test"
+    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn test"
   after_script:
     - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
