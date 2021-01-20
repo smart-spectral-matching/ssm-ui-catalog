@@ -1,9 +1,9 @@
 import React from 'react';
 import {render, screen} from '@testing-library/react';
-import Home from 'components/Home';
+import Footer from 'components/layout/Footer';
 
-test('renders Home component', () => {
-  render(<Home />);
+test('Footer text contains title', () => {
+  render(<Footer />);
   const linkElement = screen.getByText(/nuclear data\s?streams/i);
   expect(linkElement).toBeInTheDocument();
 });
