@@ -1,0 +1,21 @@
+# This file is only for local developers, and should really only be used if you don't want to install node/yarn on your machine
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    image: datastreams-fe-node # don't push this image, for local caching only
+    container_name: datastreams-fe-node
+    restart: unless-stopped
+    ports:
+      # note that if you are using Docker, do not set PORT in any env file.
+      - '3000:3000'
+    # this is needed so `yarn start` can open the browser
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/usr/local/src
+      - /usr/local/src/node_modules
+      - /usr/local/src/build
