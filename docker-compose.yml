@@ -9,9 +9,14 @@ services:
     image: datastreams-fe-node # don't push this image, for local caching only
     container_name: datastreams-fe-node
     restart: unless-stopped
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
     ports:
+      # main application port
       # note that if you are using Docker, do not set PORT in any env file.
       - '3000:3000'
+      # websocket port
+      #- '35729:35729'
     # this is needed so `yarn start` can open the browser
     stdin_open: true
     tty: true
