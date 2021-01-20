@@ -2,6 +2,7 @@ import React from 'react';
 
 import LOGO from 'assets/logo.png';
 import './Header.scss';
+import {RouteHref} from 'types/routes';
 
 const Header = () => {
   return (
@@ -9,7 +10,7 @@ const Header = () => {
       <div className="nav-wrapper">
         <div className="row">
           <div className="col s1">
-            <a href="/" className="brand-logo">
+            <a href={RouteHref.HOME} className="brand-logo">
               <img src={LOGO} alt="Brand logo" />
             </a>
           </div>

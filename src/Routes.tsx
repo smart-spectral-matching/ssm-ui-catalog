@@ -8,6 +8,7 @@ import ResultsDatasets from 'components/ResultsDatasets';
 import ErrorBoundary from 'components/shared/ErrorBoundary';
 import ErrorBoundaryRoute from 'components/shared/ErrorBoundaryRoute';
 import PageNotFound from 'components/shared/PageNotFound';
+import {RouteHref} from 'types/routes';
 
 const Routes = () => {
   return (
@@ -15,10 +16,10 @@ const Routes = () => {
       {/* TODO: manage Header here instead of inside each component? */}
       <ErrorBoundary>
         <Switch>
-          <ErrorBoundaryRoute path="/" exact component={Home} />
-          <ErrorBoundaryRoute path="/detail" component={Detail} />
-          <ErrorBoundaryRoute path="/detail-sample" component={() => <Detail isSample />} />
-          <ErrorBoundaryRoute path="/results-datasets" component={ResultsDatasets} />
+          <ErrorBoundaryRoute path={RouteHref.HOME} exact component={Home} />
+          <ErrorBoundaryRoute path={RouteHref.DETAIL_DATASET} component={Detail} />
+          <ErrorBoundaryRoute path={RouteHref.DETAIL_SAMPLE} component={() => <Detail isSample />} />
+          <ErrorBoundaryRoute path={RouteHref.RESULTS} component={ResultsDatasets} />
           <ErrorBoundaryRoute component={PageNotFound} />
         </Switch>
       </ErrorBoundary>

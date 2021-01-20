@@ -3,6 +3,7 @@ import {nanoid} from 'nanoid';
 
 import LOGO from 'assets/logo.png';
 import './index.scss';
+import {RouteHref} from 'types/routes';
 
 const ResultsDatasetLinks = () => {
   const elements = ['Helium', 'Nitrogen', 'Argon', 'Iron', 'Germanium'];
@@ -10,7 +11,7 @@ const ResultsDatasetLinks = () => {
     <>
       {elements.map((ele) => (
         <li key={nanoid()}>
-          <a href="results-datasets" className="red-text text-darken-4">
+          <a href={RouteHref.RESULTS} className="red-text text-darken-4">
             {ele}
           </a>
         </li>

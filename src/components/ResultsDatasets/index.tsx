@@ -5,6 +5,7 @@ import {nanoid} from 'nanoid';
 import H20 from 'assets/h20.jpeg';
 import Header from 'components/layout/Header';
 import './index.scss';
+import {RouteHref} from 'types/routes';
 
 enum FilterState {
   ALL = 'All',
@@ -43,7 +44,7 @@ const LoremIpsumCard = (props: {isSample?: boolean; filter: FilterState}) => {
     (!props.isSample && props.filter === FilterState.DATASETS);
   if (!isVisible) return <></>;
 
-  const example = props.isSample ? {url: 'detail-sample', display: 'Sample'} : {url: 'detail', display: 'Dataset'};
+  const example = props.isSample ? {url: RouteHref.DETAIL_SAMPLE, display: 'Sample'} : {url: RouteHref.DETAIL_DATASET, display: 'Dataset'};
 
   return (
     <div className="card horizontal">
