@@ -1,9 +1,5 @@
 import React, {ErrorInfo} from 'react';
 
-interface IErrorBoundaryProps {
-  readonly children: JSX.Element | JSX.Element[];
-}
-
 interface IErrorBoundaryState {
   error?: Error;
   errorInfo?: ErrorInfo;
@@ -17,8 +13,8 @@ interface IErrorBoundaryState {
  *
  * NOTE: Since 'ComponentDidCatch' is not implemented in React FunctionalComponents, and since we are using a paired-down version of MobX which only uses FunctionComponents, there may be some issues when dealing with Observers.
  */
-class ErrorBoundary extends React.Component<IErrorBoundaryProps, IErrorBoundaryState> {
-  constructor(props: IErrorBoundaryProps) {
+class ErrorBoundary extends React.Component<{}, IErrorBoundaryState> {
+  constructor(props: {}) {
     super(props);
     this.state = {error: undefined, errorInfo: undefined};
   }
