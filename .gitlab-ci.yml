@@ -26,8 +26,8 @@ yarninstall:
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
   after_script:
+    - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
-    - sudo docker rmi -f $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM || true
   tags:
     - rse-nds-builder
 
@@ -39,10 +39,9 @@ yarntest_lint:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn run assert-no-warnings"
+    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn run assert-no-warnings"
   after_script:
-    - docker stop $NODE_IMAGE_NAME
-    - docker rm $NODE_IMAGE_NAME
+    - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
   tags:
     - rse-nds-builder
@@ -55,10 +54,9 @@ yarntest_jest:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn test"
+    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM node -c "yarn test"
   after_script:
-    - docker stop $NODE_IMAGE_NAME
-    - docker rm $NODE_IMAGE_NAME
+    - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
   tags:
     - rse-nds-builder
@@ -73,10 +71,9 @@ yarnbuild:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME -v $PWD:$DOCKER_APP_WORKDIR $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run build"
+    - docker run $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run build"
   after_script:
-    - docker stop $NODE_IMAGE_NAME
-    - docker rm $NODE_IMAGE_NAME
+    - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
   tags:
     - rse-nds-builder
@@ -92,8 +89,8 @@ yarnbuild:
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM
   after_script:
+    - func_rse_docker_cleanup
     - sudo chown -R gitlab-runner .
-    - sudo docker rmi -f $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM || true
 
 nginxbuild-nossl:
   stage: nginxbuild
