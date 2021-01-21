@@ -20,7 +20,6 @@ after_script:
 
 nodebuild:
   stage: nodebuild
-  extends: .default-cleanups
   script:
     - func_rse_docker_cleanup
     - docker build -f Dockerfile.node --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM .
@@ -31,7 +30,6 @@ nodebuild:
 
 test_lint:
   stage: test
-  extends: .default-cleanups
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -42,7 +40,6 @@ test_lint:
 
 test_jest:
   stage: test
-  extends: .default-cleanups
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -52,7 +49,6 @@ test_jest:
     - rse-nds-builder
 
 .nginxbuild:
-  extends: .default-cleanups
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
