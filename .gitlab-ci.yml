@@ -14,12 +14,12 @@ variables:
   NODE_IMAGE_NAME: 'datastreams-fe-node'
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
-default:
-  before_script:
-    - func_rse_docker_cleanup
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
+before_script:
+  - func_rse_docker_cleanup
+
+after_script:
+  - func_rse_docker_cleanup
+  - sudo chown -R gitlab-runner .
 
 nodebuild:
   stage: nodebuild
