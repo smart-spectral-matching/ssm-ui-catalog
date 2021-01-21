@@ -14,17 +14,15 @@ variables:
   NODE_IMAGE_NAME: 'datastreams-fe-node'
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
-.default-cleanups:
-  before_script:
-    - func_rse_docker_cleanup
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
+after_script:
+  - func_rse_docker_cleanup
+  - sudo chown -R gitlab-runner .
 
 nodebuild:
   stage: nodebuild
   extends: .default-cleanups
   script:
+    - func_rse_docker_cleanup
     - docker build -f Dockerfile.node --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM .
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
@@ -35,6 +33,7 @@ test_lint:
   stage: test
   extends: .default-cleanups
   script:
+    - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run assert-no-warnings"
@@ -45,6 +44,7 @@ test_jest:
   stage: test
   extends: .default-cleanups
   script:
+    - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn test"
@@ -54,6 +54,7 @@ test_jest:
 .nginxbuild:
   extends: .default-cleanups
   script:
+    - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM -v $PWD:$DOCKER_APP_WORKDIR sh -c "yarn run build"
