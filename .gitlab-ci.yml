@@ -1,96 +1,62 @@
 stages:
-  - yarninstall
-  - yarntest
-  - yarnbuild
+  - nodebuild
+  - test
   - nginxbuild
 
 include:
-    remote: https://code.ornl.gov/rse-deployment/rse-sharables/raw/master/.gitlab-ci-before_script.yml
-
+  remote: https://code.ornl.gov/rse-deployment/rse-sharables/raw/master/.gitlab-ci-before_script.yml
 
 variables:
   V_NUM: '0.0.1' # TODO probably a way to get this from package.json instead
-  REGISTRY: "code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui"
-  NODE_URL: "${REGISTRY}/node"
-  NGINX_URL: "${REGISTRY}/nginx"
+  REGISTRY: 'code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui'
+  NODE_URL: '${REGISTRY}/node'
+  NGINX_URL: '${REGISTRY}/nginx'
   NODE_IMAGE_NAME: 'datastreams-fe-node'
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
-yarninstall:
-  stage: yarninstall
-  artifacts:
-    untracked: true
-  script:
+default:
+  before_script:
     - func_rse_docker_cleanup
+  after_script:
+    - func_rse_docker_cleanup
+    - sudo chown -R gitlab-runner .
+
+nodebuild:
+  stage: nodebuild
+  script:
     - docker build -f Dockerfile.node --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM .
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
   tags:
     - rse-nds-builder
 
-yarntest_lint:
-  stage: yarntest
-  dependencies:
-    - yarninstall
+test_lint:
+  stage: test
   script:
-    - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run assert-no-warnings"
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
   tags:
     - rse-nds-builder
 
-yarntest_jest:
-  stage: yarntest
-  dependencies:
-    - yarninstall
+test_jest:
+  stage: test
   script:
-    - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn test"
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
-  tags:
-    - rse-nds-builder
-
-yarnbuild:
-  stage: yarnbuild
-  artifacts:
-    untracked: true
-  dependencies:
-    - yarninstall
-  script:
-    - func_rse_docker_cleanup
-    - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run build"
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
   tags:
     - rse-nds-builder
 
 .nginxbuild:
-  dependencies:
-    - yarnbuild
   script:
-    # move the build artifact to .ci/ so the docker build context doesn't have to be so large
-    - mv build/ .ci/build
-    - func_rse_docker_cleanup
-    - docker build -f .ci/Dockerfile.nginx --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM .ci/
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM -v $PWD:$DOCKER_APP_WORKDIR sh -c "yarn run build"
+    - sudo chown -R gitlab-runner build
+    - mv build/ .ci/build
+    - docker build -f .ci/Dockerfile.nginx --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM .ci/
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM
-  after_script:
-    - func_rse_docker_cleanup
-    - sudo chown -R gitlab-runner .
 
 nginxbuild-nossl:
   stage: nginxbuild
