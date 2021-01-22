@@ -53,9 +53,9 @@ test_jest:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM -v $PWD:$DOCKER_APP_WORKDIR sh -c "yarn run build"
-    - sudo chown -R gitlab-runner build
-    - mv build/ .ci/build
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run build"
+    - sudo rm -rf .ci/build || true
+    - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
     - docker build -f .ci/Dockerfile.nginx --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM .ci/
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM
 
