@@ -90,7 +90,7 @@ function run() {
     } else if (!argv.silent) {
       generateOutput(output);
     }
-    process.exit(!errorOutput || !getExitCode(code));
+    process.exit(errorOutput || !getExitCode(code));
   });
 }
 

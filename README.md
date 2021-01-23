@@ -15,7 +15,7 @@ Make sure that you build before committing, because the formatter/linter relies 
 
 ## Building with Docker
 
-You can either use the `docker-compose.yml` file provided, i.e. `docker-compose up -d`, or build images yourself from `Dockerfile.node` .
+You can either use the `docker-compose.yml` file provided, i.e. `docker-compose up -d --build` , or build images yourself from `Dockerfile.node` .
 
 Note: Running from docker-compose will use `node_modules` and `build` as volumes, use `docker-compose down` with the `-v` flag to get rid of them.
 

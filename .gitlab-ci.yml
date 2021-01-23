@@ -34,6 +34,7 @@ test_audit:
   variables:
     AUDIT_OUTFILE: 'audit-report.txt'
   artifacts:
+    when: always
     paths:
       - audit-report.txt
   script:
