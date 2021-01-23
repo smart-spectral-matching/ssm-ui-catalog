@@ -9,7 +9,7 @@ ENV CI=${ci}
 WORKDIR /usr/local/src
 
 # install git if not in "CI" mode, because we want Docker users to use our pre-commit Husky hook (NPM dependency) as well
-RUN [ -z "$CI" ] && apk add --no-cache git
+RUN if [ -z "$CI" ] ; then apk add --no-cache git ; fi
 
 # Run the next two lines first, so that we can save Docker cache as long as we don't change dependencies
 COPY package.json .
