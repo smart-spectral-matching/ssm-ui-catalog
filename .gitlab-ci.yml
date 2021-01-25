@@ -28,6 +28,23 @@ nodebuild:
   tags:
     - rse-nds-builder
 
+# fail if auditing returns 'high' or 'critical' vulnerabilities, report all vulnerabilities
+test_audit:
+  stage: test
+  variables:
+    AUDIT_OUTFILE: 'audit-report.txt'
+  artifacts:
+    when: always
+    paths:
+      - audit-report.txt
+  script:
+    - func_rse_docker_cleanup
+    - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "bin/audit.js -l high" > $AUDIT_OUTFILE
+  tags:
+    - rse-nds-builder
+
 test_lint:
   stage: test
   script:

@@ -17,7 +17,7 @@ COPY yarn.lock .
 
 # Since this is strictly a static app (+ how react-scripts work), do not use the --production flag
 # CI/CD needs several additional flags, most importantly --frozen-lockfile
-RUN if [ -n "$CI" ] ; then yarn --non-interactive --no-progress --frozen-lockfile --audit ; else yarn --non-interactive ; fi
+RUN if [ -n "$CI" ] ; then yarn --non-interactive --no-progress --frozen-lockfile ; else yarn --non-interactive ; fi
 
 # add `node_modules/.bin` to $PATH for CI/CD
 ENV PATH /usr/local/src/node_modules/.bin:$PATH

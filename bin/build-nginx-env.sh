@@ -9,7 +9,7 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-cd "$(dirname "$0")" || exit 1
+cd "$(dirname "$0")/.." || exit 1
 
 if [ ! -d "build" ] ; then
     echo "Error: no build output exists. Run 'yarn run build' to generate build output"

@@ -15,7 +15,7 @@ Make sure that you build before committing, because the formatter/linter relies 
 
 ## Building with Docker
 
-You can either use the `docker-compose.yml` file provided, i.e. `docker-compose up -d`, or build images yourself from `Dockerfile.node` .
+You can either use the `docker-compose.yml` file provided, i.e. `docker-compose up -d --build` , or build images yourself from `Dockerfile.node` .
 
 Note: Running from docker-compose will use `node_modules` and `build` as volumes, use `docker-compose down` with the `-v` flag to get rid of them.
 
@@ -41,11 +41,17 @@ The application is available on `localhost:3000` by default and should refresh i
 
 `yarn test` runs the Jest unit tests. All Jest unit tests should go in `src/__tests__`
 
+### Auditing
+
+Currently, any dependency which has a `high` or `critical` severity level from `yarn audit` will fail CI/CD. (If you get a `critical` severity level, your computer may be compromised)
+
+If you have both NPM and Yarn installed, you can try running `bin/audit-fix.sh` to update some of the audit dependencies automatically.
+
 ## Using NGINX environment
 
 To test the program in a fake production environment (for example: Content-Security-Policy):
 
 -   `yarn run build` (can be done in or out of the Docker environment)
 -   (if you are in a Docker environment, exit it here)
--   `./build-nginx-env.sh`
+-   `bin/build-nginx-env.sh`
 -   `docker run [OPTIONS] datastreams-fe-nginx [COMMAND] [ARG...]`
