@@ -71,7 +71,7 @@ test_jest:
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
     # update the .env file with environment variables before running 'build'
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "sed -i "s|^[[:space:]]*REACT_APP_API_URL[[:space:]]*=.*|REACT_APP_API_URL=${API_URL}|g" .env && sed -i "s|\"\.\"|$DOMAIN" public/manifest.json && yarn run build"
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "sed -i "s|^[[:space:]]*REACT_APP_API_URL[[:space:]]*=.*|REACT_APP_API_URL=${API_URL}|g" .env && sed -i "s|\"\.\"|https://$DOMAIN" public/manifest.json && yarn run build"
     - sudo rm -rf .ci/build || true
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
     # replace the 'example.com' placeholder in the nginx-config website file with the actual domain
