@@ -5,7 +5,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.node
+      dockerfile: node.Dockerfile
     image: datastreams-fe-node # don't push this image, for local caching only
     container_name: datastreams-fe-node
     restart: unless-stopped

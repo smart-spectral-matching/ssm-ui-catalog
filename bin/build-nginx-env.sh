@@ -19,6 +19,6 @@ fi
 rm -rf .ci/build || true
 # TODO sloppy handling for Docker users' volumes
 mv build .ci/build || { sudo chown -R "$USERNAME" . && mv build .ci/build; }
-docker build -f .ci/Dockerfile.nginx -t datastreams-fe-nginx .ci
+docker build -f .ci/nginx.Dockerfile -t datastreams-fe-nginx .ci
 echo "You can now run 'docker run [OPTIONS] datastreams-fe-nginx:latest [COMMAND] [ARG...]'"
 echo "One flag you will probably want to include is '-p 80:80'"

@@ -22,7 +22,7 @@ nodebuild:
   stage: nodebuild
   script:
     - func_rse_docker_cleanup
-    - docker build -f Dockerfile.node --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM .
+    - docker build -f node.Dockerfile --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM .
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
   tags:
@@ -70,29 +70,49 @@ test_jest:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run build"
+    # update the .env file with environment variables before running 'build'
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "sed -i "s|^[[:space:]]*REACT_APP_API_URL[[:space:]]*=.*|REACT_APP_API_URL=${API_URL}|g" .env && yarn run build"
     - sudo rm -rf .ci/build || true
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
-    - docker build -f .ci/Dockerfile.nginx --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM .ci/
+    # replace the 'example.com' placeholder in the nginx-config website file with the actual domain
+    - sed -i "s|example\.com|$DOMAIN|g" .ci/$DEFAULT_NGINX_CONF
+    # replace the 'connect-src' domain in Content-Security-Policy with the api-url
+    - sed -i "s|http:\/\/ssm-dev\.ornl\.gov:8080|$API_URL|g" .ci/nginx-conf/security.conf
+    - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM .ci/
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM
 
-nginxbuild-nossl:
+nginxbuild-dev:
   stage: nginxbuild
   extends: .nginxbuild
   variables:
     DEFAULT_NGINX_CONF: 'default-nossl.conf'
+    API_URL: 'http://ssm-dev.ornl.gov:8080'
+    DOMAIN: 'ssm-dev.ornl.gov'
   only:
     - dev
   tags:
     - rse-nds-builder
 
-nginxbuild-ssl:
+nginxbuild-qa:
   stage: nginxbuild
   extends: .nginxbuild
   variables:
     DEFAULT_NGINX_CONF: 'default-ssl.conf'
+    API_URL: 'https://ssm-qa.ornl.gov:8080'
+    DOMAIN: 'ssm-qa.ornl.gov'
   only:
     - qa
+  tags:
+    - rse-nds-builder
+
+nginxbuild-prod:
+  stage: nginxbuild
+  extends: .nginxbuild
+  variables:
+    DEFAULT_NGINX_CONF: 'default-ssl.conf'
+    API_URL: 'https://ssm.ornl.gov:8080'
+    DOMAIN: 'ssm.ornl.gov'
+  only:
     - master
   tags:
     - rse-nds-builder

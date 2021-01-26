@@ -2,9 +2,9 @@
 # the docker build context should be the .ci/ directory, not the project root
 FROM nginx:stable-alpine
 
-# developers should just use the default, CI needs to change if it is using SSL/TLS
+# developers should just use the default, CI needs to change for named domains + SSL/TLS
 # if you want to use HTTPS locally, you're on your own for now
-ARG DEFAULT_NGINX_CONF=default-nossl.conf
+ARG DEFAULT_NGINX_CONF=default-localhost.conf
 
 # get rid of all the default HTML and NGINX files, we won't be needing them
 # note that /etc/nginx/conf.d/default.conf is a unique file in NGINX Docker
