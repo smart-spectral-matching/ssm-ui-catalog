@@ -7,7 +7,6 @@ include:
   remote: https://code.ornl.gov/rse-deployment/rse-sharables/raw/master/.gitlab-ci-before_script.yml
 
 variables:
-  V_NUM: '0.0.1' # TODO probably a way to get this from package.json instead
   REGISTRY: 'code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui'
   NODE_URL: '${REGISTRY}/node'
   NGINX_URL: '${REGISTRY}/nginx'
@@ -22,9 +21,9 @@ nodebuild:
   stage: nodebuild
   script:
     - func_rse_docker_cleanup
-    - docker build -f node.Dockerfile --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM .
+    - docker build -f node.Dockerfile --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME .
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    - docker push $NODE_URL/$CI_COMMIT_REF_NAME
   tags:
     - rse-nds-builder
 
@@ -40,8 +39,8 @@ test_audit:
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "bin/audit.js -l high" > $AUDIT_OUTFILE
+    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/audit.js -l high" > $AUDIT_OUTFILE
   tags:
     - rse-nds-builder
 
@@ -50,8 +49,8 @@ test_lint:
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn run assert-no-warnings"
+    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "yarn run assert-no-warnings"
   tags:
     - rse-nds-builder
 
@@ -60,8 +59,8 @@ test_jest:
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "yarn test"
+    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "yarn test"
   tags:
     - rse-nds-builder
 
@@ -69,15 +68,15 @@ test_jest:
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
     # update any necessary files with environment variables before running 'build'
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME:$V_NUM sh -c "bin/ci-node-substitutions.sh && yarn run build"
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/ci-node-substitutions.sh && yarn run build"
     - sudo rm -rf .ci/build || true
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
     # replace the 'example.com' placeholder in the nginx-config website file with the actual domain
     - bin/ci-nginx-substitutions.sh
-    - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM .ci/
-    - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$V_NUM
+    - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME .ci/
+    - docker push $NGINX_URL/$CI_COMMIT_REF_NAME
 
 nginxbuild-dev:
   stage: nginxbuild
