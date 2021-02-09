@@ -10,7 +10,7 @@ variables:
   REGISTRY: 'code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui'
   NODE_URL: '${REGISTRY}/node'
   NGINX_URL: '${REGISTRY}/nginx'
-  NODE_IMAGE_NAME: 'datastreams-fe-node'
+  NODE_IMAGE_NAME: 'ssm-fe-node'
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
 after_script:
