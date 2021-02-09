@@ -1,5 +1,5 @@
 import {observer} from 'mobx-react-lite';
-import React, {createContext, PropsWithChildren, useContext} from 'react';
+import {createContext, PropsWithChildren, useContext} from 'react';
 import {RootStore} from 'store/root';
 
 export const store = new RootStore();

@@ -40,7 +40,7 @@ test_audit:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/audit.js -l high" > $AUDIT_OUTFILE
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/audit.js" > $AUDIT_OUTFILE
   tags:
     - rse-nds-builder
 
@@ -73,7 +73,7 @@ test_jest:
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/ci-node-substitutions.sh && yarn run build"
     - sudo rm -rf .ci/build || true
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
-    # replace the 'example.com' placeholder in the nginx-config website file with the actual domain
+    # update nginx configuration files before building final image
     - bin/ci-nginx-substitutions.sh
     - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME .ci/
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME

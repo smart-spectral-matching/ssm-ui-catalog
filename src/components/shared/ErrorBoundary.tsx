@@ -1,5 +1,4 @@
-import React, {ErrorInfo} from 'react';
-
+import {Component, ErrorInfo} from 'react';
 interface IErrorBoundaryState {
   error?: Error;
   errorInfo?: ErrorInfo;
@@ -13,7 +12,7 @@ interface IErrorBoundaryState {
  *
  * NOTE: Since 'ComponentDidCatch' is not implemented in React FunctionalComponents, and since we are using a paired-down version of MobX which only uses FunctionComponents, there may be some issues when dealing with Observers.
  */
-class ErrorBoundary extends React.Component<{}, IErrorBoundaryState> {
+class ErrorBoundary extends Component<{}, IErrorBoundaryState> {
   constructor(props: {}) {
     super(props);
     this.state = {error: undefined, errorInfo: undefined};
@@ -32,7 +31,7 @@ class ErrorBoundary extends React.Component<{}, IErrorBoundaryState> {
       return (
         <aside>
           <h2>An unexpected error has occurred.</h2>
-          {process.env.NODE_ENV === 'development' && (
+          {process.env.NODE_ENV !== 'production' && (
             <details>
               <summary>{error ? error.toString() : 'Error w/out message:'}</summary>
               <p>{errorInfo ? errorInfo.componentStack : 'No additional error info provided'}</p>

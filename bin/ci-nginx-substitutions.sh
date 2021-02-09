@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# FOR CI ONLY - update environment variables before building NGINX container
+# FOR CI ONLY - update nginx config files before building NGINX container
 
 set -e
 

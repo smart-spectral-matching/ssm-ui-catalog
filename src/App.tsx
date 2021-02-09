@@ -1,25 +1,40 @@
-import React, {useEffect} from 'react';
-import {observer} from 'mobx-react-lite';
-import 'materialize-css/dist/css/materialize.min.css';
-import M from 'materialize-css';
+import {Suspense} from 'react';
+import {configure} from 'mobx';
+import {Backdrop, CssBaseline, CircularProgress, ThemeProvider} from '@material-ui/core';
 
-import './App.css';
+import './App.scss';
 import Routes from 'Routes';
 import ErrorBoundary from 'components/shared/ErrorBoundary';
 import {RootStoreProvider} from 'store/providers';
+import theme from './theme';
 
+configure({
+  enforceActions: 'always',
+  computedRequiresReaction: true,
+  reactionRequiresObservable: true,
+  observableRequiresReaction: true,
+  //disableErrorBoundaries: true
+});
 const App = () => {
-  useEffect(() => {
-    M.Collapsible.init(document.querySelectorAll('.collapsible'));
-  }, []);
-
+  window.console.log(theme);
   return (
-    <ErrorBoundary>
-      <RootStoreProvider>
-        <Routes />
-      </RootStoreProvider>
-    </ErrorBoundary>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ErrorBoundary>
+        <RootStoreProvider>
+          <Suspense
+            fallback={
+              <Backdrop open disableStrictModeCompat>
+                <CircularProgress />
+              </Backdrop>
+            }
+          >
+            <Routes />
+          </Suspense>
+        </RootStoreProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 };
 
-export default observer(App);
+export default App;

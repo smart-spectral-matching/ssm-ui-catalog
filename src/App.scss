@@ -1,0 +1,54 @@
+html,
+body,
+#root {
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+/**
+ * Make element after <main> appear at bottom of page if not enough content to force it to.
+ *
+ * NOTE: This assumes that immediate child elements of root will always be <main> (think React Routing). This is best practice anyways.
+ */
+main {
+  flex: 1 0 auto;
+}
+
+video {
+  width: 100%;
+}
+
+ul {
+  margin: 0.5rem 0 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  &:not(.browser-default) {
+    padding-left: 0;
+    list-style-type: none;
+    > li {
+      padding: 10px;
+      border-bottom: 1px solid #dddddd;
+
+      &:last-child {
+        border: 0;
+      }
+    }
+  }
+}
+
+a {
+  text-decoration: none;
+}
+
+/**
+Useful class to use if you don't mind allowing the user to edit the CSS
+*/
+.display-none {
+  display: none !important;
+}
