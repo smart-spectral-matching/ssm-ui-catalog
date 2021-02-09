@@ -1,6 +1,6 @@
-# ORNL Datastreams Search / Upload UI
+# ORNL Smart Spectral Matching Search / Upload UI
 
-Frontend for ORNL Datastreams, built in React and able to be deployed as a static website.
+Frontend for ORNL Smart Spectral Matching, built in React and able to be deployed as a static website.
 
 ## Building without Docker (preferred)
 
@@ -54,4 +54,4 @@ To test the program in a fake production environment (for example: Content-Secur
 -   `yarn run build` (can be done in or out of the Docker environment)
 -   (if you are in a Docker environment, exit it here)
 -   `bin/build-nginx-env.sh`
--   `docker run [OPTIONS] datastreams-fe-nginx [COMMAND] [ARG...]`
+-   `docker run [OPTIONS] ssm-fe-nginx [COMMAND] [ARG...]`
