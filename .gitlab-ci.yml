@@ -21,9 +21,11 @@ nodebuild:
   stage: nodebuild
   script:
     - func_rse_docker_cleanup
-    - docker build -f node.Dockerfile --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME .
+    - docker build -f node.Dockerfile --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker tag $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA $NODE_URL/$CI_COMMIT_REF_NAME:latest
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push $NODE_URL/$CI_COMMIT_REF_NAME
+    - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $NODE_URL/$CI_COMMIT_REF_NAME:latest
   tags:
     - rse-nds-builder
 
@@ -75,8 +77,11 @@ test_jest:
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
     # update nginx configuration files before building final image
     - bin/ci-nginx-substitutions.sh
-    - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME .ci/
-    - docker push $NGINX_URL/$CI_COMMIT_REF_NAME
+    - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA .ci/
+    - docker tag $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA $NGINX_URL/$CI_COMMIT_REF_NAME:latest
+    - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:latest
+
 
 nginxbuild-dev:
   stage: nginxbuild
