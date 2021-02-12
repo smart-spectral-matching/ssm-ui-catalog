@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   withBorderRadius: {
-    borderRadius: '10px',
+    borderRadius: '4px',
   },
   videoContainer: {
     position: 'relative',
@@ -138,7 +138,7 @@ const Accordions = (props: {classes: ReturnType<typeof useStyles>; isSample?: bo
           <span className={classes.accordionLabel}>System</span>
           <SvgIcon component={AtomIcon} viewBox="0 0 512 512" />
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className={classes.accordionDetails}>
           <ul>
             <li>
               <b>Discipline: </b> chemistry
@@ -163,7 +163,7 @@ const Accordions = (props: {classes: ReturnType<typeof useStyles>; isSample?: bo
           <span className={classes.accordionLabel}>Authors</span>
           <People />
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className={classes.accordionDetails}>
           <ul>
             <li>John Doe</li>
             <li>Jane Doe</li>
@@ -180,7 +180,7 @@ const Detail = (props: {isSample?: boolean}) => {
   return (
     <main id="pages-detail">
       <Header />
-      <Container fixed>
+      <Container>
         <Grid container spacing={4}>
           <Grid item sm={12} component="section">
             <Typography variant="h3" align="center">

@@ -2,10 +2,14 @@ import {makeStyles} from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   footer: {
-    padding: '2em 0 1em',
-    backgroundColor: theme.palette.grey[500],
+    height: '5vh',
+    minHeight: theme.spacing(4),
+    backgroundColor: theme.palette.secondary.main,
     color: theme.palette.common.white,
-    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
   },
 }));
 

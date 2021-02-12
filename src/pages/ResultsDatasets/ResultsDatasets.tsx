@@ -34,11 +34,8 @@ const generateRandomCollections = (str: string) => {
 };
 
 const useStyles = makeStyles((theme) => ({
-  radioList: {
-    marginTop: 0,
-  },
-  checkboxList: {
-    marginTop: '1rem',
+  fieldset: {
+    marginBottom: '1rem',
   },
   card: {
     marginBottom: '1rem',
@@ -49,12 +46,56 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     padding: '0 5px',
   },
+  scrollGrid: {
+    [theme.breakpoints.up('sm')]: {
+      maxHeight: '50vh',
+      overflowY: 'auto',
+      overflowX: 'hidden', // stupid Chrome bug
+      border: `3px solid ${theme.palette.grey[300]}`,
+      scrollbarWidth: 'thin', // Firefox
+      '&::-webkit-scrollbar': {
+        // Chrome
+        width: '7px',
+      },
+      '&::-webkit-scrollbar-track': {
+        // Chrome
+        boxShadow: `inset 0 0 6px rgba(255, 255, 255, 0.3)`,
+      },
+      '&::-webkit-scrollbar-thumb': {
+        // Chrome
+        backgroundColor: `${theme.palette.grey[800]}`,
+        outline: `1px solid ${theme.palette.grey[400]}`,
+      },
+      '@media (min-height: 450px)': {
+        maxHeight: '60vh',
+      },
+      '@media (min-height: 600px)': {
+        maxHeight: '70vh',
+      },
+      '@media (min-height: 750px)': {
+        maxHeight: '75vh',
+      },
+      '@media (min-height: 900px)': {
+        maxHeight: '80vh',
+      },
+    },
+  },
+  scrollGridL: {
+    [theme.breakpoints.up('sm')]: {
+      borderRight: 0,
+    },
+  },
+  container: {
+    display: 'flex',
+    flexGrow: 1,
+    alignItems: 'center',
+  },
 }));
 
 const Collection = observer((props: {classes: ReturnType<typeof useStyles>; title: string; values: string[]; inputName?: string}) => {
   const {classes, title, values, inputName} = props;
   return (
-    <FormControl component="fieldset" className={classes.checkboxList}>
+    <FormControl component="fieldset" className={classes.fieldset}>
       <FormLabel component="legend">{title}</FormLabel>
       <FormGroup>
         {values.map((value) => (
@@ -115,10 +156,10 @@ const ResultsDatasets = () => {
   return (
     <main>
       <Header />
-      <Container fixed>
+      <Container className={classes.container}>
         <Grid container spacing={4} alignContent="center">
-          <Grid container item sm={4} xs={12} direction="column" spacing={2}>
-            <FormControl component="fieldset" className={classes.radioList}>
+          <Grid item sm={4} xs={12} className={`${classes.scrollGrid} ${classes.scrollGridL}`}>
+            <FormControl component="fieldset" className={classes.fieldset}>
               <FormLabel component="legend">Filter By Type</FormLabel>
               <RadioGroup
                 aria-label="type"
@@ -135,7 +176,7 @@ const ResultsDatasets = () => {
             <Collection classes={classes} title="Filter By System" inputName="systemGroup" values={state.randomSystems} />
             <Collection classes={classes} title="Filter By Author" inputName="authorGroup" values={state.randomAuthors} />
           </Grid>
-          <Grid item sm={8}>
+          <Grid item sm={8} className={classes.scrollGrid}>
             {state.randomCards.map((v) => (
               <LoremIpsumCard key={nanoid()} classes={classes} isSample={v.isSample} filter={state.filter} />
             ))}

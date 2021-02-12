@@ -1,6 +1,8 @@
+import {useRef} from 'react';
 import {ButtonBase, IconButton, Input, makeStyles, Paper} from '@material-ui/core';
 import {Close, Search} from '@material-ui/icons';
 import {observer, useLocalObservable} from 'mobx-react-lite';
+import {runInAction} from 'mobx';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,9 +36,6 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.easeInOut,
     }),
   },
-  input: {
-    width: '100%',
-  },
   searchContainer: {
     margin: 'auto 0 auto 4px',
     width: `calc(100% - ${theme.spacing(6 + 4)}px)`, // 6 clear button + 4 margin
@@ -50,8 +49,12 @@ interface SearchBarProps {
 }
 
 const SearchBar = (props: SearchBarProps) => {
+  const inputEl = useRef<HTMLInputElement>();
   const state = useLocalObservable(() => ({
     searchText: '',
+    get sanitizedSearchText() {
+      return this.searchText.trim();
+    },
     updateSearchText(text: string) {
       this.searchText = text;
     },
@@ -75,15 +78,17 @@ const SearchBar = (props: SearchBarProps) => {
       </ButtonBase>
       <div className={classes.searchContainer}>
         <Input
-          className={classes.input}
+          inputProps={{ref: inputEl}}
           value={state.searchText}
           onChange={(e) => state.updateSearchText(e.target.value)}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
-              const searchValue = state.searchText.trim();
-              if (searchValue) {
-                state.fireSearchEvent(searchValue);
-              }
+              runInAction(() => {
+                const searchValue = state.sanitizedSearchText;
+                if (searchValue) {
+                  state.fireSearchEvent(searchValue);
+                }
+              });
             }
           }}
           placeholder="Search Smart Spectral Matching..."
@@ -92,9 +97,12 @@ const SearchBar = (props: SearchBarProps) => {
         />
       </div>
       <IconButton
-        onClick={() => state.updateSearchText('')}
-        disabled={!state.searchText}
-        className={`${classes.iconButton} ${!state.searchText.trim() && classes.iconButtonHidden}`}
+        onClick={() => {
+          state.updateSearchText('');
+          inputEl.current?.focus();
+        }}
+        disabled={!state.sanitizedSearchText}
+        className={`${classes.iconButton} ${!state.sanitizedSearchText && classes.iconButtonHidden}`}
       >
         <Close className={classes.icon} />
       </IconButton>

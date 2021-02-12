@@ -37,7 +37,7 @@ const ResultsDatasetLinks = () => {
 const Home = () => {
   const classes = useStyles();
   return (
-    <Container fixed component="main" className={classes.root}>
+    <Container component="main" className={classes.root}>
       <div className={classes.row}>
         <img src={LOGO} alt="brand logo" width="150" height="100" />
       </div>
