@@ -6,7 +6,6 @@ import SearchBar from 'components/SearchBar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: theme.palette.grey[100],
     marginBottom: theme.spacing(3),
     padding: theme.spacing(1, 0, 1, 0),
   },
@@ -41,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const Header = () => {
   const classes = useStyles();
   return (
-    <AppBar position="static" component="header" className={classes.root}>
+    <AppBar color="secondary" position="static" component="header" className={classes.root}>
       <Toolbar className={classes.toolbar}>
         <div className={classes.imageContainer}>
           <Link href={RouteHref.HOME} className={classes.logo}>
