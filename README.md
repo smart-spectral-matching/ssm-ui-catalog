@@ -21,6 +21,13 @@ Note: Running from docker-compose will use `node_modules` and `build` as volumes
 
 The Docker environment will include `git`, please commit from there so the formatter/linter will run automatically.
 
+Example:
+
+```
+docker login code.ornl.gov:4567
+docker-compose up --build
+```
+
 ## Adding dependencies
 
 `yarn add <dependency>` (dependencies) or `yarn add -D <dependency>` (devDependencies)

@@ -1,6 +1,6 @@
 # You can use this file in development if you'd like (mostly for Content-Security-Policy testing)
 # the docker build context should be the .ci/ directory, not the project root
-FROM nginx:stable-alpine
+FROM code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui/nginx:stable-alpine
 
 # developers should just use the default, CI needs to change for named domains + SSL/TLS
 # if you want to use HTTPS locally, you're on your own for now

@@ -8,8 +8,8 @@ include:
 
 variables:
   REGISTRY: 'code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui'
-  NODE_URL: '${REGISTRY}/node'
-  NGINX_URL: '${REGISTRY}/nginx'
+  NODE_URL: '${REGISTRY}/ssm-fe-node'
+  NGINX_URL: '${REGISTRY}/ssm-fe-nginx'
   NODE_IMAGE_NAME: 'ssm-fe-node'
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
@@ -21,9 +21,9 @@ nodebuild:
   stage: nodebuild
   script:
     - func_rse_docker_cleanup
+    - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -f node.Dockerfile --build-arg ci=true -t $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA .
     - docker tag $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA $NODE_URL/$CI_COMMIT_REF_NAME:latest
-    - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:latest
   tags:
@@ -81,7 +81,6 @@ test_jest:
     - docker tag $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA $NGINX_URL/$CI_COMMIT_REF_NAME:latest
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:latest
-
 
 nginxbuild-dev:
   stage: nginxbuild
