@@ -84,5 +84,7 @@ nginxbuild:
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:latest
   only:
     - dev
+    - qa
+    - master
   tags:
     - rse-nds-builder
