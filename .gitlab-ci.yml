@@ -66,7 +66,8 @@ test_jest:
   tags:
     - rse-nds-builder
 
-.nginxbuild:
+nginxbuild:
+  stage: nginxbuild
   script:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -77,43 +78,11 @@ test_jest:
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
     # update nginx configuration files before building final image
     - bin/ci-nginx-substitutions.sh
-    - docker build -f .ci/nginx.Dockerfile --build-arg DEFAULT_NGINX_CONF=$DEFAULT_NGINX_CONF -t $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA .ci/
+    - docker build -f .ci/nginx.Dockerfile -t $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA .ci/
     - docker tag $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA $NGINX_URL/$CI_COMMIT_REF_NAME:latest
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
     - docker push $NGINX_URL/$CI_COMMIT_REF_NAME:latest
-
-nginxbuild-dev:
-  stage: nginxbuild
-  extends: .nginxbuild
-  variables:
-    DEFAULT_NGINX_CONF: 'default-nossl.conf'
-    API_URL: 'http://ssm-dev.ornl.gov:8080'
-    DOMAIN: 'ssm-dev.ornl.gov'
   only:
     - dev
-  tags:
-    - rse-nds-builder
-
-nginxbuild-qa:
-  stage: nginxbuild
-  extends: .nginxbuild
-  variables:
-    DEFAULT_NGINX_CONF: 'default-ssl.conf'
-    API_URL: 'https://ssm-qa.ornl.gov:8080'
-    DOMAIN: 'ssm-qa.ornl.gov'
-  only:
-    - qa
-  tags:
-    - rse-nds-builder
-
-nginxbuild-prod:
-  stage: nginxbuild
-  extends: .nginxbuild
-  variables:
-    DEFAULT_NGINX_CONF: 'default-ssl.conf'
-    API_URL: 'https://ssm.ornl.gov:8080'
-    DOMAIN: 'ssm.ornl.gov'
-  only:
-    - master
   tags:
     - rse-nds-builder
