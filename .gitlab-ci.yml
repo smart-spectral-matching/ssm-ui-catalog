@@ -85,6 +85,6 @@ nginxbuild:
   only:
     - dev
     - qa
-    - master
+    - main
   tags:
     - rse-nds-builder
