@@ -1,5 +1,5 @@
 # reusable for both developers and CI/CD
-FROM node:lts-alpine
+FROM code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui/node:lts-alpine
 
 # build flag for CI (set to "true" in CI/CD) - used by react-scripts. Don't set for development.
 # If 'true', will fail on warnings

@@ -6,8 +6,8 @@ services:
     build:
       context: .
       dockerfile: node.Dockerfile
-    image: datastreams-fe-node # don't push this image, for local caching only
-    container_name: datastreams-fe-node
+    image: ssm-fe-node # don't push this image, for local caching only
+    container_name: ssm-fe-node
     restart: unless-stopped
     environment:
       CHOKIDAR_USEPOLLING: 'true'

@@ -1,30 +1,57 @@
-import React from 'react';
+import {makeStyles, AppBar, Link, Toolbar} from '@material-ui/core';
 
 import LOGO from 'assets/logo.png';
-import './Header.scss';
 import {RouteHref} from 'types/routes';
+import SearchBar from 'components/SearchBar';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(1, 0, 1, 0),
+  },
+  toolbar: {
+    justifyContent: 'space-around',
+    [theme.breakpoints.down('xs')]: {
+      flexDirection: 'column',
+    },
+    [theme.breakpoints.between('xs', 'sm')]: {
+      justifyContent: 'space-between',
+    },
+  },
+  imageContainer: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  logo: {
+    maxWidth: '15%',
+  },
+  searchBarContainer: {
+    flex: 1,
+    maxWidth: '75%',
+    [theme.breakpoints.down('sm')]: {
+      maxWidth: '100%',
+    },
+    [theme.breakpoints.down('xs')]: {
+      width: '100%',
+    },
+  },
+}));
 
 const Header = () => {
+  const classes = useStyles();
   return (
-    <nav id="components-header" className="grey lighten-4">
-      <div className="nav-wrapper">
-        <div className="row">
-          <div className="col s1">
-            <a href={RouteHref.HOME} className="brand-logo">
-              <img src={LOGO} alt="Brand logo" />
-            </a>
-          </div>
-          <div className="col s6 offset-s1">
-            <form action="results-datasets" method="GET">
-              <input className="main-search-input" type="text" name="search" placeholder="Search Nuclear Data Streams"></input>
-              <button className="btn-floating red darken-4 z-depth-2">
-                <i className="fas fa-search"></i>
-              </button>
-            </form>
-          </div>
+    <AppBar color="secondary" position="static" component="header" className={classes.root}>
+      <Toolbar className={classes.toolbar}>
+        <div className={classes.imageContainer}>
+          <Link href={RouteHref.HOME} className={classes.logo}>
+            <img src={LOGO} alt="Smart Spectral Matching - Home" width="100" height="67" />
+          </Link>
         </div>
-      </div>
-    </nav>
+        <div className={classes.searchBarContainer}>
+          <SearchBar onSearch={(result) => undefined} />
+        </div>
+      </Toolbar>
+    </AppBar>
   );
 };
 
