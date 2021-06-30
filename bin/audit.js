@@ -3,9 +3,9 @@
 
 /*
  * CLI script to run 'yarn audit' and change the exit code. Only dependency is yargs, which is usually installed with other dev libraries anyways.
- * 
+ *
  * By default, yarn gives us the following exit codes when at least one module with a given severity level has been found (returning the sum):
- *  
+ *
     1 for INFO
     2 for LOW
     4 for MODERATE
@@ -16,14 +16,14 @@
  *
  * This is problematic when running in CI, since we may only want to send a non-zero exit code on a certain error level. This is kind of annoying, and Yarn 2 isn't planning on fixing this.
  * It does not matter to Yarn if you pass in --level as an argument - the exit code doesn't change.
- * 
- * NPM audit handles this correctly, but that's pointless in CI/CD - we want to verify the yarn lockfile, and we don't really want to change the lockfile in the middle of CI/CD. 
- * 
+ *
+ * NPM audit handles this correctly, but that's pointless in CI/CD - we want to verify the yarn lockfile, and we don't really want to change the lockfile in the middle of CI/CD.
+ *
  * All this does is print to stdout - up to you if you want to send it to a file, print it to the console, or just rely on CI/CD seeing the error code and failing.
- * 
- * This script also prints more useful information than the default yarn audit command, but doesn't print all the garbage from --verbose or --json. 
+ *
+ * This script also prints more useful information than the default yarn audit command, but doesn't print all the garbage from --verbose or --json.
  * It is deliberately impossible to pass audits with a 'critical' severity because that indicates malicious code.
- * 
+ *
  */
 
 // severity order from least to most
@@ -101,7 +101,11 @@ function generateOutput(output) {
   lines.pop();
   lines = lines.map((line) => JSON.parse(line.trim()));
 
-  const adviceLines = lines.filter((line) => line.type === 'auditAdvisory').map((line) => line.data.advisory);
+  const adviceLines = lines
+    .filter((line) => line.type === 'auditAdvisory')
+    .map((line) => {
+      return {...line.data.advisory, path: line.data.resolution.path.split('>')[0]};
+    });
   const summaryLine = lines[lines.length - 1].data.vulnerabilities;
   const MINIMUM_SEVERITY_INDEX = AUDIT_SEVERITY_OPTIONS.indexOf(argv.level);
 
@@ -121,10 +125,11 @@ function generateOutput(output) {
   } else {
     // opinionated output
     adviceLines.forEach((line) => {
-      console.log(`SEVERITY:            ${line.severity.toUpperCase()}`);
-      console.log(`MODULE:              ${line.module_name}`);
-      console.log(`VULNERABILITY:       ${line.title}`);
-      console.log(`PATCHED VERSIONS:    ${line.patched_versions[0] === '<' ? 'NONE' : line.patched_versions}`);
+      console.log(`SEVERITY:             ${line.severity.toUpperCase()}`);
+      console.log(`MODULE:               ${line.module_name}`);
+      console.log(`TOP-LEVEL DEPENDENCY: ${line.path}`);
+      console.log(`VULNERABILITY:        ${line.title}`);
+      console.log(`PATCHED VERSIONS:     ${line.patched_versions[0] === '<' ? 'NONE' : line.patched_versions}`);
       console.log('OVERVIEW:');
       console.log(`  - ${line.overview}`);
       console.log('RECOMMENDATION:');
@@ -139,7 +144,7 @@ function generateOutput(output) {
       const value = AUDIT_SEVERITY_OPTIONS[i];
       console.log(`${value.toUpperCase()} vulnerabilities: ${value.length >= 8 ? '\t' : '\t\t'}${summaryLine[value]}`);
     }
-    console.log(`TOTAL vulnerabilities: \t\t${summaryLine.total}`);
+    console.log(`TOTAL vulnerabilities: \t\t${summaryLine.total}\n`);
   }
 }
 
