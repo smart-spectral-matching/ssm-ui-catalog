@@ -8,7 +8,7 @@
     "react/react-in-jsx-scope": "off",
     "react-hooks/exhaustive-deps": 0,
     "no-console": "warn",
-    "complexity": ["error", 10]
+    "complexity": ["warn", 10]
   },
   "settings": {
     "import/resolver": {
