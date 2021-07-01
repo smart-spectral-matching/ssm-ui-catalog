@@ -1,12 +1,15 @@
 import {nanoid} from 'nanoid';
 import {makeStyles, Button, Container, Link, Typography} from '@material-ui/core';
 import {CloudUpload} from '@material-ui/icons';
+import {observer, useLocalObservable} from 'mobx-react-lite';
+import {FC, useEffect} from 'react';
 
 import LOGO from 'assets/logo.png';
 import {RouteHref} from 'types/routes';
 import SearchBar from 'components/SearchBar';
-
-const elements = ['Helium', 'Nitrogen', 'Argon', 'Iron', 'Germanium'];
+import {useStore} from 'store/providers';
+import {BatsModelCondensed} from 'types/batsModel';
+import {PaginatedResponse} from 'types/paginated-response';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,20 +25,50 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ResultsDatasetLinks = () => {
+interface ModelSummariesProps {
+  elements: Array<BatsModelCondensed>;
+}
+
+const ModelSummaries: FC<ModelSummariesProps> = observer(({elements}) => {
   return (
     <>
       {elements.map((ele) => (
         <li key={nanoid()}>
-          <Link href={RouteHref.RESULTS}>{ele}</Link>
+          <Link href={RouteHref.RESULTS}>{ele.title}</Link>
         </li>
       ))}
     </>
   );
-};
+});
 
-const Home = () => {
+const Home = observer(() => {
+  const store = useStore();
+  const state = useLocalObservable(() => ({
+    elements: [] as Array<BatsModelCondensed>,
+    setElements: (elements: Array<BatsModelCondensed>) => {
+      state.elements = elements;
+    },
+  }));
+
+  /**
+   * this is local because we should refetch every time the Home page is re-rendered,
+   * to get the latest models
+   */
+  useEffect(() => {
+    if (store.datasetUuid) {
+      fetch(`${process.env.REACT_APP_API_URL}/datasets/${store.datasetUuid}/models?returnFull=false`)
+        .then((res) => res.json())
+        .then((json: PaginatedResponse<BatsModelCondensed>) => {
+          state.setElements(json.data);
+          window.console.log(state.elements);
+        })
+        // TODO we can add a state variable to update the UI later on
+        .catch((err) => window.console.error("Didn't fetch model summaries", err));
+    }
+  }, [store.datasetUuid]);
+
   const classes = useStyles();
+
   return (
     <Container component="main" className={classes.root}>
       <div className={classes.row}>
@@ -53,7 +86,7 @@ const Home = () => {
               Latest Samples/Datasets
             </Typography>
           </li>
-          <ResultsDatasetLinks />
+          <ModelSummaries elements={state.elements} />
         </ul>
       </div>
 
@@ -64,6 +97,6 @@ const Home = () => {
       </div>
     </Container>
   );
-};
+});
 
 export default Home;

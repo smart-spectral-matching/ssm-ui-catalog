@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
       },
       '&::-webkit-scrollbar-track': {
         // Chrome
-        boxShadow: `inset 0 0 6px rgba(255, 255, 255, 0.3)`,
+        boxShadow: 'inset 0 0 6px rgba(255, 255, 255, 0.3)',
       },
       '&::-webkit-scrollbar-thumb': {
         // Chrome

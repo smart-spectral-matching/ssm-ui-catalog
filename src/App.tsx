@@ -7,13 +7,25 @@ import Routes from 'Routes';
 import ErrorBoundary from 'components/shared/ErrorBoundary';
 import {RootStoreProvider} from 'store/providers';
 import makeTheme from './theme';
+import {QueryClient, QueryClientProvider} from 'react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: async ({queryKey}) => {
+        const d = await fetch(`${process.env.REACT_APP_API_URL}${queryKey[0]}`);
+        return d.json();
+      },
+    },
+  },
+});
 
 configure({
   enforceActions: 'always',
   computedRequiresReaction: true,
   reactionRequiresObservable: true,
   observableRequiresReaction: true,
-  //disableErrorBoundaries: true,
+  // disableErrorBoundaries: true,
 });
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -23,17 +35,19 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ErrorBoundary>
-        <RootStoreProvider>
-          <Suspense
-            fallback={
-              <Backdrop open>
-                <CircularProgress />
-              </Backdrop>
-            }
-          >
-            <Routes />
-          </Suspense>
-        </RootStoreProvider>
+        <QueryClientProvider client={queryClient}>
+          <RootStoreProvider>
+            <Suspense
+              fallback={
+                <Backdrop open>
+                  <CircularProgress />
+                </Backdrop>
+              }
+            >
+              <Routes />
+            </Suspense>
+          </RootStoreProvider>
+        </QueryClientProvider>
       </ErrorBoundary>
     </ThemeProvider>
   );

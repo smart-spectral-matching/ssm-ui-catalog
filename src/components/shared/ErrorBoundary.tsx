@@ -1,4 +1,5 @@
 import {Component, ErrorInfo} from 'react';
+
 interface IErrorBoundaryState {
   error?: Error;
   errorInfo?: ErrorInfo;

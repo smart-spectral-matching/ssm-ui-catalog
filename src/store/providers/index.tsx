@@ -6,13 +6,11 @@ export const store = new RootStore();
 const StoreContext = createContext<null | RootStore>(store);
 
 export function useStore(): RootStore {
-  const store = useContext(StoreContext);
-  if (store === null) {
+  const rootStore = useContext(StoreContext);
+  if (rootStore === null) {
     throw new Error('Store cannot be null, please add a context provider');
   }
-  return store;
+  return rootStore;
 }
 
-export const RootStoreProvider: FC = (props) => {
-  return <StoreContext.Provider value={store}>{props.children}</StoreContext.Provider>;
-};
+export const RootStoreProvider: FC = (props) => <StoreContext.Provider value={store}>{props.children}</StoreContext.Provider>;
