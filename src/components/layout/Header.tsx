@@ -1,4 +1,5 @@
 import {makeStyles, AppBar, Link, Toolbar} from '@material-ui/core';
+import {Link as RouterLink} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
 import {RouteHref} from 'types';
@@ -43,7 +44,7 @@ const Header = () => {
     <AppBar color="secondary" position="static" component="header" className={classes.root}>
       <Toolbar className={classes.toolbar}>
         <div className={classes.imageContainer}>
-          <Link href={RouteHref.HOME} className={classes.logo}>
+          <Link className={classes.logo} component={RouterLink} to={RouteHref.HOME}>
             <img src={LOGO} alt="Smart Spectral Matching - Home" width="100" height="67" />
           </Link>
         </div>

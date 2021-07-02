@@ -3,6 +3,7 @@ import {makeStyles, Button, Container, Link, Typography} from '@material-ui/core
 import {CloudUpload} from '@material-ui/icons';
 import {observer, useLocalObservable} from 'mobx-react-lite';
 import {FC, useEffect} from 'react';
+import {Link as RouterLink} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
 import SearchBar from 'components/SearchBar';
@@ -34,7 +35,9 @@ const ModelSummaries: FC<ModelSummariesProps> = observer(({dataset, elements}) =
     <>
       {elements.map((ele, idx) => (
         <li key={nanoid()}>
-          <Link href={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${dataset}/${ele.uuid}`}>{ele.title}</Link>
+          <Link component={RouterLink} to={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${dataset}/${ele.uuid}`}>
+            {ele.title}
+          </Link>
         </li>
       ))}
     </>

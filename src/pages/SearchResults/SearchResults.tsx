@@ -17,6 +17,7 @@ import {
   RadioGroup,
   Checkbox,
 } from '@material-ui/core';
+import {Link as RouterLink} from 'react-router-dom';
 
 import H20 from 'assets/h20.jpeg';
 import Header from 'components/layout/Header';
@@ -122,7 +123,7 @@ const LoremIpsumCard = (props: {classes: ReturnType<typeof useStyles>; isSample?
       </div>
       <CardContent>
         <Typography variant="h5">
-          <Link href={example.url} color="primary">
+          <Link color="primary" component={RouterLink} to={example.url}>
             H<sub>2</sub>O
           </Link>
         </Typography>
