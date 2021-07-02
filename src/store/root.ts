@@ -9,7 +9,7 @@ export class RootStore {
    * For now, define this variable on application startup,
    * then persist it forever.
    */
-  datasetUuid: string | null = null;
+  datasetUuid?: string;
 
   constructor() {
     makeAutoObservable(this);

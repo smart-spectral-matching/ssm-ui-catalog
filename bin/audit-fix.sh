@@ -5,7 +5,7 @@
 # Yarn is better than NPM for the vast majority of use-cases, but NPM does have the useful 'npm audit fix', which Yarn lacks
 # This is a way to use "npm audit fix" for a moment, while still maintaining general usage of yarn (as you should never use both together)
 
-set -e
+set -euo pipefail
 
 cd "$(dirname "$0")/.." || exit 1
 

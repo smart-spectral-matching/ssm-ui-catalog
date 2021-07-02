@@ -5,11 +5,9 @@ import {observer, useLocalObservable} from 'mobx-react-lite';
 import {FC, useEffect} from 'react';
 
 import LOGO from 'assets/logo.png';
-import {RouteHref} from 'types/routes';
 import SearchBar from 'components/SearchBar';
 import {useStore} from 'store/providers';
-import {BatsModelCondensed} from 'types/batsModel';
-import {PaginatedResponse} from 'types/paginated-response';
+import {BatsModelCondensed, PaginatedResponse, RouteHref} from 'types';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,15 +24,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface ModelSummariesProps {
+  dataset?: string;
   elements: Array<BatsModelCondensed>;
 }
 
-const ModelSummaries: FC<ModelSummariesProps> = observer(({elements}) => {
+const ModelSummaries: FC<ModelSummariesProps> = observer(({dataset, elements}) => {
+  if (!dataset) return null;
   return (
     <>
-      {elements.map((ele) => (
+      {elements.map((ele, idx) => (
         <li key={nanoid()}>
-          <Link href={RouteHref.RESULTS}>{ele.title}</Link>
+          <Link href={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${dataset}/${ele.uuid}`}>{ele.title}</Link>
         </li>
       ))}
     </>
@@ -86,7 +86,7 @@ const Home = observer(() => {
               Latest Samples/Datasets
             </Typography>
           </li>
-          <ModelSummaries elements={state.elements} />
+          <ModelSummaries dataset={store.datasetUuid} elements={state.elements} />
         </ul>
       </div>
 

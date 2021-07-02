@@ -2,7 +2,7 @@
 # util script for development only, run in project root directory
 # NOTE: always run outside Docker environment
 
-set -e
+set -euo pipefail
 
 if [ "$(id -u)" -eq 0 ]; then
   echo "Do not run as root or inside the Docker file"

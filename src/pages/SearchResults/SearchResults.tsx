@@ -20,7 +20,7 @@ import {
 
 import H20 from 'assets/h20.jpeg';
 import Header from 'components/layout/Header';
-import {RouteHref} from 'types/routes';
+import {RouteHref} from 'types';
 
 enum FilterState {
   ALL = 'All',
@@ -135,7 +135,7 @@ const LoremIpsumCard = (props: {classes: ReturnType<typeof useStyles>; isSample?
   );
 };
 
-const ResultsDatasets = () => {
+const SearchResults = () => {
   const state = useLocalObservable(() => ({
     filter: FilterState.ALL,
     updateFilter(filter: FilterState) {
@@ -187,4 +187,4 @@ const ResultsDatasets = () => {
   );
 };
 
-export default observer(ResultsDatasets);
+export default observer(SearchResults);

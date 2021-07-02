@@ -7,9 +7,10 @@ import ErrorBoundaryRoute from 'components/shared/ErrorBoundaryRoute';
 import {RouteHref} from 'types/routes';
 import {useDatasetQuery} from 'store/useDatasetQuery';
 
-const Detail = lazy(() => import('pages/Detail'));
+const Detail = lazy(() => import('pages/Detail/Detail'));
+const DetailSample = lazy(() => import('pages/Detail/DetailSample'));
 const Home = lazy(() => import('pages/Home'));
-const ResultsDatasets = lazy(() => import('pages/ResultsDatasets'));
+const SearchResults = lazy(() => import('pages/SearchResults'));
 const PageNotFound = lazy(() => import('components/shared/PageNotFound'));
 
 const Routes = () => {
@@ -19,9 +20,9 @@ const Routes = () => {
       {/* TODO: manage Header here instead of inside each component? */}
       <ErrorBoundary>
         <Switch>
-          <ErrorBoundaryRoute path={RouteHref.DETAIL_DATASET} component={Detail} />
-          <ErrorBoundaryRoute path={RouteHref.DETAIL_SAMPLE} component={() => <Detail isSample />} />
-          <ErrorBoundaryRoute path={RouteHref.RESULTS} component={ResultsDatasets} />
+          <ErrorBoundaryRoute path={`${RouteHref.DETAIL_DATASET}/:dataset/:model`} component={Detail} />
+          <ErrorBoundaryRoute path={`${RouteHref.DETAIL_SAMPLE}/:dataset/:model`} component={DetailSample} />
+          <ErrorBoundaryRoute path={RouteHref.SEARCH} component={SearchResults} />
           <ErrorBoundaryRoute exact path={RouteHref.HOME} component={Home} />
           <ErrorBoundaryRoute component={PageNotFound} />
         </Switch>

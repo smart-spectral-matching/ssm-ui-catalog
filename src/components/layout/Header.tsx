@@ -1,7 +1,7 @@
 import {makeStyles, AppBar, Link, Toolbar} from '@material-ui/core';
 
 import LOGO from 'assets/logo.png';
-import {RouteHref} from 'types/routes';
+import {RouteHref} from 'types';
 import SearchBar from 'components/SearchBar';
 
 const useStyles = makeStyles((theme) => ({
