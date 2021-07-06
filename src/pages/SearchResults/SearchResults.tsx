@@ -130,7 +130,7 @@ const LoremIpsumCard = (props: {classes: ReturnType<typeof useStyles>; isSample?
         <Typography variant="body1">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </Typography>
-        <Chip label={example.display} component="a" href={example.url} clickable color={!isSample ? 'primary' : 'secondary'} />
+        <Chip label={example.display} component={RouterLink} to={example.url} clickable color={!isSample ? 'primary' : 'secondary'} />
       </CardContent>
     </Card>
   );
