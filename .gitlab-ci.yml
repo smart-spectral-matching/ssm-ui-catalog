@@ -74,7 +74,7 @@ nginxbuild:
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
     # update any necessary files with environment variables before running 'build'
-    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/ci-node-substitutions.sh && yarn run build"
+    - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/ci-node-substitutions.sh $CI_COMMIT_REF_NAME && yarn run build"
     - sudo rm -rf .ci/build || true
     - docker cp $NODE_IMAGE_NAME:$DOCKER_APP_WORKDIR/build .ci/build
     # update nginx configuration files before building final image
