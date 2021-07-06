@@ -20,8 +20,8 @@ const Routes = () => {
       {/* TODO: manage Header here instead of inside each component? */}
       <ErrorBoundary>
         <Switch>
-          <ErrorBoundaryRoute path={`${RouteHref.DETAIL_DATASET}/:dataset/:model`} component={Detail} />
-          <ErrorBoundaryRoute path={`${RouteHref.DETAIL_SAMPLE}/:dataset/:model`} component={DetailSample} />
+          <ErrorBoundaryRoute path={`${RouteHref.DETAIL_DATASET}/:dataset?/:model?`} component={Detail} />
+          <ErrorBoundaryRoute path={`${RouteHref.DETAIL_SAMPLE}/:dataset?/:model?`} component={DetailSample} />
           <ErrorBoundaryRoute path={RouteHref.SEARCH} component={SearchResults} />
           <ErrorBoundaryRoute exact path={RouteHref.HOME} component={Home} />
           <ErrorBoundaryRoute component={PageNotFound} />

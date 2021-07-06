@@ -3,7 +3,7 @@ import {makeStyles, Button, Container, Link, Typography} from '@material-ui/core
 import {CloudUpload} from '@material-ui/icons';
 import {observer, useLocalObservable} from 'mobx-react-lite';
 import {FC, useEffect} from 'react';
-import {Link as RouterLink} from 'react-router-dom';
+import {Link as RouterLink, useHistory} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
 import SearchBar from 'components/SearchBar';
@@ -52,6 +52,7 @@ const Home = observer(() => {
       state.elements = elements;
     },
   }));
+  const history = useHistory();
 
   /**
    * this is local because we should refetch every time the Home page is re-rendered,
@@ -79,7 +80,7 @@ const Home = observer(() => {
       </div>
 
       <div className={classes.row}>
-        <SearchBar className={classes.rowContent} onSearch={(result) => undefined} />
+        <SearchBar className={classes.rowContent} onSearch={(result) => history.push(RouteHref.SEARCH)} />
       </div>
 
       <div className={classes.row}>

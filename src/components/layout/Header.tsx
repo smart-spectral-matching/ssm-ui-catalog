@@ -1,5 +1,5 @@
 import {makeStyles, AppBar, Link, Toolbar} from '@material-ui/core';
-import {Link as RouterLink} from 'react-router-dom';
+import {Link as RouterLink, useHistory} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
 import {RouteHref} from 'types';
@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Header = () => {
+  const history = useHistory();
   const classes = useStyles();
   return (
     <AppBar color="secondary" position="static" component="header" className={classes.root}>
@@ -49,7 +50,7 @@ const Header = () => {
           </Link>
         </div>
         <div className={classes.searchBarContainer}>
-          <SearchBar onSearch={(result) => undefined} />
+          <SearchBar onSearch={(result) => history.push(RouteHref.SEARCH)} />
         </div>
       </Toolbar>
     </AppBar>
