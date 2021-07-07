@@ -3,6 +3,8 @@ import {TablePaginationActionsProps} from '@material-ui/core/TablePagination/Tab
 import {FirstPage, KeyboardArrowLeft, KeyboardArrowRight, LastPage} from '@material-ui/icons';
 import {FC} from 'react';
 
+const getAriaLabel = (type: string, pageArg: number) => `Go to ${type} page (${pageArg + 1})`;
+
 interface CustomTablePaginationActionsProps extends TablePaginationActionsProps {}
 
 /**
@@ -29,8 +31,6 @@ const CustomTablePaginationActions: FC<CustomTablePaginationActionsProps> = ({
 
   const isFirstPage = page === 0;
   const isLastPage = page === lastPage;
-
-  const getAriaLabel = (type: string, pageArg: number) => `Go to ${type} page (${pageArg + 1})`;
 
   return (
     <Box display="flex">
