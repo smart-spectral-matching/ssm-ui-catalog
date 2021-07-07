@@ -1,14 +1,32 @@
-import {nanoid} from 'nanoid';
-import {makeStyles, Button, Container, Link, Typography} from '@material-ui/core';
+import {
+  makeStyles,
+  Button,
+  Container,
+  Link,
+  Typography,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableFooter,
+  TableCell,
+  TablePagination,
+  Toolbar,
+} from '@material-ui/core';
 import {CloudUpload} from '@material-ui/icons';
 import {observer, useLocalObservable} from 'mobx-react-lite';
-import {FC, useEffect} from 'react';
+import {useEffect} from 'react';
 import {Link as RouterLink, useHistory} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
 import SearchBar from 'components/SearchBar';
 import {useStore} from 'store/providers';
 import {BatsModelCondensed, PaginatedResponse, RouteHref} from 'types';
+import CustomTablePaginationActions from 'components/CustomTablePaginationActions';
+
+const PAGE_SIZE = 5;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,32 +42,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface ModelSummariesProps {
-  dataset?: string;
-  elements: Array<BatsModelCondensed>;
-}
-
-const ModelSummaries: FC<ModelSummariesProps> = observer(({dataset, elements}) => {
-  if (!dataset) return null;
-  return (
-    <>
-      {elements.map((ele, idx) => (
-        <li key={nanoid()}>
-          <Link component={RouterLink} to={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${dataset}/${ele.uuid}`}>
-            {ele.title}
-          </Link>
-        </li>
-      ))}
-    </>
-  );
-});
-
 const Home = observer(() => {
   const store = useStore();
   const state = useLocalObservable(() => ({
     elements: [] as Array<BatsModelCondensed>,
-    setElements: (elements: Array<BatsModelCondensed>) => {
-      state.elements = elements;
+    /**
+     * This is ZERO BASED because the Material-UI pagination component
+     * assumes this.
+     */
+    page: 0,
+    count: 0,
+    /**
+     * We want to use this when interacting with the API + for human-readable content
+     */
+    get oneBasedPage() {
+      return state.page + 1;
+    },
+    parseResponse: (response: PaginatedResponse<BatsModelCondensed>) => {
+      state.elements = response.data;
+      state.count = response.total;
+    },
+    changePage: (newPage: number) => {
+      state.page = newPage; // triggers useEffect hook
     },
   }));
   const history = useHistory();
@@ -60,16 +74,18 @@ const Home = observer(() => {
    */
   useEffect(() => {
     if (store.datasetUuid) {
-      fetch(`${process.env.REACT_APP_API_URL}/datasets/${store.datasetUuid}/models?returnFull=false`)
+      fetch(
+        `${process.env.REACT_APP_API_URL}/datasets/${store.datasetUuid}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`
+      )
         .then((res) => res.json())
         .then((json: PaginatedResponse<BatsModelCondensed>) => {
-          state.setElements(json.data);
+          state.parseResponse(json);
           window.console.log(state.elements);
         })
         // TODO we can add a state variable to update the UI later on
         .catch((err) => window.console.error("Didn't fetch model summaries", err));
     }
-  }, [store.datasetUuid]);
+  }, [store.datasetUuid, state.page]);
 
   const classes = useStyles();
 
@@ -84,14 +100,53 @@ const Home = observer(() => {
       </div>
 
       <div className={classes.row}>
-        <ul className={classes.rowContent}>
-          <li>
+        <Paper className={classes.rowContent}>
+          <Toolbar>
             <Typography variant="h5" color="textSecondary">
-              Latest Samples/Datasets
+              Latest Models
             </Typography>
-          </li>
-          <ModelSummaries dataset={store.datasetUuid} elements={state.elements} />
-        </ul>
+          </Toolbar>
+          <TableContainer>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Last Modified Date</TableCell>
+                  <TableCell>Created On Date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {state.elements.map((ele, idx) => (
+                  <TableRow key={ele.uuid}>
+                    <TableCell>
+                      <Link
+                        component={RouterLink}
+                        to={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${store.datasetUuid}/${ele.uuid}`}
+                      >
+                        {ele.title}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{ele.modified}</TableCell>
+                    <TableCell>{ele.created}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPage={PAGE_SIZE}
+                    rowsPerPageOptions={[]}
+                    count={state.count}
+                    page={state.page}
+                    onChangePage={(e, page) => state.changePage(page)}
+                    colSpan={3}
+                    ActionsComponent={CustomTablePaginationActions}
+                  />
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </TableContainer>
+        </Paper>
       </div>
 
       <div className={classes.row}>
