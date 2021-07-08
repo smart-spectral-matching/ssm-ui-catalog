@@ -21,10 +21,10 @@ import {useEffect} from 'react';
 import {Link as RouterLink, useHistory} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
-import SearchBar from 'components/SearchBar';
-import {useStore} from 'store/providers';
-import {BatsModelCondensed, PaginatedResponse, RouteHref} from 'types';
 import CustomTablePaginationActions from 'components/CustomTablePaginationActions';
+import SearchBar from 'components/SearchBar';
+import {BatsModelCondensed, PaginatedResponse, RouteHref} from 'types';
+import {API_URL, DATASET} from 'ssm-constants';
 
 const PAGE_SIZE = 5;
 
@@ -43,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Home = observer(() => {
-  const store = useStore();
   const state = useLocalObservable(() => ({
     elements: [] as Array<BatsModelCondensed>,
     /**
@@ -73,19 +72,15 @@ const Home = observer(() => {
    * to get the latest models
    */
   useEffect(() => {
-    if (store.datasetUuid) {
-      fetch(
-        `${process.env.REACT_APP_API_URL}/datasets/${store.datasetUuid}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`
-      )
-        .then((res) => res.json())
-        .then((json: PaginatedResponse<BatsModelCondensed>) => {
-          state.parseResponse(json);
-          window.console.log(state.elements);
-        })
-        // TODO we can add a state variable to update the UI later on
-        .catch((err) => window.console.error("Didn't fetch model summaries", err));
-    }
-  }, [store.datasetUuid, state.page]);
+    fetch(`${API_URL}/datasets/${DATASET}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`)
+      .then((res) => res.json())
+      .then((json: PaginatedResponse<BatsModelCondensed>) => {
+        state.parseResponse(json);
+        window.console.log(state.elements);
+      })
+      // TODO we can add a state variable to update the UI later on
+      .catch((err) => window.console.error("Didn't fetch model summaries", err));
+  }, [state.page]);
 
   const classes = useStyles();
 
@@ -121,7 +116,7 @@ const Home = observer(() => {
                     <TableCell>
                       <Link
                         component={RouterLink}
-                        to={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${store.datasetUuid}/${ele.uuid}`}
+                        to={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${DATASET}/${ele.uuid}`}
                       >
                         {ele.title}
                       </Link>

@@ -5,7 +5,6 @@ import Footer from 'components/layout/Footer';
 import ErrorBoundary from 'components/shared/ErrorBoundary';
 import ErrorBoundaryRoute from 'components/shared/ErrorBoundaryRoute';
 import {RouteHref} from 'types/routes';
-import {useDatasetQuery} from 'store/useDatasetQuery';
 
 const Detail = lazy(() => import('pages/Detail/Detail'));
 const DetailSample = lazy(() => import('pages/Detail/DetailSample'));
@@ -14,7 +13,6 @@ const SearchResults = lazy(() => import('pages/SearchResults'));
 const PageNotFound = lazy(() => import('components/shared/PageNotFound'));
 
 const Routes = () => {
-  useDatasetQuery();
   return (
     <Router>
       {/* TODO: manage Header here instead of inside each component? */}

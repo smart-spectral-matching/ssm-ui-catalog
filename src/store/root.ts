@@ -5,17 +5,7 @@ import {makeAutoObservable} from 'mobx';
  * this is just convenient for now
  */
 export class RootStore {
-  /**
-   * For now, define this variable on application startup,
-   * then persist it forever.
-   */
-  datasetUuid?: string;
-
   constructor() {
     makeAutoObservable(this);
-  }
-
-  setDatasetUuid(datasetUuid: string) {
-    this.datasetUuid = datasetUuid;
   }
 }

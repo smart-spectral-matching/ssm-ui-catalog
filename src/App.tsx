@@ -9,11 +9,13 @@ import {RootStoreProvider} from 'store/providers';
 import makeTheme from './theme';
 import {QueryClient, QueryClientProvider} from 'react-query';
 
+import {API_URL} from 'ssm-constants';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: async ({queryKey}) => {
-        const d = await fetch(`${process.env.REACT_APP_API_URL}${queryKey[0]}`);
+        const d = await fetch(`${API_URL}${queryKey[0]}`);
         return d.json();
       },
     },
