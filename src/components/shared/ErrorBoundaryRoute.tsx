@@ -2,7 +2,7 @@ import {Route, RouteProps} from 'react-router-dom';
 import ErrorBoundary from './ErrorBoundary';
 
 export const ErrorBoundaryRoute = ({component: Component, ...rest}: RouteProps) => {
-  if (!Component) throw new Error(`A component needs to be specified for path ${(rest as Omit<RouteProps, 'component'>).path}`);
+  if (!Component) throw new Error(`A component needs to be specified for path ${rest.path}`);
 
   return (
     <Route

@@ -18,11 +18,9 @@ import {
 import {CloudUpload} from '@material-ui/icons';
 import {observer, useLocalObservable} from 'mobx-react-lite';
 import {useEffect} from 'react';
-import {Link as RouterLink, useHistory} from 'react-router-dom';
+import {Link as RouterLink} from 'react-router-dom';
 
-import LOGO from 'assets/logo.png';
 import CustomTablePaginationActions from 'components/CustomTablePaginationActions';
-import SearchBar from 'components/SearchBar';
 import {BatsModelCondensed, PaginatedResponse, RouteHref} from 'types';
 import {API_URL, DATASET} from 'ssm-constants';
 
@@ -65,7 +63,6 @@ const Home = observer(() => {
       state.page = newPage; // triggers useEffect hook
     },
   }));
-  const history = useHistory();
 
   /**
    * this is local because we should refetch every time the Home page is re-rendered,
@@ -73,7 +70,10 @@ const Home = observer(() => {
    */
   useEffect(() => {
     fetch(`${API_URL}/datasets/${DATASET}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw res;
+        return res.json();
+      })
       .then((json: PaginatedResponse<BatsModelCondensed>) => {
         state.parseResponse(json);
         window.console.log(state.elements);
@@ -86,14 +86,6 @@ const Home = observer(() => {
 
   return (
     <Container component="main" className={classes.root}>
-      <div className={classes.row}>
-        <img src={LOGO} alt="brand logo" width="150" height="100" />
-      </div>
-
-      <div className={classes.row}>
-        <SearchBar className={classes.rowContent} onSearch={(result) => history.push(RouteHref.SEARCH)} />
-      </div>
-
       <div className={classes.row}>
         <Paper className={classes.rowContent}>
           <Toolbar>
@@ -133,7 +125,7 @@ const Home = observer(() => {
                     rowsPerPageOptions={[]}
                     count={state.count}
                     page={state.page}
-                    onChangePage={(e, page) => state.changePage(page)}
+                    onPageChange={(e, page) => state.changePage(page)}
                     colSpan={3}
                     ActionsComponent={CustomTablePaginationActions}
                   />

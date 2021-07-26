@@ -20,7 +20,6 @@ import {
 import {Link as RouterLink} from 'react-router-dom';
 
 import H20 from 'assets/h20.jpeg';
-import Header from 'components/layout/Header';
 import {RouteHref} from 'types';
 
 enum FilterState {
@@ -155,36 +154,33 @@ const SearchResults = () => {
   const classes = useStyles();
 
   return (
-    <main>
-      <Header />
-      <Container className={classes.container}>
-        <Grid container spacing={4} alignContent="center">
-          <Grid item sm={4} xs={12} className={`${classes.scrollGrid} ${classes.scrollGridL}`}>
-            <FormControl component="fieldset" className={classes.fieldset}>
-              <FormLabel component="legend">Filter By Type</FormLabel>
-              <RadioGroup
-                aria-label="type"
-                name="type"
-                value={state.filter}
-                onChange={(e) => state.updateFilter(e.target.value as FilterState)}
-              >
-                {Object.values(FilterState).map((value) => (
-                  <FormControlLabel key={nanoid()} value={value} control={<Radio />} label={value} />
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <Collection classes={classes} title="Filter By Method" inputName="methodGroup" values={state.randomMethods} />
-            <Collection classes={classes} title="Filter By System" inputName="systemGroup" values={state.randomSystems} />
-            <Collection classes={classes} title="Filter By Author" inputName="authorGroup" values={state.randomAuthors} />
-          </Grid>
-          <Grid item sm={8} className={classes.scrollGrid}>
-            {state.randomCards.map((v) => (
-              <LoremIpsumCard key={nanoid()} classes={classes} isSample={v.isSample} filter={state.filter} />
-            ))}
-          </Grid>
+    <Container component="main" className={classes.container}>
+      <Grid container spacing={4} alignContent="center">
+        <Grid item sm={4} xs={12} className={`${classes.scrollGrid} ${classes.scrollGridL}`}>
+          <FormControl component="fieldset" className={classes.fieldset}>
+            <FormLabel component="legend">Filter By Type</FormLabel>
+            <RadioGroup
+              aria-label="type"
+              name="type"
+              value={state.filter}
+              onChange={(e) => state.updateFilter(e.target.value as FilterState)}
+            >
+              {Object.values(FilterState).map((value) => (
+                <FormControlLabel key={nanoid()} value={value} control={<Radio />} label={value} />
+              ))}
+            </RadioGroup>
+          </FormControl>
+          <Collection classes={classes} title="Filter By Method" inputName="methodGroup" values={state.randomMethods} />
+          <Collection classes={classes} title="Filter By System" inputName="systemGroup" values={state.randomSystems} />
+          <Collection classes={classes} title="Filter By Author" inputName="authorGroup" values={state.randomAuthors} />
         </Grid>
-      </Container>
-    </main>
+        <Grid item sm={8} className={classes.scrollGrid}>
+          {state.randomCards.map((v) => (
+            <LoremIpsumCard key={nanoid()} classes={classes} isSample={v.isSample} filter={state.filter} />
+          ))}
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

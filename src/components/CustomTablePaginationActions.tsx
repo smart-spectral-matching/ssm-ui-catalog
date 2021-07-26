@@ -5,8 +5,6 @@ import {FC} from 'react';
 
 const getAriaLabel = (type: string, pageArg: number) => `Go to ${type} page (${pageArg + 1})`;
 
-interface CustomTablePaginationActionsProps extends TablePaginationActionsProps {}
-
 /**
  * Custom Table pagination actions, with first button and last button support
  *
@@ -15,11 +13,11 @@ interface CustomTablePaginationActionsProps extends TablePaginationActionsProps 
  *
  * TODO should be able to use the material-ui default on v5.
  */
-const CustomTablePaginationActions: FC<CustomTablePaginationActionsProps> = ({
+const CustomTablePaginationActions: FC<TablePaginationActionsProps> = ({
   count,
   page,
   rowsPerPage,
-  onChangePage,
+  onPageChange,
   backIconButtonProps,
   nextIconButtonProps,
 }) => {
@@ -35,7 +33,7 @@ const CustomTablePaginationActions: FC<CustomTablePaginationActionsProps> = ({
   return (
     <Box display="flex">
       <IconButton
-        onClick={(e) => onChangePage(e, 0)}
+        onClick={(e) => onPageChange(e, 0)}
         disabled={isFirstPage}
         aria-label={getAriaLabel('first', 0)}
         title={getAriaLabel('first', 0)}
@@ -44,7 +42,7 @@ const CustomTablePaginationActions: FC<CustomTablePaginationActionsProps> = ({
       </IconButton>
       <IconButton
         {...backIconButtonProps}
-        onClick={(e) => onChangePage(e, previousPage)}
+        onClick={(e) => onPageChange(e, previousPage)}
         disabled={isFirstPage}
         aria-label={getAriaLabel('previous', previousPage)}
         title={getAriaLabel('previous', previousPage)}
@@ -53,7 +51,7 @@ const CustomTablePaginationActions: FC<CustomTablePaginationActionsProps> = ({
       </IconButton>
       <IconButton
         {...nextIconButtonProps}
-        onClick={(e) => onChangePage(e, nextPage)}
+        onClick={(e) => onPageChange(e, nextPage)}
         disabled={isLastPage}
         aria-label={getAriaLabel('next', nextPage)}
         title={getAriaLabel('next', nextPage)}
@@ -61,7 +59,7 @@ const CustomTablePaginationActions: FC<CustomTablePaginationActionsProps> = ({
         {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
       </IconButton>
       <IconButton
-        onClick={(e) => onChangePage(e, lastPage)}
+        onClick={(e) => onPageChange(e, lastPage)}
         disabled={isLastPage}
         aria-label={getAriaLabel('last', lastPage)}
         title={getAriaLabel('last', lastPage)}
