@@ -9,6 +9,7 @@ const theme = (color?: PaletteType) =>
       },
       secondary: {
         main: '#777777',
+        contrastText: '#fff',
       },
     },
     overrides: {

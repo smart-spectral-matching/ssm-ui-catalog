@@ -1,16 +1,8 @@
-import {Container, makeStyles, Typography} from '@material-ui/core';
+import {Box, Container, Typography} from '@material-ui/core';
 
 import ABOUT_IMG from 'assets/ssm_about.png';
 
-const useStyles = makeStyles((theme) => ({
-  imageContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-}));
-
 const About = () => {
-  const classes = useStyles();
   return (
     <Container component="main">
       <Typography variant="h1">About</Typography>
@@ -31,9 +23,9 @@ const About = () => {
         scientific data storage for CURIES. The SSM platform will result in a powerful, readily deployable, and user-friendly resource for
         the nonproliferation community.
       </Typography>
-      <div className={classes.imageContainer}>
+      <Box display="flex" justifyContent="center">
         <img src={ABOUT_IMG} alt="SSM Workflow" />
-      </div>
+      </Box>
     </Container>
   );
 };

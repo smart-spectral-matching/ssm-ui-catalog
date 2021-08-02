@@ -11,7 +11,9 @@
     "no-console": "warn",
     "complexity": ["warn", 10]
   },
-  "parserOptions": {
-    "project": "./tsconfig.json"
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   }
 }

@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = observer(() => {
+const Home = () => {
   const state = useLocalObservable(() => ({
     elements: [] as Array<BatsModelCondensed>,
     /**
@@ -76,7 +76,6 @@ const Home = observer(() => {
       })
       .then((json: PaginatedResponse<BatsModelCondensed>) => {
         state.parseResponse(json);
-        window.console.log(state.elements);
       })
       // TODO we can add a state variable to update the UI later on
       .catch((err) => window.console.error("Didn't fetch model summaries", err));
@@ -143,6 +142,6 @@ const Home = observer(() => {
       </div>
     </Container>
   );
-});
+};
 
-export default Home;
+export default observer(Home);

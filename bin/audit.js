@@ -4,6 +4,8 @@
 /*
  * CLI script to run 'yarn audit' and change the exit code. Only dependency is yargs, which is usually installed with other dev libraries anyways.
  *
+ * We only check dependencies used in production, see https://overreacted.io/npm-audit-broken-by-design/ for justification of ignoring dev dependencies.
+ *
  * By default, yarn gives us the following exit codes when at least one module with a given severity level has been found (returning the sum):
  *
     1 for INFO
@@ -31,12 +33,6 @@ const AUDIT_SEVERITY_OPTIONS = ['info', 'low', 'moderate', 'high', 'critical'];
 
 const argv = require('yargs')
   .usage('Usage: $0 [options]')
-  .option('groups', {
-    alias: 'g',
-    type: 'array',
-    description: 'Only audit dependencies from listed groups. Follows yarn defaults if not specified (all but peerDependencies)',
-    choices: ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies'],
-  })
   .option('level', {
     alias: 'l',
     type: 'string',
@@ -67,12 +63,8 @@ const argv = require('yargs')
   .epilogue('Purpose: Control "yarn audit" exit code and output relevant information').argv;
 
 function run() {
-  const yarnArgs = ['audit'];
-  argv.silent ? yarnArgs.push('--silent') : yarnArgs.push('--json');
-  if (argv.groups) {
-    yarnArgs.push('--groups');
-    argv.groups.forEach((arg) => yarnArgs.push(arg));
-  }
+  const yarnArgs = ['audit', '--groups', 'dependencies'];
+  yarnArgs.push(argv.silent ? '--silent' : '--json');
   argv.ignoreLessSevere && yarnArgs.push('--level', argv.level);
 
   const yarn = require('child_process').spawn('yarn', yarnArgs);

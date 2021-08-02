@@ -1,5 +1,5 @@
-import {makeStyles, AppBar, Link, Toolbar, Menu, List, ListItem, MenuItem, ListItemText, Typography} from '@material-ui/core';
-import React, {useState} from 'react';
+import {makeStyles, AppBar, Link, List, ListItem, ListItemText, Menu, MenuItem, Toolbar, Typography} from '@material-ui/core';
+import {useState} from 'react';
 import {Link as RouterLink, useHistory} from 'react-router-dom';
 
 import LOGO from 'assets/logo.png';
@@ -72,17 +72,19 @@ const Header = () => {
           </div>
           <List className={classes.linkContainer}>
             <ListItem>
-              <Link component={RouterLink} to={RouteHref.HOME}>
+              <Link component={RouterLink} to={RouteHref.HOME} color="inherit">
                 HOME
               </Link>
             </ListItem>
             <ListItem>
-              <Link component={RouterLink} to={RouteHref.ABOUT}>
+              <Link component={RouterLink} to={RouteHref.ABOUT} color="inherit">
                 ABOUT
               </Link>
             </ListItem>
             <ListItem>
-              <Link href={MACHINE_LEARNING_URL}>TRAINING</Link>
+              <Link href={MACHINE_LEARNING_URL} color="inherit">
+                TRAINING
+              </Link>
             </ListItem>
             <ListItem
               button
@@ -91,7 +93,7 @@ const Header = () => {
             >
               <ListItemText
                 primary={
-                  <Typography variant="body2" color="primary">
+                  <Typography variant="body2" color="inherit">
                     DOCS&nbsp;▾
                   </Typography>
                 }
@@ -100,14 +102,13 @@ const Header = () => {
             <Menu
               id={DOCS_MENU_ID}
               anchorEl={docsMenu}
-              keepMounted
               open={!!docsMenu}
               onClose={() => setDocsMenu(null)}
               getContentAnchorEl={null} // needed for menu to appear below, see https://stackoverflow.com/a/52551100
               anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
               transformOrigin={{vertical: 'top', horizontal: 'center'}}
             >
-              <MenuItem component={Link} href={API_DOCS_URL} onClick={() => setDocsMenu(null)}>
+              <MenuItem component={Link} href={API_DOCS_URL} onClick={() => setDocsMenu(null)} color="inherit">
                 API
               </MenuItem>
             </Menu>
