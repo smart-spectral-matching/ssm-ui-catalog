@@ -17,6 +17,6 @@ change_env_var() {
 # environment variables
 change_env_var "REACT_APP_API_URL" "/api"
 change_env_var "REACT_APP_API_DOCS_URL" "/api/swagger-ui/"
-change_env_var "REACT_APP_MACHINE_LEARNING_URL" "/machine-learning/training/"
+change_env_var "REACT_APP_MACHINE_LEARNING_URL" "/machine-learning/notebooks/"
 # robots.txt - disallow all crawlers if not in production
 [ "$1" = "main" ] || printf "User-agent: *\nDisallow: /\n" > public/robots.txt
