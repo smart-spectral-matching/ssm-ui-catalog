@@ -17,6 +17,10 @@ export const API_URL = process.env.REACT_APP_API_URL as string;
  */
 export const API_DOCS_URL = process.env.REACT_APP_API_DOCS_URL as string;
 /**
- * Link to the Machine Learning Hub. If frontend and ML-hub are behind same proxy, should be absolute path.
+ * Link to the Machine Learning UI Hub. If frontend and ML-hub are behind same proxy, should be absolute path.
  */
-export const MACHINE_LEARNING_URL = process.env.REACT_APP_MACHINE_LEARNING_URL as string;
+export const MACHINE_LEARNING_UI_URL = process.env.REACT_APP_MACHINE_LEARNING_UI_URL as string;
+/**
+ * Link to the Machine Learning Jupyter Notebooks. If behind same proxy as frontend, should be absolute path.
+ */
+export const MACHINE_LEARNING_NOTEBOOKS_URL = process.env.REACT_APP_MACHINE_LEARNING_NOTEBOOKS_URL as string;
