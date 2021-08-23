@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
     queries: {
       queryFn: async ({queryKey}) => {
         const d = await fetch(`${API_URL}${queryKey[0]}`);
+        if (!d.ok) throw d;
         return d.json();
       },
     },
