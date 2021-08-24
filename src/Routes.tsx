@@ -18,7 +18,6 @@ const Routes = () => {
   return (
     <Router>
       <Header />
-      {/* TODO: manage Header here instead of inside each component? */}
       <ErrorBoundary>
         <Switch>
           <ErrorBoundaryRoute path={`${RouteHref.DETAIL_DATASET}/:dataset?/:model?`} component={Detail} />

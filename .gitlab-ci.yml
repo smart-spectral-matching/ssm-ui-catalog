@@ -42,7 +42,6 @@ test_audit:
     - func_rse_docker_cleanup
     - docker login --username=$CI_REGISTRY_USER --password=$CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
-    # TODO get rid of audit.js arguments when react-scripts updates
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/audit.js" > $AUDIT_OUTFILE
   tags:
     - rse-nds-builder
