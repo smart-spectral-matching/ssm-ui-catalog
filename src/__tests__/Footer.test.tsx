@@ -1,4 +1,5 @@
-import {render, screen} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+
 import Footer from 'components/layout/Footer';
 
 test('Footer text contains title', () => {

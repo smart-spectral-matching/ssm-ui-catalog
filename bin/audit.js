@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint no-console: off */
 
 /*
  * CLI script to run 'yarn audit' and change the exit code. Only dependency is yargs, which is usually installed with other dev libraries anyways.
@@ -28,10 +27,14 @@
  *
  */
 
+const childProcess = require('child_process');
+
+const yargs = require('yargs');
+
 // severity order from least to most
 const AUDIT_SEVERITY_OPTIONS = ['info', 'low', 'moderate', 'high', 'critical'];
 
-const argv = require('yargs')
+const argv = yargs
   .usage('Usage: $0 [options]')
   .option('level', {
     alias: 'l',
@@ -62,28 +65,19 @@ const argv = require('yargs')
   .strict()
   .epilogue('Purpose: Control "yarn audit" exit code and output relevant information').argv;
 
-function run() {
-  const yarnArgs = ['audit', '--groups', 'dependencies'];
-  yarnArgs.push(argv.silent ? '--silent' : '--json');
-  argv.ignoreLessSevere && yarnArgs.push('--level', argv.level);
-
-  const yarn = require('child_process').spawn('yarn', yarnArgs);
-
-  // stdout will not be filled all at once, so append to a string
-  let output = '';
-  yarn.stdout.on('data', (data) => (output += data.toString()));
-  let errorOutput = '';
-  yarn.stderr.on('data', (data) => (errorOutput += data.toString()));
-
-  yarn.on('close', (code) => {
-    // if stderr was printed to, the yarn audit failed
-    if (errorOutput) {
-      console.error(argv.silent ? errorOutput : JSON.parse(errorOutput).data);
-    } else if (!argv.silent) {
-      generateOutput(output);
-    }
-    process.exit(errorOutput || !getExitCode(code));
-  });
+function getExitCode(code) {
+  switch (argv.level) {
+    case 'low':
+      return code < 2;
+    case 'moderate':
+      return code < 4;
+    case 'high':
+      return code < 8;
+    case 'critical':
+      return code < 16;
+    default:
+      return code < 1;
+  }
 }
 
 function generateOutput(output) {
@@ -95,9 +89,7 @@ function generateOutput(output) {
 
   const adviceLines = lines
     .filter((line) => line.type === 'auditAdvisory')
-    .map((line) => {
-      return {...line.data.advisory, path: line.data.resolution.path.split('>')[0]};
-    });
+    .map((line) => ({ ...line.data.advisory, path: line.data.resolution.path.split('>')[0] }));
   const summaryLine = lines[lines.length - 1].data.vulnerabilities;
   const MINIMUM_SEVERITY_INDEX = AUDIT_SEVERITY_OPTIONS.indexOf(argv.level);
 
@@ -113,7 +105,7 @@ function generateOutput(output) {
 
   if (argv.json) {
     // give it everything in one JSON object (so you can pipe this script into a .json file)
-    console.log(JSON.stringify({modules: adviceLines, summary: summaryLine}, null, 2));
+    console.log(JSON.stringify({ modules: adviceLines, summary: summaryLine }, null, 2));
   } else {
     // opinionated output
     adviceLines.forEach((line) => {
@@ -134,25 +126,34 @@ function generateOutput(output) {
     console.log('-----------------------------------------------------------------------------------------------------\n');
     for (let i = argv.ignoreLessSevere ? MINIMUM_SEVERITY_INDEX : 0; i < AUDIT_SEVERITY_OPTIONS.length; i++) {
       const value = AUDIT_SEVERITY_OPTIONS[i];
-      console.log(`${value.toUpperCase()} vulnerabilities: ${value.length >= 8 ? '\t' : '\t\t'}${summaryLine[value]}`);
+      console.log(`${value.toUpperCase()} vulnerabilities: ${summaryLine[value]}`);
     }
-    console.log(`TOTAL vulnerabilities: \t\t${summaryLine.total}\n`);
+    console.log(`TOTAL vulnerabilities: ${summaryLine.total}\n`);
   }
 }
 
-function getExitCode(code) {
-  switch (argv.level) {
-    case 'low':
-      return code < 2;
-    case 'moderate':
-      return code < 4;
-    case 'high':
-      return code < 8;
-    case 'critical':
-      return code < 16;
-    default:
-      return code < 1;
-  }
+function run() {
+  const yarnArgs = ['audit', '--groups', 'dependencies'];
+  yarnArgs.push(argv.silent ? '--silent' : '--json');
+  if (argv.ignoreLessSevere) yarnArgs.push('--level', argv.level);
+
+  const yarn = childProcess.spawn('yarn', yarnArgs);
+
+  // stdout will not be filled all at once, so append to a string
+  let output = '';
+  yarn.stdout.on('data', (data) => (output += data.toString()));
+  let errorOutput = '';
+  yarn.stderr.on('data', (data) => (errorOutput += data.toString()));
+
+  yarn.on('close', (code) => {
+    // if stderr was printed to, the yarn audit failed
+    if (errorOutput) {
+      console.error(argv.silent ? errorOutput : JSON.parse(errorOutput).data);
+    } else if (!argv.silent) {
+      generateOutput(output);
+    }
+    process.exit(errorOutput || !getExitCode(code));
+  });
 }
 
 process.chdir(`${__dirname}/..`);

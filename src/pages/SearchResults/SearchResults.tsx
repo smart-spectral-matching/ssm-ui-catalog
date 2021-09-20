@@ -1,26 +1,26 @@
-import {observer, useLocalObservable} from 'mobx-react-lite';
-import {nanoid} from 'nanoid';
+import { Link as RouterLink } from 'react-router-dom';
+import { observer, useLocalObservable } from 'mobx-react-lite';
 import {
-  makeStyles,
   Card,
   CardContent,
+  Checkbox,
   Chip,
   Container,
-  Grid,
-  Link,
-  Typography,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormLabel,
+  Grid,
+  Link,
+  makeStyles,
   Radio,
   RadioGroup,
-  Checkbox,
+  Typography,
 } from '@material-ui/core';
-import {Link as RouterLink} from 'react-router-dom';
+import { nanoid } from 'nanoid';
 
 import H20 from 'assets/h20.jpeg';
-import {RouteHref} from 'types';
+import { RouteHref } from 'types';
 
 enum FilterState {
   ALL = 'All',
@@ -92,8 +92,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Collection = observer((props: {classes: ReturnType<typeof useStyles>; title: string; values: string[]; inputName?: string}) => {
-  const {classes, title, values, inputName} = props;
+const Collection = observer((props: { classes: ReturnType<typeof useStyles>; title: string; values: string[]; inputName?: string }) => {
+  const { classes, title, values, inputName } = props;
   return (
     <FormControl component="fieldset" className={classes.fieldset}>
       <FormLabel component="legend">{title}</FormLabel>
@@ -106,14 +106,14 @@ const Collection = observer((props: {classes: ReturnType<typeof useStyles>; titl
   );
 });
 
-const LoremIpsumCard = (props: {classes: ReturnType<typeof useStyles>; isSample?: boolean; filter: FilterState}) => {
-  const {classes, isSample, filter} = props;
+const LoremIpsumCard = (props: { classes: ReturnType<typeof useStyles>; isSample: boolean; filter: FilterState }) => {
+  const { classes, isSample, filter } = props;
   // this is a good example of a property which would normally be computed
   const isVisible =
     filter === FilterState.ALL || (isSample && filter === FilterState.SAMPLES) || (!isSample && filter === FilterState.DATASETS);
   if (!isVisible) return <></>;
 
-  const example = isSample ? {url: RouteHref.DETAIL_SAMPLE, display: 'Sample'} : {url: RouteHref.DETAIL_DATASET, display: 'Dataset'};
+  const example = isSample ? { url: RouteHref.DETAIL_SAMPLE, display: 'Sample' } : { url: RouteHref.DETAIL_DATASET, display: 'Dataset' };
 
   return (
     <Card className={classes.card} component="article">
@@ -139,12 +139,12 @@ const SearchResults = () => {
   const state = useLocalObservable(() => ({
     filter: FilterState.ALL,
     updateFilter(filter: FilterState) {
-      this.filter = filter;
+      state.filter = filter;
     },
     /*
      * NOTE: Do not directly set JSX attributes derived from Math.random(), because ANY state change forces them to rerender
      */
-    randomCards: Array.from(Array(Math.floor(Math.random() * 10) + 10), (_) => ({
+    randomCards: Array.from(Array(Math.floor(Math.random() * 10) + 10), () => ({
       isSample: Math.random() >= 0.5,
     })),
     randomMethods: generateRandomCollections('Method'),
@@ -166,7 +166,7 @@ const SearchResults = () => {
               onChange={(e) => state.updateFilter(e.target.value as FilterState)}
             >
               {Object.values(FilterState).map((value) => (
-                <FormControlLabel key={nanoid()} value={value} control={<Radio />} label={value} />
+                <FormControlLabel key={value} value={value} control={<Radio />} label={value} />
               ))}
             </RadioGroup>
           </FormControl>

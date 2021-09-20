@@ -1,7 +1,7 @@
-import {Box, IconButton, useTheme} from '@material-ui/core';
-import {TablePaginationActionsProps} from '@material-ui/core/TablePagination/TablePaginationActions';
-import {FirstPage, KeyboardArrowLeft, KeyboardArrowRight, LastPage} from '@material-ui/icons';
-import {FC} from 'react';
+import { FC } from 'react';
+import { Box, IconButton, useTheme } from '@material-ui/core';
+import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
+import { FirstPage, KeyboardArrowLeft, KeyboardArrowRight, LastPage } from '@material-ui/icons';
 
 const getAriaLabel = (type: string, pageArg: number) => `Go to ${type} page (${pageArg + 1})`;
 

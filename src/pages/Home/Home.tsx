@@ -1,34 +1,34 @@
+import { useEffect } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { observer, useLocalObservable } from 'mobx-react-lite';
 import {
-  makeStyles,
+  Box,
   Button,
+  CircularProgress,
   Container,
+  IconButton,
   Link,
-  Typography,
-  TableContainer,
+  makeStyles,
+  MenuItem,
   Paper,
   Table,
-  TableHead,
-  TableRow,
   TableBody,
-  TableFooter,
   TableCell,
+  TableContainer,
+  TableFooter,
+  TableHead,
   TablePagination,
-  Toolbar,
-  MenuItem,
-  IconButton,
+  TableRow,
   TextField,
-  CircularProgress,
-  Box,
+  Toolbar,
+  Typography,
 } from '@material-ui/core';
-import {CloudUpload, Refresh} from '@material-ui/icons';
-import {observer, useLocalObservable} from 'mobx-react-lite';
-import {useEffect} from 'react';
-import {Link as RouterLink} from 'react-router-dom';
+import { CloudUpload, Refresh } from '@material-ui/icons';
 
 import CustomTablePaginationActions from 'components/CustomTablePaginationActions';
-import {BatsModelCondensed, PaginatedResponse, RouteHref} from 'types';
-import {API_URL} from 'ssm-constants';
-import {useStore} from 'store/providers';
+import { API_URL } from 'ssm-constants';
+import { useStore } from 'store/providers';
+import { BatsModelCondensed, PaginatedResponse, RouteHref } from 'types';
 
 const PAGE_SIZE = 5;
 
@@ -83,7 +83,7 @@ const Home = () => {
     if (store.datasetsLoaded) return;
     fetch(`${API_URL}/datasets`)
       .then((res) => {
-        if (!res.ok) throw res;
+        if (!res.ok) throw new Error(res.statusText);
         return res.json();
       })
       .then((json: Array<string>) => store.updateDatasets(json))
@@ -102,7 +102,7 @@ const Home = () => {
     if (!store.selectedDataset) return;
     fetch(`${API_URL}/datasets/${store.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`)
       .then((res) => {
-        if (!res.ok) throw res;
+        if (!res.ok) throw new Error(res.statusText);
         return res.json();
       })
       .then((json: PaginatedResponse<BatsModelCondensed>) => state.showModels(json))
@@ -125,7 +125,7 @@ const Home = () => {
             error={!!store.datasetLoadErr}
             helperText={store.datasetLoadErr}
             select
-            SelectProps={{onChange: (e) => (store.selectedDataset = e.target.value as string)}}
+            SelectProps={{ onChange: (e) => (store.selectedDataset = e.target.value as string) }}
           >
             {store.datasets.map((dataset) => (
               <MenuItem value={dataset} key={dataset}>

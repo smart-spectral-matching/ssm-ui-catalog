@@ -9,9 +9,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
-    "format": "prettier --write .",
-    "lint": "eslint --fix --ext ts,tsx src/",
-    "assert-no-warnings": "eslint --max-warnings 0 --ext ts,tsx src/",
+    "format": "prettier --write . && eslint --color --fix .",
+    "assert-no-warnings": "eslint --max-warnings 0 --color .",
     "eject": "react-scripts eject"
   },
   "dependencies": {
@@ -20,11 +19,17 @@
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
     "mobx-utils": "^6.0.4",
+    "nanoid": "^3.1.25",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.19.0",
     "react-router-dom": "^5.2.0",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "workbox-core": "^6.3.0",
+    "workbox-expiration": "^6.3.0",
+    "workbox-precaching": "^6.3.0",
+    "workbox-routing": "^6.3.0",
+    "workbox-strategies": "^6.3.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.14.1",
@@ -37,6 +42,14 @@
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-array-func": "^3.1.7",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-no-unsanitized": "^3.1.5",
+    "eslint-plugin-no-use-extend-native": "^0.5.0",
+    "eslint-plugin-only-warn": "^1.0.3",
+    "eslint-plugin-optimize-regex": "^1.2.1",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-sonarjs": "^0.10.0",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.4",
     "prettier": "^2.3.2",
@@ -55,8 +68,7 @@
     ],
     "**/*.(ts|js)?(x)": [
       "prettier --write",
-      "eslint --fix",
-      "eslint --max-warnings 0"
+      "eslint --color --fix --max-warnings 0"
     ]
   },
   "browserslist": {

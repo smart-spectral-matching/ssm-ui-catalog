@@ -32,7 +32,7 @@ docker-compose up --build
 
 `yarn add <dependency>` (dependencies) or `yarn add -D <dependency>` (devDependencies)
 
-Note that it doesn't strictly matter whether a dependency is `dev` or not when packaging for a static website, but it's best to put development tools in `devDependencies` and application tools in `dependencies` for organizational purposes anyways. `react-scripts` is the one exception to this.
+Note that it doesn't strictly matter whether a dependency is `dev` or not when packaging for a static website, but it's best to put development tools in `devDependencies` and application tools in `dependencies` for organizational purposes anyways.
 
 Removing dependencies: `yarn remove <dependency>`
 
@@ -50,7 +50,7 @@ The application is available on `localhost:3000` by default and should refresh i
 
 ### Auditing
 
-Currently, any dependency which has a `high` or `critical` severity level from `yarn audit` will fail CI/CD. (If you get a `critical` severity level, your computer may be compromised)
+Currently, any regular dependency will fail CI/CD. Dev dependencies are not checked in CI/CD, but if you get a `critical` severity level, your computer may be compromised.
 
 If you have both NPM and Yarn installed, you can try running `bin/audit-fix.sh` to update some of the audit dependencies automatically.
 

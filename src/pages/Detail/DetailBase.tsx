@@ -1,23 +1,23 @@
+import { FC, useEffect } from 'react';
+import { useQuery, UseQueryResult } from 'react-query';
+import { observer } from 'mobx-react-lite';
 import {
-  makeStyles,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Container,
-  Grid,
-  SvgIcon,
-  Typography,
+  AccordionSummary,
   Card,
   CardContent,
+  Container,
+  Grid,
+  makeStyles,
+  SvgIcon,
+  Typography,
 } from '@material-ui/core';
-import {ExpandMore, People} from '@material-ui/icons';
-import {observer} from 'mobx-react-lite';
-import {FC, useEffect} from 'react';
-import {useQuery, UseQueryResult} from 'react-query';
+import { ExpandMore, People } from '@material-ui/icons';
 
-import {ReactComponent as AtomIcon} from 'assets/atom.svg';
-import {ReactComponent as FlaskIcon} from 'assets/flask.svg';
-import {DetailsProps} from './DetailProps';
+import { ReactComponent as AtomIcon } from 'assets/atom.svg';
+import { ReactComponent as FlaskIcon } from 'assets/flask.svg';
+import { DetailsProps } from './DetailProps';
 
 const useStyles = makeStyles((theme) => ({
   accordionContainer: {
@@ -69,138 +69,139 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Accordions = (props: {classes: ReturnType<typeof useStyles>; isSample?: boolean}) => {
-  const {classes, isSample} = props;
-  return (
-    <>
-      {!isSample && (
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMore />}>
-            <span className={classes.accordionLabel}>Method</span>
-            <SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />
-          </AccordionSummary>
-          <AccordionDetails className={classes.accordionDetails}>
-            <ul className={classes.list}>
-              <li>
-                <b>Evaluation: </b> calculation
-              </li>
-            </ul>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>calculation/1/</AccordionSummary>
-              <AccordionDetails className={classes.accordionDetails}>
-                <ul className={classes.list}>
-                  <li>
-                    <b>Approach: </b> Quantum Mechanics
-                  </li>
-                  <li>
-                    <b>Calc Class: </b> ab initio
-                  </li>
-                  <li>
-                    <b>Calc Type: </b> ab ccsd(t)
-                  </li>
-                  <li>
-                    <b>Sub Method: </b> calculation/2/
-                  </li>
-                </ul>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>calculation/2/</AccordionSummary>
-              <AccordionDetails className={classes.accordionDetails}>
-                <ul className={classes.list}>
-                  <li>
-                    <b>Approach: </b> Quantum Mechanics
-                  </li>
-                  <li>
-                    <b>Calc Class: </b> ab initio
-                  </li>
-                  <li>
-                    <b>Calc Type: </b> ab ccsd(t)
-                  </li>
-                  <li>
-                    <b>Sub Method: </b> calculation/2/
-                  </li>
-                </ul>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>basisset/1/</AccordionSummary>
-              <AccordionDetails className={classes.accordionDetails}>
-                <ul className={classes.list}>
-                  <li>
-                    <b>Title: </b> 3-21G
-                  </li>
-                  <li>
-                    <b>Description: </b> A test BSE basis set
-                  </li>
-                  <li>
-                    <b>Format: </b> orbital
-                  </li>
-                  <li>
-                    <b>Set Type: </b> Quantum Mechanics
-                  </li>
-                  <li>
-                    <b>Harmonic Type: </b> Spherical
-                  </li>
-                  <li>
-                    <b>Contraction Type: </b> general
-                  </li>
-                </ul>
-              </AccordionDetails>
-            </Accordion>
-          </AccordionDetails>
-        </Accordion>
-      )}
+const Accordions = ({ classes, isSample }: { classes: ReturnType<typeof useStyles>; isSample?: boolean }) => (
+  <>
+    {!isSample && (
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
-          <span className={classes.accordionLabel}>System</span>
-          <SvgIcon component={AtomIcon} viewBox="0 0 512 512" />
+          <span className={classes.accordionLabel}>Method</span>
+          <SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />
         </AccordionSummary>
         <AccordionDetails className={classes.accordionDetails}>
           <ul className={classes.list}>
             <li>
-              <b>Discipline: </b> chemistry
+              <b>Evaluation: </b> calculation
             </li>
-            <li>
-              <b>Subdiscipline: </b> computational chemistry
-            </li>
-            <li>
-              <b>Facets: </b>
+          </ul>
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMore />}>calculation/1/</AccordionSummary>
+            <AccordionDetails className={classes.accordionDetails}>
               <ul className={classes.list}>
-                <li>temperature</li>
-                <li>charge</li>
-                <li>multiplicity</li>
-                <li>space</li>
+                <li>
+                  <b>Approach: </b> Quantum Mechanics
+                </li>
+                <li>
+                  <b>Calc Class: </b> ab initio
+                </li>
+                <li>
+                  <b>Calc Type: </b> ab ccsd(t)
+                </li>
+                <li>
+                  <b>Sub Method: </b> calculation/2/
+                </li>
               </ul>
-            </li>
-          </ul>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMore />}>calculation/2/</AccordionSummary>
+            <AccordionDetails className={classes.accordionDetails}>
+              <ul className={classes.list}>
+                <li>
+                  <b>Approach: </b> Quantum Mechanics
+                </li>
+                <li>
+                  <b>Calc Class: </b> ab initio
+                </li>
+                <li>
+                  <b>Calc Type: </b> ab ccsd(t)
+                </li>
+                <li>
+                  <b>Sub Method: </b> calculation/2/
+                </li>
+              </ul>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMore />}>basisset/1/</AccordionSummary>
+            <AccordionDetails className={classes.accordionDetails}>
+              <ul className={classes.list}>
+                <li>
+                  <b>Title: </b> 3-21G
+                </li>
+                <li>
+                  <b>Description: </b> A test BSE basis set
+                </li>
+                <li>
+                  <b>Format: </b> orbital
+                </li>
+                <li>
+                  <b>Set Type: </b> Quantum Mechanics
+                </li>
+                <li>
+                  <b>Harmonic Type: </b> Spherical
+                </li>
+                <li>
+                  <b>Contraction Type: </b> general
+                </li>
+              </ul>
+            </AccordionDetails>
+          </Accordion>
         </AccordionDetails>
       </Accordion>
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <span className={classes.accordionLabel}>Authors</span>
-          <People />
-        </AccordionSummary>
-        <AccordionDetails className={classes.accordionDetails}>
-          <ul className={classes.list}>
-            <li>John Doe</li>
-            <li>Jane Doe</li>
-          </ul>
-        </AccordionDetails>
-      </Accordion>
-    </>
-  );
-};
+    )}
+    <Accordion>
+      <AccordionSummary expandIcon={<ExpandMore />}>
+        <span className={classes.accordionLabel}>System</span>
+        <SvgIcon component={AtomIcon} viewBox="0 0 512 512" />
+      </AccordionSummary>
+      <AccordionDetails className={classes.accordionDetails}>
+        <ul className={classes.list}>
+          <li>
+            <b>Discipline: </b> chemistry
+          </li>
+          <li>
+            <b>Subdiscipline: </b> computational chemistry
+          </li>
+          <li>
+            <b>Facets: </b>
+            <ul className={classes.list}>
+              <li>temperature</li>
+              <li>charge</li>
+              <li>multiplicity</li>
+              <li>space</li>
+            </ul>
+          </li>
+        </ul>
+      </AccordionDetails>
+    </Accordion>
+    <Accordion>
+      <AccordionSummary expandIcon={<ExpandMore />}>
+        <span className={classes.accordionLabel}>Authors</span>
+        <People />
+      </AccordionSummary>
+      <AccordionDetails className={classes.accordionDetails}>
+        <ul className={classes.list}>
+          <li>John Doe</li>
+          <li>Jane Doe</li>
+        </ul>
+      </AccordionDetails>
+    </Accordion>
+  </>
+);
 
 // TODO we will probably get rid of isSample later on
-const DetailBase: FC<DetailsProps & {isSample?: boolean}> = ({dataset, model, isSample}) => {
+const DetailBase: FC<DetailsProps & { isSample?: boolean }> = ({ dataset, model, isSample }) => {
   const classes = useStyles();
 
   // TODO temporarily log the result from the model UUID until we decide how to parse it
   const query: UseQueryResult<any, any> = useQuery(`/datasets/${dataset}/models/${model}`);
   useEffect(() => {
     if (query.isFetched) {
-      query.error ? window.console.error(query.error) : window.console.log(query.data);
+      if (query.error) {
+        window.console.error(query.error);
+      } else {
+        window.console.log(query.data);
+      }
     }
   }, [query.isFetched]);
 
@@ -249,6 +250,7 @@ const DetailBase: FC<DetailsProps & {isSample?: boolean}> = ({dataset, model, is
         <Grid item sm={6} component="section">
           <Card>
             <div className={classes.videoContainer}>
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video autoPlay loop className={classes.withBorderRadius}>
                 <source
                   src="https://ak6.picdn.net/shutterstock/videos/1012853036/preview/stock-footage-animation-rotation-of-model-molecule-from-glass-and-crystal.webm"

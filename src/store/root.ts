@@ -1,4 +1,4 @@
-import {makeAutoObservable} from 'mobx';
+import { makeAutoObservable } from 'mobx';
 
 /**
  * TODO this will eventually be spread out into a more tree-like structure,
@@ -6,8 +6,11 @@ import {makeAutoObservable} from 'mobx';
  */
 export class RootStore {
   datasetsLoaded = false;
+
   datasetLoadErr = '';
+
   datasets: Array<string> = [];
+
   selectedDataset = '';
 
   constructor() {
@@ -15,7 +18,6 @@ export class RootStore {
   }
 
   updateDatasets(newDatasets: Array<string>) {
-    this.datasetLoadErr = '';
     this.datasets = newDatasets;
     if (newDatasets.length) {
       this.datasetLoadErr = '';

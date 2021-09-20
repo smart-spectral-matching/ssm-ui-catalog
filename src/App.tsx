@@ -1,22 +1,22 @@
-import {useMemo, Suspense} from 'react';
-import {configure} from 'mobx';
-import {useMediaQuery, Backdrop, CssBaseline, CircularProgress, ThemeProvider} from '@material-ui/core';
+import { Suspense, useMemo } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { configure } from 'mobx';
+import { Backdrop, CircularProgress, CssBaseline, ThemeProvider, useMediaQuery } from '@material-ui/core';
+
+import ErrorBoundary from 'components/shared/ErrorBoundary';
+import { API_URL } from 'ssm-constants';
+import { RootStoreProvider } from 'store/providers';
+import makeTheme from 'theme';
+import Routes from './Routes';
 
 import './App.scss';
-import Routes from 'Routes';
-import ErrorBoundary from 'components/shared/ErrorBoundary';
-import {RootStoreProvider} from 'store/providers';
-import makeTheme from './theme';
-import {QueryClient, QueryClientProvider} from 'react-query';
-
-import {API_URL} from 'ssm-constants';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: async ({queryKey}) => {
+      queryFn: async ({ queryKey }) => {
         const d = await fetch(`${API_URL}${queryKey[0]}`);
-        if (!d.ok) throw d;
+        if (!d.ok) throw new Error(d.statusText);
         return d.json();
       },
     },

@@ -1,5 +1,6 @@
-import {createContext, FC, useContext} from 'react';
-import {RootStore} from 'store/root';
+import { createContext, FC, useContext } from 'react';
+
+import { RootStore } from 'store/root';
 
 export const store = new RootStore();
 

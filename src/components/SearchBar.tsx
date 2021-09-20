@@ -1,8 +1,8 @@
-import {useRef} from 'react';
-import {ButtonBase, IconButton, Input, makeStyles, Paper} from '@material-ui/core';
-import {Close, Search} from '@material-ui/icons';
-import {observer, useLocalObservable} from 'mobx-react-lite';
-import {runInAction} from 'mobx';
+import { useRef } from 'react';
+import { runInAction } from 'mobx';
+import { observer, useLocalObservable } from 'mobx-react-lite';
+import { ButtonBase, IconButton, Input, makeStyles, Paper } from '@material-ui/core';
+import { Close, Search } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,20 +53,20 @@ const SearchBar = (props: SearchBarProps) => {
   const state = useLocalObservable(() => ({
     searchText: '',
     get sanitizedSearchText() {
-      return this.searchText.trim();
+      return state.searchText.trim();
     },
     updateSearchText(text: string) {
-      this.searchText = text;
+      state.searchText = text;
     },
     fireSearchEvent(searchValue: string) {
-      this.searchText = '';
+      state.searchText = '';
       props.onSearch(searchValue);
     },
   }));
   const classes = useStyles();
 
   return (
-    <Paper className={`${classes.root} ${props.className}`}>
+    <Paper className={`${classes.root}${!!props.className && props.className}`}>
       <ButtonBase
         disableRipple
         component="span"
@@ -78,7 +78,7 @@ const SearchBar = (props: SearchBarProps) => {
       </ButtonBase>
       <div className={classes.searchContainer}>
         <Input
-          inputProps={{ref: inputEl}}
+          inputProps={{ ref: inputEl }}
           value={state.searchText}
           onChange={(e) => state.updateSearchText(e.target.value)}
           onKeyUp={(e) => {

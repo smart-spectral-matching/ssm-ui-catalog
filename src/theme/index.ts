@@ -1,4 +1,4 @@
-import {unstable_createMuiStrictModeTheme as createMuiTheme, responsiveFontSizes, PaletteType} from '@material-ui/core';
+import { PaletteType, responsiveFontSizes, unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core';
 
 const theme = (color?: PaletteType) =>
   createMuiTheme({

@@ -1,11 +1,11 @@
-import {makeStyles, AppBar, Link, List, ListItem, ListItemText, Menu, MenuItem, Toolbar, Typography} from '@material-ui/core';
-import {useState} from 'react';
-import {Link as RouterLink, useHistory} from 'react-router-dom';
+import { useState } from 'react';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { AppBar, Link, List, ListItem, ListItemText, makeStyles, Menu, MenuItem, Toolbar, Typography } from '@material-ui/core';
 
 import LOGO from 'assets/logo.png';
-import {RouteHref} from 'types';
 import SearchBar from 'components/SearchBar';
-import {API_DOCS_URL, MACHINE_LEARNING_NOTEBOOKS_URL, MACHINE_LEARNING_UI_URL} from 'ssm-constants';
+import { API_DOCS_URL, MACHINE_LEARNING_NOTEBOOKS_URL, MACHINE_LEARNING_UI_URL } from 'ssm-constants';
+import { RouteHref } from 'types';
 
 const ML_MENU_ID = 'ml-menu-id';
 const DOCS_MENU_ID = 'docs-menu-id';
@@ -102,8 +102,8 @@ const Header = () => {
               open={!!mlMenu}
               onClose={() => setMlMenu(null)}
               getContentAnchorEl={null} // needed for menu to appear below, see https://stackoverflow.com/a/52551100
-              anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-              transformOrigin={{vertical: 'top', horizontal: 'center'}}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
               <MenuItem component={Link} href={MACHINE_LEARNING_UI_URL} onClick={() => setMlMenu(null)} color="inherit">
                 UI
@@ -131,8 +131,8 @@ const Header = () => {
               open={!!docsMenu}
               onClose={() => setDocsMenu(null)}
               getContentAnchorEl={null} // needed for menu to appear below, see https://stackoverflow.com/a/52551100
-              anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-              transformOrigin={{vertical: 'top', horizontal: 'center'}}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
               <MenuItem component={Link} href={API_DOCS_URL} onClick={() => setDocsMenu(null)} color="inherit">
                 API
