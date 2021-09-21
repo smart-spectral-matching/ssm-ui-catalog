@@ -72,27 +72,29 @@ const Home = () => {
    * do not automatically run this if a user navigates to Home a second time
    */
   useEffect(() => {
-    if (store.datasetsLoaded) return;
+    if (store.dataset.datasetsLoaded) return;
     fetch(`${API_URL}/datasets`)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
       })
-      .then((json: Array<string>) => store.updateDatasets(json))
+      .then((json: Array<string>) => store.dataset.updateDatasets(json))
       .catch((err) => {
-        store.datasetLoadErr = 'Did not fetch datasets, click reload button to try again';
+        store.dataset.datasetLoadErr = 'Did not fetch datasets, click reload button to try again';
         window.console.error(err);
       })
-      .finally(() => (store.datasetsLoaded = true));
-  }, [store.datasetsLoaded]);
+      .finally(() => (store.dataset.datasetsLoaded = true));
+  }, [store.dataset.datasetsLoaded]);
 
   /**
    * this is local because we should refetch every time the Home page is re-rendered,
    * to get the latest models
    */
   useEffect(() => {
-    if (!store.selectedDataset) return;
-    fetch(`${API_URL}/datasets/${store.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`)
+    if (!store.dataset.selectedDataset) return;
+    fetch(
+      `${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}&returnFull=false`,
+    )
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
@@ -102,7 +104,7 @@ const Home = () => {
         state.modelErr = 'Could not fetch models';
         window.console.error(err);
       });
-  }, [store.selectedDataset, state.oneBasedPage]);
+  }, [store.dataset.selectedDataset, state.oneBasedPage]);
 
   return (
     <Container component="main" sx={{ mt: 8 }}>
@@ -110,15 +112,15 @@ const Home = () => {
         <Box display="flex" sx={{ minWidth: '50%' }}>
           <TextField
             id="select-dataset"
-            value={store.selectedDataset}
+            value={store.dataset.selectedDataset}
             label="Select Dataset"
             variant="standard"
-            error={!!store.datasetLoadErr}
-            helperText={store.datasetLoadErr}
+            error={!!store.dataset.datasetLoadErr}
+            helperText={store.dataset.datasetLoadErr}
             select
-            SelectProps={{ onChange: (e) => (store.selectedDataset = e.target.value as string) }}
+            SelectProps={{ onChange: (e) => (store.dataset.selectedDataset = e.target.value as string) }}
           >
-            {store.datasets.map((dataset) => (
+            {store.dataset.datasets.map((dataset) => (
               <MenuItem value={dataset} key={dataset}>
                 {dataset}
               </MenuItem>
@@ -128,7 +130,7 @@ const Home = () => {
             color="secondary"
             aria-label="refresh datasets"
             title="Refresh Datasets"
-            onClick={() => (store.datasetsLoaded = false)}
+            onClick={() => (store.dataset.datasetsLoaded = false)}
           >
             <Refresh />
           </IconButton>
@@ -151,15 +153,19 @@ const Home = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {state.modelErr || store.datasetLoadErr ? (
+                {state.modelErr || store.dataset.datasetLoadErr ? (
                   <TableRow>
-                    <TableCell colSpan={3}>{state.modelErr || store.datasetLoadErr}</TableCell>
+                    <TableCell colSpan={3}>{state.modelErr || store.dataset.datasetLoadErr}</TableCell>
                   </TableRow>
                 ) : state.models.length ? (
                   state.models.map((ele) => (
                     <TableRow key={ele.uuid}>
                       <TableCell>
-                        <Link component={RouterLink} to={`${RouteHref.DETAIL}/${store.selectedDataset}/${ele.uuid}`}>
+                        <Link
+                          component={RouterLink}
+                          to={`${RouteHref.DETAIL}/${store.dataset.selectedDataset}/${ele.uuid}`}
+                          onClick={() => store.model.setSecondaryCache(ele.uuid, ele.modified)}
+                        >
                           {ele.title}
                         </Link>
                       </TableCell>

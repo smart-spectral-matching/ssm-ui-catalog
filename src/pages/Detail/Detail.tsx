@@ -1,7 +1,7 @@
-import { FC } from 'react';
-import { observer } from 'mobx-react-lite';
-import { ExpandMore, People } from '@mui/icons-material';
+import { FC, PropsWithChildren, ReactElement, ReactNode } from 'react';
+import { ExpandMore, MultilineChart, People } from '@mui/icons-material';
 import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Grid, styled, SvgIcon, Typography } from '@mui/material';
+import { nanoid } from 'nanoid';
 
 import { BatsModel } from 'types';
 
@@ -45,131 +45,90 @@ const VideoCaption = styled('span')(({ theme }) => ({
   fontSize: theme.spacing(3),
 }));
 
-const Accordions: FC<Record<string, never>> = () => (
-  <>
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMore />}>
-        <AccordionLabel>Method</AccordionLabel>
-        <SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />
-      </AccordionSummary>
-      <AccordionDetails sx={{ flexDirection: 'column' }}>
-        <AccordionList>
-          <li>
-            <b>Evaluation: </b> calculation
-          </li>
-        </AccordionList>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMore />}>calculation/1/</AccordionSummary>
-          <AccordionDetails sx={{ flexDirection: 'column' }}>
-            <AccordionList>
-              <li>
-                <b>Approach: </b> Quantum Mechanics
-              </li>
-              <li>
-                <b>Calc Class: </b> ab initio
-              </li>
-              <li>
-                <b>Calc Type: </b> ab ccsd(t)
-              </li>
-              <li>
-                <b>Sub Method: </b> calculation/2/
-              </li>
-            </AccordionList>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMore />}>calculation/2/</AccordionSummary>
-          <AccordionDetails sx={{ flexDirection: 'column' }}>
-            <AccordionList>
-              <li>
-                <b>Approach: </b> Quantum Mechanics
-              </li>
-              <li>
-                <b>Calc Class: </b> ab initio
-              </li>
-              <li>
-                <b>Calc Type: </b> ab ccsd(t)
-              </li>
-              <li>
-                <b>Sub Method: </b> calculation/2/
-              </li>
-            </AccordionList>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMore />}>basisset/1/</AccordionSummary>
-          <AccordionDetails sx={{ flexDirection: 'column' }}>
-            <AccordionList>
-              <li>
-                <b>Title: </b> 3-21G
-              </li>
-              <li>
-                <b>Description: </b> A test BSE basis set
-              </li>
-              <li>
-                <b>Format: </b> orbital
-              </li>
-              <li>
-                <b>Set Type: </b> Quantum Mechanics
-              </li>
-              <li>
-                <b>Harmonic Type: </b> Spherical
-              </li>
-              <li>
-                <b>Contraction Type: </b> general
-              </li>
-            </AccordionList>
-          </AccordionDetails>
-        </Accordion>
-      </AccordionDetails>
-    </Accordion>
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMore />}>
-        <AccordionLabel>System</AccordionLabel>
-        <SvgIcon component={AtomIcon} viewBox="0 0 512 512" />
-      </AccordionSummary>
-      <AccordionDetails sx={{ flexDirection: 'column' }}>
-        <AccordionList>
-          <li>
-            <b>Discipline: </b> chemistry
-          </li>
-          <li>
-            <b>Subdiscipline: </b> computational chemistry
-          </li>
-          <li>
-            <b>Facets: </b>
-            <AccordionList>
-              <li>temperature</li>
-              <li>charge</li>
-              <li>multiplicity</li>
-              <li>space</li>
-            </AccordionList>
-          </li>
-        </AccordionList>
-      </AccordionDetails>
-    </Accordion>
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMore />}>
-        <AccordionLabel>Authors</AccordionLabel>
-        <People />
-      </AccordionSummary>
-      <AccordionDetails sx={{ flexDirection: 'column' }}>
-        <AccordionList>
-          <li>John Doe</li>
-          <li>Jane Doe</li>
-        </AccordionList>
-      </AccordionDetails>
-    </Accordion>
-  </>
+/**
+ * Display simple object
+ */
+const AccordionListItem: FC<PropsWithChildren<{ objKey: string }>> = ({ objKey, children }) => (
+  <li>
+    <b>{objKey}:</b> {children}
+  </li>
 );
 
-// TODO we will probably get rid of isSample later on
+/**
+ *
+ * Creates an accordion
+ *
+ */
+const TopLevelAccordion: FC<PropsWithChildren<{ label: string; icon?: ReactElement<any, any> }>> = ({ label, icon, children }) => (
+  <Accordion>
+    <AccordionSummary expandIcon={<ExpandMore />}>
+      <AccordionLabel>{label}</AccordionLabel>
+      {icon}
+    </AccordionSummary>
+    <AccordionDetails sx={{ flexDirection: 'column' }}>
+      <AccordionList>{children}</AccordionList>
+    </AccordionDetails>
+  </Accordion>
+);
+
+/**
+ *
+ * Dynamically generate a component based on the type of "value" . Recursive function.
+ *
+ * Icon is an optional property, but it will not be passed recursively down the tree.
+ *
+ * TODO "topLevel" is a hack to stop accordions with custom icons from rendering as list items
+ * (SHOULD be able to just check if "icon" is undefined, but that doesn't seem to work)
+ *
+ */
+const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement<any, any>; topLevel?: boolean }> = ({
+  label,
+  value,
+  icon,
+  topLevel,
+}) => {
+  if (Array.isArray(value)) {
+    const arrayChildren = value.map((arrayValue, idx) => (
+      <li key={`${label}-${nanoid()}`}>
+        <DynamicAccordionProps label={`${label} (${idx + 1})`} value={arrayValue} />
+      </li>
+    ));
+    return topLevel ? (
+      <TopLevelAccordion label={label} icon={icon}>
+        {arrayChildren}
+      </TopLevelAccordion>
+    ) : (
+      <li>
+        <AccordionList>{arrayChildren}</AccordionList>
+      </li>
+    );
+  }
+  if (typeof value === 'object' && value !== null) {
+    // MUST check array before object - "null" is also an object
+    return (
+      <li>
+        <TopLevelAccordion label={label} icon={icon}>
+          {Object.entries(value).map(([objLabel, objValue]) => (
+            <DynamicAccordionProps key={objLabel} label={objLabel} value={objValue} />
+          ))}
+        </TopLevelAccordion>
+      </li>
+    );
+  }
+  if (typeof value === 'boolean') {
+    // React cannot render boolean values, so convert value to a string
+    return <AccordionListItem objKey={label}>{value.toString()}</AccordionListItem>;
+  }
+  // indicates string, number, or null
+  return <AccordionListItem objKey={label}>{value as ReactNode}</AccordionListItem>;
+};
+
 const Detail: FC<{ data: BatsModel }> = ({ data }) => (
   <>
     <Grid container spacing={4}>
       <Grid item sm={12} component="section">
         <Typography variant="h3" align="center">
-          {data.scidata.property}
+          {data.title}
         </Typography>
       </Grid>
       <Grid
@@ -182,34 +141,18 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => (
           justifyContent: 'space-evenly',
         }}
       >
-        <Typography variant="body1">{data.scidata.description}</Typography>
-        <AccordionList>
-          <li>
-            <Typography variant="caption" title="Lorum ipsum dolor sit amet">
-              Lorem
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="caption" title="Aliquam tincidunt mauris eu risus">
-              Aliquam
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="caption" title="Morbi in sem quis dui placerat ornare">
-              Morbi
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="caption" title="Praesent dapibus, neque id cursus faucibus">
-              Praesent
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="caption" title="Pellentesque fermentum dolor">
-              Pellentesque
-            </Typography>
-          </li>
-        </AccordionList>
+        {data.scidata.property && (
+          <>
+            <Typography variant="h4">Property</Typography>
+            <Typography variant="body1">{data.scidata.property}</Typography>
+          </>
+        )}
+        {data.scidata.description && (
+          <>
+            <Typography variant="h4">Description</Typography>
+            <Typography variant="body1">{data.scidata.description}</Typography>
+          </>
+        )}
       </Grid>
       <Grid item sm={6} component="section">
         <Card>
@@ -230,16 +173,35 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => (
           </div>
           <CardContent>
             <Typography variant="caption">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Video caption goes here. The video will likely be replaced by an image later on. Lorem ipsum dolor sit amet, consectetur
+              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Typography>
           </CardContent>
         </Card>
       </Grid>
     </Grid>
     <AccordionsContainer>
-      <Accordions />
+      {data.scidata.dataseries && (
+        <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} topLevel />
+      )}
+      {data.scidata.methodology && (
+        <DynamicAccordionProps
+          label="Method"
+          value={data.scidata.methodology}
+          icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
+        />
+      )}
+      {data.scidata.system && (
+        <DynamicAccordionProps
+          label="System"
+          value={data.scidata.system}
+          icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />}
+          topLevel
+        />
+      )}
+      {data.scidata.sources && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} topLevel />}
     </AccordionsContainer>
   </>
 );
 
-export default observer(Detail);
+export default Detail;

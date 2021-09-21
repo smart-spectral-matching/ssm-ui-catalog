@@ -32,7 +32,16 @@ export interface PaginatedResponse<T> {
  * Consistent JSON format of 400-level responses
  */
 export interface ApiProblem {
+  /**
+   * brief description of error (usually just the HTTP status code title)
+   */
   title: string;
+  /**
+   * HTTP status code
+   */
   status: number;
+  /**
+   * in-depth description of error, telling you why the error was thrown
+   */
   detail: string;
 }

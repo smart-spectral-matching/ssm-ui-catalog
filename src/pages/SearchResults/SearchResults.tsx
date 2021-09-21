@@ -185,7 +185,7 @@ const SearchResults = () => {
               key={nanoid()}
               isSample={v.isSample}
               filter={state.filter}
-              detailLink={`${RouteHref.DETAIL}/${store.selectedDataset}`}
+              detailLink={`${RouteHref.DETAIL}/${store.dataset.selectedDataset}`}
             />
           ))}
         </ScrollGrid>

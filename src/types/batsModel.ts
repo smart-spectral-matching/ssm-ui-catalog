@@ -11,10 +11,8 @@ export interface BatsModelCondensed {
 
 /**
  * Complete model
- *
  */
 export interface BatsModel extends BatsModelCondensed {
-  // allow for dynamic properties as well
   /**
    * URL to the full path
    */
@@ -23,9 +21,56 @@ export interface BatsModel extends BatsModelCondensed {
 }
 
 export interface SciData {
-  // dynamic properties
+  description: string | null;
+  property: string | null;
+  /**
+   * mostly dynamically generated, but some paths will be consistent.
+   */
+  dataseries: Array<DataSeries>;
+  /**
+   * dynamically generated property value, may be null
+   */
+  methodology: Record<string, any> | null;
+  /**
+   * dynamically generated property value, may be null
+   */
+  sources: Record<string, any> | null;
+  /**
+   * dynamically generated property value, may be null
+   */
+  system: Record<string, any> | null;
+}
+
+export interface DataSeries {
+  'x-axis': Axis;
+  'y-axis': Axis;
+}
+
+export interface Axis {
+  /**
+   * dynamic values
+   */
   [key: string]: any;
-  property: string;
-  description: string;
-  methodology: { evaluationMethod: string };
+  axisType?: string | null;
+  label?: string | null;
+  parameter?: Parameter | null;
+}
+
+export interface Parameter {
+  /**
+   * dynamic values
+   */
+  [key: string]: any;
+  property?: string | null;
+  quantity?: string | null;
+  numericValueArray?: ValueArray | null;
+}
+
+export interface ValueArray {
+  /**
+   * dynamic values
+   */
+  [key: string]: any;
+  unitRef?: string | null;
+  numberArray?: number[] | null;
 }

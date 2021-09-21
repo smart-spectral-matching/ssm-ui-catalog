@@ -5,16 +5,10 @@ import { Container, Skeleton } from '@mui/material';
 
 import { API_URL } from 'ssm-constants';
 import { useStore } from 'store/providers';
-import { ApiProblem, BatsModel, RouteHref } from 'types';
+import { ApiProblem, BatsModel, LoadState, RouteHref } from 'types';
 import Detail from './Detail';
 
 const HELPER_TEXT = `(example: ...${RouteHref.DETAIL}/datset-name-here/model-uuid-here)`;
-
-enum LoadState {
-  LOADING,
-  LOADED,
-  ERROR,
-}
 
 interface DetailsUrlProps {
   dataset?: string;
@@ -27,7 +21,11 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
   const store = useStore();
   const state = useLocalObservable(() => ({
     loadState:
-      store.cachedModel && store.cachedModel.uuid === model ? LoadState.LOADED : !!dataset && !!model ? LoadState.LOADING : LoadState.ERROR,
+      store.model.cachedModel && store.model.cachedModel.uuid === model
+        ? LoadState.LOADED
+        : !!dataset && !!model
+        ? LoadState.LOADING
+        : LoadState.ERROR,
     errorMessage: !dataset
       ? `Dataset name not provided in URL ${HELPER_TEXT}`
       : !model
@@ -35,9 +33,12 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
       : '',
   }));
 
+  /**
+   * Fetch model on initial mount, or when load state changes if it's changed to loading
+   */
   useEffect(() => {
     if (state.loadState === LoadState.LOADING) {
-      fetch(`${API_URL}/datasets/${dataset}/models/${model}`)
+      fetch(`${API_URL}/datasets/${dataset}/models/${model}?returnFull=false`)
         .then((res) => {
           if (res.status >= 500)
             throw new Error(`Could not load model from API: Server messed up. Status ${res.status}: ${res.statusText}`);
@@ -47,28 +48,37 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
           if ((json as ApiProblem).status && (json as ApiProblem).status >= 400) {
             throw new Error(`Could not load model from API: ${(json as ApiProblem).detail}`);
           }
-          store.cachedModel = json as BatsModel;
+          store.model.syncCacheAndUpdate(json as BatsModel);
           window.console.log(json);
           state.loadState = LoadState.LOADED;
         })
-        .catch((err) => {
-          state.errorMessage = err;
+        .catch((err: Error) => {
+          state.errorMessage = err.message;
           state.loadState = LoadState.ERROR;
         });
     }
   }, [state.loadState]);
 
+  /**
+   * retrigger load if cache is not in sync
+   */
+  useEffect(() => {
+    if (!store.model.isCacheInSync) {
+      state.loadState = LoadState.LOADING;
+    }
+  }, [store.model.isCacheInSync]);
+
   return (
     <Container component="main">
       {state.loadState === LoadState.LOADED ? (
-        <Detail data={store.cachedModel!} />
+        <Detail data={store.model.cachedModel!} />
       ) : state.loadState === LoadState.ERROR ? (
-        <div>
-          <h5>The following error was found:</h5>
+        <>
+          <h3>The following error was found:</h3>
           <p>{state.errorMessage}</p>
-        </div>
+        </>
       ) : (
-        <Skeleton variant="rectangular" height="100%" />
+        <Skeleton variant="rectangular" animation="wave" height="70vh" />
       )}
     </Container>
   );

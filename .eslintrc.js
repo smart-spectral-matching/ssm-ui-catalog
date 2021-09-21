@@ -82,6 +82,7 @@ module.exports = {
         '@typescript-eslint/no-parameter-properties': 1, // force explicit declaration of class properties in constructor
         '@typescript-eslint/semi': 0, // Managed by prettier
         'import/order': 0, // off for simple-import-sort
+        'import/no-cycle': 0, // import cycling check too aggressive
         'no-console': 1, // use window.console if something needs to be logged in production
         'react/destructuring-assignment': 0, // Mobx needs non-destructuring assignments
         'react/jsx-closing-bracket-location': 0, // managed by prettier
@@ -103,7 +104,7 @@ module.exports = {
               // sort React packages first, then mobx packages, then anything which indicates external JS package (not relative path or in the base TS imports)
               ['^react.*', '^mobx.*', `^(?!${BASE_TS_IMPORTS.join('|')}(?=/|$))@?\\w`],
               // absolute ts(x)/js(x) imports (from baseUrl, no file extension at the end), then relative imports without file extension
-              [`^(${BASE_TS_IMPORTS.join('|')})(/(?!.*\\.).*|$)`, '^[\\.\\.?/]+[^\\.]+$'],
+              [`^(${BASE_TS_IMPORTS.join('|')})(/(?!.*\\.).*|$)`, '^(\\.\\.?/)+[^\\.]+$'],
               // everything else - mainly asset imports (i.e. images)
               [''],
             ],
