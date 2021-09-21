@@ -189,6 +189,7 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => (
           label="Method"
           value={data.scidata.methodology}
           icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
+          topLevel
         />
       )}
       {data.scidata.system && (
