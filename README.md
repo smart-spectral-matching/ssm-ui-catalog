@@ -10,7 +10,7 @@ Make sure that you build before committing, because the formatter/linter relies 
 
 ### Requirements
 
--   NodeJS >= 10 (check from command line with `node -v`)
+-   NodeJS >= 12 (check from command line with `node -v`)
 -   Yarn. NPM works in a pinch, but is not recommended. Do not commit package-lock.json to the repository.
 
 ## Building with Docker
