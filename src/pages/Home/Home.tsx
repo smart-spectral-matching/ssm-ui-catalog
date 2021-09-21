@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { observer, useLocalObservable } from 'mobx-react-lite';
+import { CloudUpload, Refresh } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -8,9 +9,9 @@ import {
   Container,
   IconButton,
   Link,
-  makeStyles,
   MenuItem,
   Paper,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -22,8 +23,7 @@ import {
   TextField,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import { CloudUpload, Refresh } from '@material-ui/icons';
+} from '@mui/material';
 
 import CustomTablePaginationActions from 'components/CustomTablePaginationActions';
 import { API_URL } from 'ssm-constants';
@@ -32,18 +32,10 @@ import { BatsModelCondensed, PaginatedResponse, RouteHref } from 'types';
 
 const PAGE_SIZE = 5;
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(8),
-  },
-  row: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: theme.spacing(1.5),
-  },
-  rowContent: {
-    minWidth: '50%',
-  },
+const Row = styled('section')(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  padding: theme.spacing(1.5),
 }));
 
 const Home = () => {
@@ -112,16 +104,15 @@ const Home = () => {
       });
   }, [store.selectedDataset, state.oneBasedPage]);
 
-  const classes = useStyles();
-
   return (
-    <Container component="main" className={classes.root}>
-      <section className={classes.row}>
-        <Box display="flex" className={classes.rowContent}>
+    <Container component="main" sx={{ mt: 8 }}>
+      <Row>
+        <Box display="flex" sx={{ minWidth: '50%' }}>
           <TextField
             id="select-dataset"
             value={store.selectedDataset}
             label="Select Dataset"
+            variant="standard"
             error={!!store.datasetLoadErr}
             helperText={store.datasetLoadErr}
             select
@@ -142,9 +133,9 @@ const Home = () => {
             <Refresh />
           </IconButton>
         </Box>
-      </section>
-      <section className={classes.row}>
-        <Paper className={classes.rowContent}>
+      </Row>
+      <Row>
+        <Paper sx={{ minWidth: '50%' }}>
           <Toolbar>
             <Typography variant="h5" color="textSecondary">
               Latest Models
@@ -165,13 +156,10 @@ const Home = () => {
                     <TableCell colSpan={3}>{state.modelErr || store.datasetLoadErr}</TableCell>
                   </TableRow>
                 ) : state.models.length ? (
-                  state.models.map((ele, idx) => (
+                  state.models.map((ele) => (
                     <TableRow key={ele.uuid}>
                       <TableCell>
-                        <Link
-                          component={RouterLink}
-                          to={`${idx % 2 === 0 ? RouteHref.DETAIL_SAMPLE : RouteHref.DETAIL_DATASET}/${store.selectedDataset}/${ele.uuid}`}
-                        >
+                        <Link component={RouterLink} to={`${RouteHref.DETAIL}/${store.selectedDataset}/${ele.uuid}`}>
                           {ele.title}
                         </Link>
                       </TableCell>
@@ -203,13 +191,13 @@ const Home = () => {
             </Table>
           </TableContainer>
         </Paper>
-      </section>
+      </Row>
 
-      <section className={classes.row}>
+      <Row>
         <Button variant="contained" color="primary" startIcon={<CloudUpload />} size="large" title="Upload is currently non-functional.">
           Upload Data
         </Button>
-      </section>
+      </Row>
     </Container>
   );
 };

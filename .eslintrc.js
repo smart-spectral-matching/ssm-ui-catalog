@@ -1,13 +1,11 @@
 const fs = require('fs');
-const path = require('path');
 
 /**
  * Find our basedir imports, i.e. 'types', 'components', 'service-worker'
  */
 const BASE_TS_IMPORTS = fs.readdirSync('src', { withFileTypes: true }).map((d) => {
   const name = d.name;
-  if (d.isDirectory()) return name;
-  return path.basename(name, path.extname(name));
+  return d.isDirectory() ? name : name.split('.')[0];
 });
 
 /**
@@ -100,16 +98,18 @@ module.exports = {
           1,
           {
             groups: [
-              // sort React packages first, then mobx packages, then anything which indicates external package (starts with letter, or '@' followed by letter)
-              ['^react', '^mobx', '^@?\\w'],
-              // absolute imports, then relative imports
-              [`^(${BASE_TS_IMPORTS.join('|')})(/.*|$)`, '^\\.'],
-              // CSS imports
-              ['^[^.]'],
+              // side effect imports first (CSS and JSON will get grouped here)
+              ['^\\u0000'],
+              // sort React packages first, then mobx packages, then anything which indicates external JS package (not relative path or in the base TS imports)
+              ['^react.*', '^mobx.*', `^(?!${BASE_TS_IMPORTS.join('|')}(?=/|$))@?\\w`],
+              // absolute ts(x)/js(x) imports (from baseUrl, no file extension at the end), then relative imports without file extension
+              [`^(${BASE_TS_IMPORTS.join('|')})(/(?!.*\\.).*|$)`, '^[\\.\\.?/]+[^\\.]+$'],
+              // everything else - mainly asset imports (i.e. images)
+              [''],
             ],
           },
         ], // sort imports in a specific order (this is autofixable)
-        'simple-import-sort/exports': 1, // sort exports
+        'simple-import-sort/exports': 1, // sort exports (this is autofixable)
         'sort-imports': 0, // off for simple-import-sort
       },
       parserOptions: {

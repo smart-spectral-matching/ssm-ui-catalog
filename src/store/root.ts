@@ -1,5 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
+import { BatsModel } from 'types';
+
 /**
  * TODO this will eventually be spread out into a more tree-like structure,
  * this is just convenient for now
@@ -12,6 +14,11 @@ export class RootStore {
   datasets: Array<string> = [];
 
   selectedDataset = '';
+
+  /**
+   * keep latest model data stored in store cache
+   */
+  cachedModel: BatsModel | undefined = undefined;
 
   constructor() {
     makeAutoObservable(this);

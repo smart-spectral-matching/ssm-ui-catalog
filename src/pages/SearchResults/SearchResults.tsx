@@ -12,15 +12,19 @@ import {
   FormLabel,
   Grid,
   Link,
-  makeStyles,
   Radio,
   RadioGroup,
+  styled,
+  Theme,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { nanoid } from 'nanoid';
 
-import H20 from 'assets/h20.jpeg';
+import { useStore } from 'store/providers';
+import { ImageContainer } from 'theme/GlobalComponents';
 import { RouteHref } from 'types';
+
+import H20 from 'assets/h20.jpeg';
 
 enum FilterState {
   ALL = 'All',
@@ -33,69 +37,54 @@ const generateRandomCollections = (str: string) => {
   return Array.from(Array(ranDumb), (_, i) => `${str} ${i + 1}`);
 };
 
-const useStyles = makeStyles((theme) => ({
-  fieldset: {
-    marginBottom: '1rem',
+const gridProps = (theme: Theme) => ({
+  maxHeight: '50vh',
+  overflowY: 'auto',
+  overflowX: 'hidden', // stupid Chrome bug
+  border: `3px solid ${theme.palette.grey[300]}`,
+  scrollbarWidth: 'thin', // Firefox
+  '&::-webkit-scrollbar': {
+    // Chrome
+    width: '7px',
   },
-  card: {
-    marginBottom: '1rem',
-    display: 'flex',
+  '&::-webkit-scrollbar-track': {
+    // Chrome
+    boxShadow: 'inset 0 0 6px rgba(255, 255, 255, 0.3)',
   },
-  imageWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 5px',
+  '&::-webkit-scrollbar-thumb': {
+    // Chrome
+    backgroundColor: `${theme.palette.grey[800]}`,
+    outline: `1px solid ${theme.palette.grey[400]}`,
   },
-  scrollGrid: {
-    [theme.breakpoints.up('sm')]: {
-      maxHeight: '50vh',
-      overflowY: 'auto',
-      overflowX: 'hidden', // stupid Chrome bug
-      border: `3px solid ${theme.palette.grey[300]}`,
-      scrollbarWidth: 'thin', // Firefox
-      '&::-webkit-scrollbar': {
-        // Chrome
-        width: '7px',
-      },
-      '&::-webkit-scrollbar-track': {
-        // Chrome
-        boxShadow: 'inset 0 0 6px rgba(255, 255, 255, 0.3)',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        // Chrome
-        backgroundColor: `${theme.palette.grey[800]}`,
-        outline: `1px solid ${theme.palette.grey[400]}`,
-      },
-      '@media (min-height: 450px)': {
-        maxHeight: '60vh',
-      },
-      '@media (min-height: 600px)': {
-        maxHeight: '70vh',
-      },
-      '@media (min-height: 750px)': {
-        maxHeight: '75vh',
-      },
-      '@media (min-height: 900px)': {
-        maxHeight: '80vh',
-      },
-    },
+  '@media (min-height: 450px)': {
+    maxHeight: '60vh',
   },
-  scrollGridL: {
-    [theme.breakpoints.up('sm')]: {
-      borderRight: 0,
-    },
+  '@media (min-height: 600px)': {
+    maxHeight: '70vh',
   },
-  container: {
-    display: 'flex',
-    flexGrow: 1,
-    alignItems: 'center',
+  '@media (min-height: 750px)': {
+    maxHeight: '75vh',
+  },
+  '@media (min-height: 900px)': {
+    maxHeight: '80vh',
+  },
+});
+
+const ScrollGrid = styled(Grid)(({ theme }) => ({
+  [theme.breakpoints.up('sm')]: gridProps(theme),
+}));
+
+const LeftScrollGrid = styled(Grid)(({ theme }) => ({
+  [theme.breakpoints.up('sm')]: {
+    ...gridProps(theme),
+    borderRight: 0,
   },
 }));
 
-const Collection = observer((props: { classes: ReturnType<typeof useStyles>; title: string; values: string[]; inputName?: string }) => {
-  const { classes, title, values, inputName } = props;
+const Collection = observer((props: { title: string; values: string[]; inputName?: string }) => {
+  const { title, values, inputName } = props;
   return (
-    <FormControl component="fieldset" className={classes.fieldset}>
+    <FormControl component="fieldset" sx={{ mb: '1rem' }}>
       <FormLabel component="legend">{title}</FormLabel>
       <FormGroup>
         {values.map((value) => (
@@ -106,36 +95,45 @@ const Collection = observer((props: { classes: ReturnType<typeof useStyles>; tit
   );
 });
 
-const LoremIpsumCard = (props: { classes: ReturnType<typeof useStyles>; isSample: boolean; filter: FilterState }) => {
-  const { classes, isSample, filter } = props;
+const LoremIpsumCard = (props: { isSample: boolean; filter: FilterState; detailLink: string }) => {
+  const { isSample, filter, detailLink } = props;
   // this is a good example of a property which would normally be computed
-  const isVisible =
-    filter === FilterState.ALL || (isSample && filter === FilterState.SAMPLES) || (!isSample && filter === FilterState.DATASETS);
-  if (!isVisible) return <></>;
-
-  const example = isSample ? { url: RouteHref.DETAIL_SAMPLE, display: 'Sample' } : { url: RouteHref.DETAIL_DATASET, display: 'Dataset' };
+  if ((filter === FilterState.SAMPLES && !isSample) || (filter === FilterState.DATASETS && isSample)) return null;
 
   return (
-    <Card className={classes.card} component="article">
-      <div className={classes.imageWrapper}>
+    <Card
+      sx={{
+        marginBottom: '1rem',
+        display: 'flex',
+      }}
+      component="article"
+    >
+      <ImageContainer sx={{ px: '5px' }}>
         <img src={H20} alt="H20" height="59" width="100" />
-      </div>
+      </ImageContainer>
       <CardContent>
         <Typography variant="h5">
-          <Link color="primary" component={RouterLink} to={example.url}>
+          <Link color="primary" component={RouterLink} to={detailLink}>
             H<sub>2</sub>O
           </Link>
         </Typography>
         <Typography variant="body1">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </Typography>
-        <Chip label={example.display} component={RouterLink} to={example.url} clickable color={!isSample ? 'primary' : 'secondary'} />
+        <Chip
+          label={isSample ? 'Sample' : 'Dataset'}
+          component={RouterLink}
+          to={detailLink}
+          clickable
+          color={!isSample ? 'primary' : 'secondary'}
+        />
       </CardContent>
     </Card>
   );
 };
 
 const SearchResults = () => {
+  const store = useStore();
   const state = useLocalObservable(() => ({
     filter: FilterState.ALL,
     updateFilter(filter: FilterState) {
@@ -151,13 +149,20 @@ const SearchResults = () => {
     randomSystems: generateRandomCollections('System'),
     randomAuthors: generateRandomCollections('Author'),
   }));
-  const classes = useStyles();
 
   return (
-    <Container component="main" className={classes.container}>
-      <Grid container spacing={4} alignContent="center">
-        <Grid item sm={4} xs={12} className={`${classes.scrollGrid} ${classes.scrollGridL}`}>
-          <FormControl component="fieldset" className={classes.fieldset}>
+    <Container
+      component="main"
+      sx={{
+        display: 'flex',
+        flexGrow: 1,
+        alignItems: 'center',
+      }}
+      maxWidth="xl"
+    >
+      <Grid container spacing={1} alignContent="center">
+        <LeftScrollGrid item sm={4} xs={12}>
+          <FormControl component="fieldset" sx={{ mb: '1rem' }}>
             <FormLabel component="legend">Filter By Type</FormLabel>
             <RadioGroup
               aria-label="type"
@@ -170,15 +175,20 @@ const SearchResults = () => {
               ))}
             </RadioGroup>
           </FormControl>
-          <Collection classes={classes} title="Filter By Method" inputName="methodGroup" values={state.randomMethods} />
-          <Collection classes={classes} title="Filter By System" inputName="systemGroup" values={state.randomSystems} />
-          <Collection classes={classes} title="Filter By Author" inputName="authorGroup" values={state.randomAuthors} />
-        </Grid>
-        <Grid item sm={8} className={classes.scrollGrid}>
+          <Collection title="Filter By Method" inputName="methodGroup" values={state.randomMethods} />
+          <Collection title="Filter By System" inputName="systemGroup" values={state.randomSystems} />
+          <Collection title="Filter By Author" inputName="authorGroup" values={state.randomAuthors} />
+        </LeftScrollGrid>
+        <ScrollGrid item sm={8}>
           {state.randomCards.map((v) => (
-            <LoremIpsumCard key={nanoid()} classes={classes} isSample={v.isSample} filter={state.filter} />
+            <LoremIpsumCard
+              key={nanoid()}
+              isSample={v.isSample}
+              filter={state.filter}
+              detailLink={`${RouteHref.DETAIL}/${store.selectedDataset}`}
+            />
           ))}
-        </Grid>
+        </ScrollGrid>
       </Grid>
     </Container>
   );

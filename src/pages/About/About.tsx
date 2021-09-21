@@ -1,4 +1,6 @@
-import { Box, Container, Typography } from '@material-ui/core';
+import { Container, Typography } from '@mui/material';
+
+import { ImageContainer } from 'theme/GlobalComponents';
 
 import ABOUT_IMG from 'assets/ssm_about.png';
 
@@ -22,9 +24,9 @@ const About = () => (
       storage for CURIES. The SSM platform will result in a powerful, readily deployable, and user-friendly resource for the
       nonproliferation community.
     </Typography>
-    <Box display="flex" justifyContent="center">
+    <ImageContainer sx={{ justifyContent: 'center', my: '1rem' }}>
       <img src={ABOUT_IMG} alt="SSM Workflow" />
-    </Box>
+    </ImageContainer>
   </Container>
 );
 

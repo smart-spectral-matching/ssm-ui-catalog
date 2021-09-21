@@ -1,9 +1,9 @@
-import { PaletteType, responsiveFontSizes, unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core';
+import { createTheme, PaletteMode, responsiveFontSizes, ThemeOptions, unstable_createMuiStrictModeTheme } from '@mui/material';
 
-const theme = (color?: PaletteType) =>
-  createMuiTheme({
+const theme = (mode?: PaletteMode) => {
+  const options = {
     palette: {
-      type: color,
+      mode,
       primary: {
         main: '#b71c1c',
       },
@@ -12,29 +12,57 @@ const theme = (color?: PaletteType) =>
         contrastText: '#fff',
       },
     },
-    overrides: {
+    components: {
       MuiFormControl: {
-        root: {
-          border: '2px groove',
-          borderRadius: '10px',
-          margin: '0 2px',
-          width: '100%',
+        defaultProps: {
+          variant: 'standard',
         },
-      },
-      MuiFormLabel: {
-        root: {
-          padding: '0 2px',
+        styleOverrides: {
+          root: {
+            border: '2px groove',
+            borderRadius: '10px',
+            margin: '0 -4px',
+            width: '100%',
+          },
         },
       },
       MuiFormControlLabel: {
-        root: {
-          marginLeft: '11px',
-          marginRight: 0,
+        styleOverrides: {
+          root: {
+            marginLeft: '11px',
+            marginRight: 0,
+          },
+        },
+      },
+      MuiFormLabel: {
+        styleOverrides: {
+          root: {
+            padding: '0 2px',
+          },
+        },
+      },
+      MuiLink: {
+        defaultProps: {
+          underline: 'hover',
+        },
+      },
+      MuiSelect: {
+        defaultProps: {
+          variant: 'standard',
+        },
+      },
+      MuiTextField: {
+        defaultProps: {
+          variant: 'standard',
         },
       },
     },
-  });
+  } as ThemeOptions;
+  // development/testing needs a separate import to avoid React Strict mode warnings
+  const themeGenerator = process.env.NODE_ENV === 'production' ? createTheme : unstable_createMuiStrictModeTheme;
+  return themeGenerator(options);
+};
 
-export default function makeTheme(color?: PaletteType) {
-  return responsiveFontSizes(theme(color));
+export default function makeTheme(mode?: PaletteMode) {
+  return responsiveFontSizes(theme(mode));
 }

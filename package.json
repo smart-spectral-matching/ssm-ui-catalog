@@ -14,8 +14,10 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "@material-ui/core": "^4.12.2",
-    "@material-ui/icons": "^4.11.2",
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
+    "@mui/icons-material": "^5.0.0",
+    "@mui/material": "^5.0.0",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
     "mobx-utils": "^6.0.4",
@@ -73,13 +75,12 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      "> 0.5%",
+      "last 2 versions",
+      "Firefox ESR",
       "not dead",
-      "not op_mini all",
-      "not ie 11",
-      "not ios_saf 9.3",
-      "not chrome < 51",
-      "not safari < 10"
+      "not IE 11",
+      "maintained node versions"
     ],
     "development": [
       "last 1 chrome version",
@@ -88,6 +89,6 @@
     ]
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   }
 }

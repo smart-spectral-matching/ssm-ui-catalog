@@ -27,3 +27,12 @@ export interface PaginatedResponse<T> {
    */
   total: number;
 }
+
+/**
+ * Consistent JSON format of 400-level responses
+ */
+export interface ApiProblem {
+  title: string;
+  status: number;
+  detail: string;
+}

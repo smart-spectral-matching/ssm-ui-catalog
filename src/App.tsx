@@ -1,15 +1,15 @@
+import './App.scss';
+
 import { Suspense, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { configure } from 'mobx';
-import { Backdrop, CircularProgress, CssBaseline, ThemeProvider, useMediaQuery } from '@material-ui/core';
+import { Backdrop, CircularProgress, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
 
 import ErrorBoundary from 'components/shared/ErrorBoundary';
 import { API_URL } from 'ssm-constants';
 import { RootStoreProvider } from 'store/providers';
 import makeTheme from 'theme';
 import Routes from './Routes';
-
-import './App.scss';
 
 const queryClient = new QueryClient({
   defaultOptions: {

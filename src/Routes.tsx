@@ -8,8 +8,7 @@ import ErrorBoundaryRoute from 'components/shared/ErrorBoundaryRoute';
 import { RouteHref } from 'types';
 
 const About = lazy(() => import('pages/About'));
-const Detail = lazy(() => import('pages/Detail/Detail'));
-const DetailSample = lazy(() => import('pages/Detail/DetailSample'));
+const Detail = lazy(() => import('pages/Detail'));
 const Home = lazy(() => import('pages/Home'));
 const SearchResults = lazy(() => import('pages/SearchResults'));
 const PageNotFound = lazy(() => import('components/shared/PageNotFound'));
@@ -19,8 +18,7 @@ const Routes = () => (
     <Header />
     <ErrorBoundary>
       <Switch>
-        <ErrorBoundaryRoute path={`${RouteHref.DETAIL_DATASET}/:dataset?/:model?`} component={Detail} />
-        <ErrorBoundaryRoute path={`${RouteHref.DETAIL_SAMPLE}/:dataset?/:model?`} component={DetailSample} />
+        <ErrorBoundaryRoute path={`${RouteHref.DETAIL}/:dataset?/:model?`} component={Detail} />
         <ErrorBoundaryRoute path={`${RouteHref.SEARCH}/:searchTerm?`} component={SearchResults} />
         <ErrorBoundaryRoute path={RouteHref.ABOUT} component={About} />
         <ErrorBoundaryRoute exact path={RouteHref.HOME} component={Home} />
