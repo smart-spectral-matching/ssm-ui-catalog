@@ -75,25 +75,17 @@ const TopLevelAccordion: FC<PropsWithChildren<{ label: string; icon?: ReactEleme
  *
  * Dynamically generate a component based on the type of "value" . Recursive function.
  *
- * Icon is an optional property, but it will not be passed recursively down the tree.
- *
- * TODO "topLevel" is a hack to stop accordions with custom icons from rendering as list items
- * (SHOULD be able to just check if "icon" is undefined, but that doesn't seem to work)
+ * Icon is an optional property, but it will not be passed recursively down the tree. If "icon" is defined, it assumes the highest-level accordion.
  *
  */
-const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement<any, any>; topLevel?: boolean }> = ({
-  label,
-  value,
-  icon,
-  topLevel,
-}) => {
+const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement<any, any> }> = ({ label, value, icon }) => {
   if (Array.isArray(value)) {
     const arrayChildren = value.map((arrayValue, idx) => (
       <li key={`${label}-${nanoid()}`}>
         <DynamicAccordionProps label={`${label} (${idx + 1})`} value={arrayValue} />
       </li>
     ));
-    return topLevel ? (
+    return icon ? (
       <TopLevelAccordion label={label} icon={icon}>
         {arrayChildren}
       </TopLevelAccordion>
@@ -105,15 +97,16 @@ const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement
   }
   if (typeof value === 'object' && value !== null) {
     // MUST check array before object - "null" is also an object
-    return (
-      <li>
-        <TopLevelAccordion label={label} icon={icon}>
-          {Object.entries(value).map(([objLabel, objValue]) => (
-            <DynamicAccordionProps key={objLabel} label={objLabel} value={objValue} />
-          ))}
-        </TopLevelAccordion>
-      </li>
+
+    const objectChildren = (
+      <TopLevelAccordion label={label} icon={icon}>
+        {Object.entries(value).map(([objLabel, objValue]) => (
+          <DynamicAccordionProps key={objLabel} label={objLabel} value={objValue} />
+        ))}
+      </TopLevelAccordion>
     );
+
+    return icon ? objectChildren : <li>{objectChildren}</li>;
   }
   if (typeof value === 'boolean') {
     // React cannot render boolean values, so convert value to a string
@@ -181,26 +174,18 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => (
       </Grid>
     </Grid>
     <AccordionsContainer>
-      {data.scidata.dataseries && (
-        <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} topLevel />
-      )}
+      {data.scidata.dataseries && <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} />}
       {data.scidata.methodology && (
         <DynamicAccordionProps
           label="Method"
           value={data.scidata.methodology}
           icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
-          topLevel
         />
       )}
       {data.scidata.system && (
-        <DynamicAccordionProps
-          label="System"
-          value={data.scidata.system}
-          icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />}
-          topLevel
-        />
+        <DynamicAccordionProps label="System" value={data.scidata.system} icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />} />
       )}
-      {data.scidata.sources && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} topLevel />}
+      {data.scidata.sources && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} />}
     </AccordionsContainer>
   </>
 );
