@@ -38,7 +38,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
    */
   useEffect(() => {
     if (state.loadState === LoadState.LOADING) {
-      fetch(`${API_URL}/datasets/${dataset}/models/${model}?returnFull=false`)
+      fetch(`${API_URL}/datasets/${dataset}/models/${model}`)
         .then((res) => {
           if (res.status >= 500)
             throw new Error(`Could not load model from API: Server messed up. Status ${res.status}: ${res.statusText}`);
