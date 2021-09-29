@@ -5,6 +5,16 @@
  */
 export type NonEmptyArray<T> = [T, ...T[]];
 
+export type Nullable<T> = T | null;
+/**
+ * allow for all properties of an object to be nullable (shallow)
+ */
+export type ShallowNullableObject<T> = { [K in keyof T]: T[K] | null };
+/**
+ * allow for all properties of an object to be nullable (deep)
+ */
+export type DeepNullableObject<T> = { [K in keyof T]: DeepNullableObject<T[K]> | null };
+
 export enum LoadState {
   LOADING,
   LOADED,

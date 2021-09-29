@@ -4,6 +4,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Grid,
 import { nanoid } from 'nanoid';
 
 import { BatsModel } from 'types';
+import { isNonEmptyArray, isNonEmptyObject } from 'utils';
 
 import { ReactComponent as AtomIcon } from 'assets/atom.svg';
 import { ReactComponent as FlaskIcon } from 'assets/flask.svg';
@@ -16,11 +17,12 @@ const AccordionLabel = styled('span')(() => ({
   marginRight: '1em',
 }));
 
-const AccordionList = styled('ul')(() => ({
+const AccordionList = styled('ul')<{ needsScroll?: string }>(({ needsScroll }) => ({
   margin: '0.5rem 0 1rem',
   border: '1px solid #e0e0e0',
   borderRadius: '10px',
-  overflow: 'hidden',
+  maxHeight: needsScroll ? '25vh' : 'unset',
+  overflowY: 'auto',
   position: 'relative',
   '&:not(.browserDefault)': {
     paddingLeft: 0,
@@ -78,7 +80,7 @@ const TopLevelAccordion: FC<PropsWithChildren<{ label: string; icon?: ReactEleme
  * Icon is an optional property, but it will not be passed recursively down the tree. If "icon" is defined, it assumes the highest-level accordion.
  *
  */
-const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement<any, any> }> = ({ label, value, icon }) => {
+const DynamicAccordionProps: FC<{ label: string; value: unknown; icon?: ReactElement<any, any> }> = ({ label, value, icon }) => {
   if (Array.isArray(value)) {
     const arrayChildren = value.map((arrayValue, idx) => (
       <li key={`${label}-${nanoid()}`}>
@@ -91,7 +93,7 @@ const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement
       </TopLevelAccordion>
     ) : (
       <li>
-        <AccordionList>{arrayChildren}</AccordionList>
+        <AccordionList needsScroll={arrayChildren.length > 10 ? 'yes' : undefined}>{arrayChildren}</AccordionList>
       </li>
     );
   }
@@ -100,9 +102,11 @@ const DynamicAccordionProps: FC<{ label: string; value: any; icon?: ReactElement
 
     const objectChildren = (
       <TopLevelAccordion label={label} icon={icon}>
-        {Object.entries(value).map(([objLabel, objValue]) => (
-          <DynamicAccordionProps key={objLabel} label={objLabel} value={objValue} />
-        ))}
+        {Object.entries(value)
+          .sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase(), 'en'))
+          .map(([objLabel, objValue]) => (
+            <DynamicAccordionProps key={objLabel} label={objLabel} value={objValue} />
+          ))}
       </TopLevelAccordion>
     );
 
@@ -174,18 +178,20 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => (
       </Grid>
     </Grid>
     <AccordionsContainer>
-      {data.scidata.dataseries && <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} />}
-      {data.scidata.methodology && (
+      {isNonEmptyArray(data.scidata.dataseries) && (
+        <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} />
+      )}
+      {isNonEmptyObject(data.scidata.methodology) && (
         <DynamicAccordionProps
           label="Method"
           value={data.scidata.methodology}
           icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
         />
       )}
-      {data.scidata.system && (
+      {isNonEmptyObject(data.scidata.system) && (
         <DynamicAccordionProps label="System" value={data.scidata.system} icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />} />
       )}
-      {data.scidata.sources && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} />}
+      {isNonEmptyObject(data.scidata.sources) && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} />}
     </AccordionsContainer>
   </>
 );

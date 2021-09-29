@@ -25,7 +25,7 @@ const About = () => (
       nonproliferation community.
     </Typography>
     <ImageContainer sx={{ justifyContent: 'center', my: '1rem' }}>
-      <img src={ABOUT_IMG} alt="SSM Workflow" />
+      <img src={ABOUT_IMG} alt="SSM Workflow" style={{ maxWidth: '100%' }} />
     </ImageContainer>
   </Container>
 );
