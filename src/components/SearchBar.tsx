@@ -39,8 +39,8 @@ const ClearIconButton = styled(IconButton)(({ disabled, theme }) => ({
   }),
 }));
 
-const ClearIcon = styled(Close)<{ enabled?: string }>(({ enabled, theme }) => ({
-  opacity: enabled ? 1 : 0,
+const ClearIcon = styled(Close)<{ $enabled?: boolean }>(({ $enabled, theme }) => ({
+  opacity: $enabled ? 1 : 0,
   transition: theme.transitions.create(['opacity'], {
     duration: theme.transitions.duration.shorter,
     easing: theme.transitions.easing.easeInOut,
@@ -94,7 +94,7 @@ const SearchBar = (props: SearchBarProps) => {
         }}
         disabled={!state.sanitizedSearchText}
       >
-        <ClearIcon enabled={state.sanitizedSearchText} />
+        <ClearIcon $enabled={!!state.sanitizedSearchText} />
       </ClearIconButton>
     </Root>
   );

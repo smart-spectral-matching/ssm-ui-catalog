@@ -92,9 +92,7 @@ const Home = () => {
    */
   useEffect(() => {
     if (!store.dataset.selectedDataset) return;
-    fetch(
-      `${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`,
-    )
+    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();

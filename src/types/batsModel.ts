@@ -53,9 +53,9 @@ export interface Axis {
    * dynamic values
    */
   [key: string]: any;
-  axisType?: Nullable<string>;
-  label?: Nullable<string>;
-  parameter?: Nullable<Parameter>;
+  axisType: string;
+  label: string;
+  parameter: Parameter;
 }
 
 export interface Parameter {
@@ -63,9 +63,9 @@ export interface Parameter {
    * dynamic values
    */
   [key: string]: any;
-  property?: Nullable<string>;
-  quantity?: Nullable<string>;
-  numericValueArray?: Nullable<ValueArray>;
+  property: string;
+  quantity: string;
+  numericValueArray: ValueArray;
 }
 
 export interface ValueArray {
@@ -73,6 +73,6 @@ export interface ValueArray {
    * dynamic values
    */
   [key: string]: any;
-  unitRef?: Nullable<string>;
-  numberArray?: Nullable<number[]>;
+  unitRef: string;
+  numberArray: number[];
 }

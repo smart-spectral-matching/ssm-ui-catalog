@@ -1,8 +1,21 @@
 import { FC, PropsWithChildren, ReactElement, ReactNode } from 'react';
-import { ExpandMore, MultilineChart, People } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Grid, styled, SvgIcon, Typography } from '@mui/material';
+import { observer, useLocalObservable } from 'mobx-react-lite';
+import { ExpandMore, KeyboardArrowLeft, KeyboardArrowRight, MultilineChart, People } from '@mui/icons-material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  ButtonGroup,
+  Card,
+  Grid,
+  IconButton,
+  styled,
+  SvgIcon,
+  Typography,
+} from '@mui/material';
 import { nanoid } from 'nanoid';
 
+import ZoomableLineChart from 'components/graphs/ZoomableLineChart';
 import { BatsModel } from 'types';
 import { isNonEmptyArray, isNonEmptyObject } from 'utils';
 
@@ -17,34 +30,31 @@ const AccordionLabel = styled('span')(() => ({
   marginRight: '1em',
 }));
 
-const AccordionList = styled('ul')<{ needsScroll?: string }>(({ needsScroll }) => ({
-  margin: '0.5rem 0 1rem',
-  border: '1px solid #e0e0e0',
-  borderRadius: '10px',
-  maxHeight: needsScroll ? '25vh' : 'unset',
-  overflowY: 'auto',
-  position: 'relative',
-  '&:not(.browserDefault)': {
-    paddingLeft: 0,
-    listStyleType: 'none',
-    '&>li': {
-      padding: '10px',
-      borderBottom: '1px solid #dddddd',
-      '&:last-child': {
-        border: 0,
+const AccordionList = styled('ul', { shouldForwardProp: (prop) => prop !== 'needsScroll' })<{ needsScroll?: boolean }>(
+  ({ needsScroll }) => ({
+    margin: '0.5rem 0 1rem',
+    border: '1px solid #e0e0e0',
+    borderRadius: '10px',
+    maxHeight: needsScroll ? '25vh' : 'unset',
+    overflowY: 'auto',
+    position: 'relative',
+    '&:not(.browserDefault)': {
+      paddingLeft: 0,
+      listStyleType: 'none',
+      '&>li': {
+        padding: '10px',
+        borderBottom: '1px solid #dddddd',
+        '&:last-child': {
+          border: 0,
+        },
       },
     },
-  },
-}));
+  }),
+);
 
-const VideoCaption = styled('span')(({ theme }) => ({
-  color: theme.palette.common.white,
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  maxWidth: '100%',
-  padding: theme.spacing(3),
-  fontSize: theme.spacing(3),
+const DataseriesDisplay = styled('span')(() => ({
+  display: 'inline-flex',
+  alignItems: 'center',
 }));
 
 /**
@@ -93,7 +103,7 @@ const DynamicAccordionProps: FC<{ label: string; value: unknown; icon?: ReactEle
       </TopLevelAccordion>
     ) : (
       <li>
-        <AccordionList needsScroll={arrayChildren.length > 10 ? 'yes' : undefined}>{arrayChildren}</AccordionList>
+        <AccordionList needsScroll={arrayChildren.length > 10}>{arrayChildren}</AccordionList>
       </li>
     );
   }
@@ -120,80 +130,95 @@ const DynamicAccordionProps: FC<{ label: string; value: unknown; icon?: ReactEle
   return <AccordionListItem objKey={label}>{value as ReactNode}</AccordionListItem>;
 };
 
-const Detail: FC<{ data: BatsModel }> = ({ data }) => (
-  <>
-    <Grid container spacing={4}>
-      <Grid item sm={12} component="section">
-        <Typography variant="h3" align="center">
-          {data.title}
-        </Typography>
-      </Grid>
-      <Grid
-        item
-        sm={6}
-        component="section"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-evenly',
-        }}
-      >
-        {data.scidata.property && (
-          <>
-            <Typography variant="h4">Property</Typography>
-            <Typography variant="body1">{data.scidata.property}</Typography>
-          </>
-        )}
-        {data.scidata.description && (
-          <>
-            <Typography variant="h4">Description</Typography>
-            <Typography variant="body1">{data.scidata.description}</Typography>
-          </>
-        )}
-      </Grid>
-      <Grid item sm={6} component="section">
-        <Card>
-          <div style={{ position: 'relative' }}>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video autoPlay loop style={{ borderRadius: '4px' }}>
-              <source
-                src="https://ak6.picdn.net/shutterstock/videos/1012853036/preview/stock-footage-animation-rotation-of-model-molecule-from-glass-and-crystal.webm"
-                type="video/mp4"
-              />
-              <source
-                src="https://ak6.picdn.net/shutterstock/videos/1012853036/preview/stock-footage-animation-rotation-of-model-molecule-from-glass-and-crystal.webm"
-                type="video/ogg"
-              />
-              Your browser does not support the video tag.
-            </video>
-            <VideoCaption>Demo Visualization</VideoCaption>
-          </div>
-          <CardContent>
-            <Typography variant="caption">
-              Video caption goes here. The video will likely be replaced by an image later on. Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-    <AccordionsContainer>
-      {isNonEmptyArray(data.scidata.dataseries) && (
-        <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} />
-      )}
-      {isNonEmptyObject(data.scidata.methodology) && (
-        <DynamicAccordionProps
-          label="Method"
-          value={data.scidata.methodology}
-          icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
-        />
-      )}
-      {isNonEmptyObject(data.scidata.system) && (
-        <DynamicAccordionProps label="System" value={data.scidata.system} icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />} />
-      )}
-      {isNonEmptyObject(data.scidata.sources) && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} />}
-    </AccordionsContainer>
-  </>
-);
+const Detail: FC<{ data: BatsModel }> = ({ data }) => {
+  const state = useLocalObservable(() => ({
+    activeDataseriesIdx: 0,
+    get selectedDataseries() {
+      const dataseries = data.scidata.dataseries;
+      if (!isNonEmptyArray(dataseries)) return null;
+      return dataseries![state.activeDataseriesIdx];
+    },
+  }));
 
-export default Detail;
+  return (
+    <>
+      <Grid container spacing={4}>
+        <Grid item sm={12} component="section">
+          <Typography variant="h3" align="center">
+            {data.title}
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          md={4}
+          component="section"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-evenly',
+          }}
+        >
+          {data.scidata.property && (
+            <>
+              <Typography variant="h4">Property</Typography>
+              <Typography variant="body1">{data.scidata.property}</Typography>
+            </>
+          )}
+          {data.scidata.description && (
+            <>
+              <Typography variant="h4">Description</Typography>
+              <Typography variant="body1">{data.scidata.description}</Typography>
+            </>
+          )}
+        </Grid>
+        <Grid item md={8} component="section" sx={{ width: '100%' }}>
+          <Card>
+            {!!state.selectedDataseries && (
+              <ZoomableLineChart dataseries={state.selectedDataseries}>
+                <ButtonGroup variant="outlined" aria-label="Switch Dataset">
+                  <IconButton
+                    aria-label="previous"
+                    title="Go to previous dataset"
+                    disabled={state.activeDataseriesIdx === 0}
+                    onClick={() => (state.activeDataseriesIdx -= 1)}
+                  >
+                    <KeyboardArrowLeft />
+                  </IconButton>
+                  <DataseriesDisplay>
+                    {`Dataseries ${state.activeDataseriesIdx + 1} of ${data.scidata.dataseries!.length}`}
+                  </DataseriesDisplay>
+                  <IconButton
+                    aria-label="next"
+                    title="Go to next dataset"
+                    disabled={state.activeDataseriesIdx === data.scidata.dataseries!.length - 1}
+                    onClick={() => (state.activeDataseriesIdx += 1)}
+                  >
+                    <KeyboardArrowRight />
+                  </IconButton>
+                </ButtonGroup>
+              </ZoomableLineChart>
+            )}
+          </Card>
+        </Grid>
+      </Grid>
+      <AccordionsContainer>
+        {isNonEmptyArray(data.scidata.dataseries) && (
+          <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} />
+        )}
+        {isNonEmptyObject(data.scidata.methodology) && (
+          <DynamicAccordionProps
+            label="Method"
+            value={data.scidata.methodology}
+            icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
+          />
+        )}
+        {isNonEmptyObject(data.scidata.system) && (
+          <DynamicAccordionProps label="System" value={data.scidata.system} icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />} />
+        )}
+        {isNonEmptyObject(data.scidata.sources) && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} />}
+      </AccordionsContainer>
+    </>
+  );
+};
+
+export default observer(Detail);
