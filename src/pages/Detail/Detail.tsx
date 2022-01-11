@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, ReactElement, ReactNode } from 'react';
+import { FC, PropsWithChildren, ReactElement, ReactNode, Suspense } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { ExpandMore, KeyboardArrowLeft, KeyboardArrowRight, MultilineChart, People } from '@mui/icons-material';
 import {
@@ -18,6 +18,7 @@ import { nanoid } from 'nanoid';
 import ZoomableLineChart from 'components/graphs/ZoomableLineChart';
 import { BatsModel } from 'types';
 import { isNonEmptyArray, isNonEmptyObject } from 'utils';
+import { transientOptions } from 'utils/jss-utils';
 
 import { ReactComponent as AtomIcon } from 'assets/atom.svg';
 import { ReactComponent as FlaskIcon } from 'assets/flask.svg';
@@ -30,27 +31,28 @@ const AccordionLabel = styled('span')(() => ({
   marginRight: '1em',
 }));
 
-const AccordionList = styled('ul', { shouldForwardProp: (prop) => prop !== 'needsScroll' })<{ needsScroll?: boolean }>(
-  ({ needsScroll }) => ({
-    margin: '0.5rem 0 1rem',
-    border: '1px solid #e0e0e0',
-    borderRadius: '10px',
-    maxHeight: needsScroll ? '25vh' : 'unset',
-    overflowY: 'auto',
-    position: 'relative',
-    '&:not(.browserDefault)': {
-      paddingLeft: 0,
-      listStyleType: 'none',
-      '&>li': {
-        padding: '10px',
-        borderBottom: '1px solid #dddddd',
-        '&:last-child': {
-          border: 0,
-        },
+const AccordionList = styled(
+  'ul',
+  transientOptions,
+)<{ $needsScroll?: boolean }>(({ $needsScroll }) => ({
+  margin: '0.5rem 0 1rem',
+  border: '1px solid #e0e0e0',
+  borderRadius: '10px',
+  maxHeight: $needsScroll ? '25vh' : 'unset',
+  overflowY: 'auto',
+  position: 'relative',
+  '&:not(.browserDefault)': {
+    paddingLeft: 0,
+    listStyleType: 'none',
+    '&>li': {
+      padding: '10px',
+      borderBottom: '1px solid #dddddd',
+      '&:last-child': {
+        border: 0,
       },
     },
-  }),
-);
+  },
+}));
 
 const DataseriesDisplay = styled('span')(() => ({
   display: 'inline-flex',
@@ -61,9 +63,9 @@ const DataseriesDisplay = styled('span')(() => ({
  * Display simple object
  */
 const AccordionListItem: FC<PropsWithChildren<{ objKey: string }>> = ({ objKey, children }) => (
-  <li>
+  <>
     <b>{objKey}:</b> {children}
-  </li>
+  </>
 );
 
 /**
@@ -102,25 +104,23 @@ const DynamicAccordionProps: FC<{ label: string; value: unknown; icon?: ReactEle
         {arrayChildren}
       </TopLevelAccordion>
     ) : (
-      <li>
-        <AccordionList needsScroll={arrayChildren.length > 10}>{arrayChildren}</AccordionList>
-      </li>
+      <AccordionList $needsScroll={arrayChildren.length > 10}>{arrayChildren}</AccordionList>
     );
   }
   if (typeof value === 'object' && value !== null) {
     // MUST check array before object - "null" is also an object
 
-    const objectChildren = (
+    return (
       <TopLevelAccordion label={label} icon={icon}>
         {Object.entries(value)
           .sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase(), 'en'))
           .map(([objLabel, objValue]) => (
-            <DynamicAccordionProps key={objLabel} label={objLabel} value={objValue} />
+            <li key={objLabel}>
+              <DynamicAccordionProps label={objLabel} value={objValue} />
+            </li>
           ))}
       </TopLevelAccordion>
     );
-
-    return icon ? objectChildren : <li>{objectChildren}</li>;
   }
   if (typeof value === 'boolean') {
     // React cannot render boolean values, so convert value to a string
@@ -173,31 +173,35 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => {
         </Grid>
         <Grid item md={8} component="section" sx={{ width: '100%' }}>
           <Card>
-            {!!state.selectedDataseries && (
-              <ZoomableLineChart dataseries={state.selectedDataseries}>
-                <ButtonGroup variant="outlined" aria-label="Switch Dataset">
-                  <IconButton
-                    aria-label="previous"
-                    title="Go to previous dataset"
-                    disabled={state.activeDataseriesIdx === 0}
-                    onClick={() => (state.activeDataseriesIdx -= 1)}
-                  >
-                    <KeyboardArrowLeft />
-                  </IconButton>
-                  <DataseriesDisplay>
-                    {`Dataseries ${state.activeDataseriesIdx + 1} of ${data.scidata.dataseries!.length}`}
-                  </DataseriesDisplay>
-                  <IconButton
-                    aria-label="next"
-                    title="Go to next dataset"
-                    disabled={state.activeDataseriesIdx === data.scidata.dataseries!.length - 1}
-                    onClick={() => (state.activeDataseriesIdx += 1)}
-                  >
-                    <KeyboardArrowRight />
-                  </IconButton>
-                </ButtonGroup>
-              </ZoomableLineChart>
-            )}
+            <Suspense fallback={<div>Loading chart...</div>}>
+              {state.selectedDataseries ? (
+                <ZoomableLineChart dataseries={state.selectedDataseries}>
+                  <ButtonGroup variant="outlined" aria-label="Switch Dataset">
+                    <IconButton
+                      aria-label="previous"
+                      title="Go to previous dataset"
+                      disabled={state.activeDataseriesIdx === 0}
+                      onClick={() => (state.activeDataseriesIdx -= 1)}
+                    >
+                      <KeyboardArrowLeft />
+                    </IconButton>
+                    <DataseriesDisplay>
+                      {`Dataseries ${state.activeDataseriesIdx + 1} of ${data.scidata.dataseries!.length}`}
+                    </DataseriesDisplay>
+                    <IconButton
+                      aria-label="next"
+                      title="Go to next dataset"
+                      disabled={state.activeDataseriesIdx === data.scidata.dataseries!.length - 1}
+                      onClick={() => (state.activeDataseriesIdx += 1)}
+                    >
+                      <KeyboardArrowRight />
+                    </IconButton>
+                  </ButtonGroup>
+                </ZoomableLineChart>
+              ) : (
+                <div>No data available for chart</div>
+              )}
+            </Suspense>
           </Card>
         </Grid>
       </Grid>

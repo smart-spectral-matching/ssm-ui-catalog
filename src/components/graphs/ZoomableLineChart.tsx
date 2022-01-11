@@ -2,10 +2,12 @@ import { FC, PropsWithChildren, useEffect, useRef } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { Button, CardActions, Checkbox, FormControlLabel, styled, useTheme } from '@mui/material';
 import type { ZoomTransform } from 'd3';
-import { axisBottom, axisLeft, curveCatmullRom, line, max, min, scaleLinear, select, zoom } from 'd3';
+import { axisBottom, axisLeft, curveCatmullRom, line, max, min, scaleLinear, schemeCategory10, select, zoom } from 'd3';
 
-import { DataSeries } from 'types';
+import { Axis, DataSeries, ValueArray } from 'types';
 import useResizeObserver from 'utils/useResizeObserver';
+
+const colors = schemeCategory10;
 
 const margin = { top: 10, right: 10, bottom: 50, left: 75 }; // TODO maybe provide this from a parent component instead
 const Wrapper = styled('div')(({ theme }) => ({
@@ -21,8 +23,34 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
 }));
 
+const D3Tooltip = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  lineHeight: 1,
+  fontWeight: 'bold',
+  padding: '12px',
+  background: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  border: 0,
+  borderRadius: '8px',
+  pointerEvents: 'none',
+  opacity: 0,
+}));
+
 // used for SVG definitions if not defined by the parent component.
 const RANDOM_ID = `${Math.random()}`;
+
+function dataMapper(xValueArr: ValueArray, yValueArr: ValueArray) {
+  const xData = xValueArr.numberArray;
+  const yData = yValueArr.numberArray;
+  if (xData.length !== yData.length) window.console.warn('WARNING: Data does not have 1:1 ratio of X and Y values!');
+  return xData.length >= yData.length ? yData.map((value, idx) => [xData[idx], value]) : xData.map((value, idx) => [value, yData[idx]]);
+}
+
+function getUnitRef(axis: Axis, valueArrIdx: number) {
+  const ref = axis.parameter.numericValueArray[valueArrIdx].unitRef;
+  if (ref) return ` (${ref})`;
+  return '';
+}
 
 /**
  * Component that renders a ZoomableLineChart
@@ -53,10 +81,27 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
       return dataseries['y-axis'].parameter.property;
     },
     get data() {
-      const xData = dataseries['x-axis'].parameter.numericValueArray.numberArray;
-      const yData = dataseries['y-axis'].parameter.numericValueArray.numberArray;
-      if (xData.length !== yData.length) window.console.warn('WARNING: Data does not have 1:1 ratio of X and Y values!');
-      return xData.length >= yData.length ? yData.map((value, idx) => [xData[idx], value]) : xData.map((value, idx) => [value, yData[idx]]);
+      const allX = dataseries['x-axis'].parameter.numericValueArray;
+      const allY = dataseries['y-axis'].parameter.numericValueArray;
+      if (allX.length !== allY.length) window.console.warn('numericValueArray of x and y axis are not equal');
+      return allX.length >= allY.length ? allY.map((v, i) => dataMapper(allX[i], v)) : allX.map((v, i) => dataMapper(v, allY[i]));
+    },
+    // for both x and y:
+    // include 0 in all graphs, either as minimum or as maximum
+    get alldata() {
+      return state.data.flat();
+    },
+    get xMax() {
+      return Math.max(0, max(state.alldata, (d) => d[0]) ?? 0);
+    },
+    get xMin() {
+      return Math.min(0, min(state.alldata, (d) => d[0]) ?? 0);
+    },
+    get yMax() {
+      return Math.max(0, max(state.alldata, (d) => d[1]) ?? 0);
+    },
+    get yMin() {
+      return Math.min(0, min(state.alldata, (d) => d[1]) ?? 0);
     },
   }));
 
@@ -74,10 +119,8 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     const tooltip = select(tooltipRef.current!).style('opacity', 0);
 
     // x-scale
-    const xMax = max(state.data, (d) => d[0])!;
-    const xMin = Math.min(0, min(state.data, (d) => d[0]) ?? 0);
     const xScale = scaleLinear()
-      .domain([xMin, xMax])
+      .domain([state.xMin, state.xMax])
       .range(state.reverseData ? [width - 10, 10] : [10, width - 10])
       .nice();
 
@@ -88,10 +131,8 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     }
 
     // y-scale
-    const yMax = max(state.data, (d) => d[1])!;
-    const yMin = Math.max(0, min(state.data, (d) => d[1]) ?? 0);
     const yScale = scaleLinear()
-      .domain([yMin, yMax])
+      .domain([state.yMin, state.yMax])
       .range([height - 10, 15])
       .nice();
 
@@ -101,40 +142,48 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
       .y((d) => yScale(d[1]))
       .curve(curveCatmullRom);
 
-    // line graph
-    svgContent
-      .selectAll('.myLine')
-      .data([state.data])
-      .join('path')
-      .attr('class', 'myLine')
-      .attr('stroke', 'black')
-      .attr('fill', 'none')
-      // @ts-ignore
-      .attr('d', lineGenerator);
+    state.data.forEach((data, idx) => {
+      // line graph
+      svgContent
+        .selectAll(`.d3Line-${idx}`)
+        .data([data])
+        .join('path')
+        .attr('class', `d3Line-${idx}`)
+        .attr('stroke', colors[idx % 10])
+        .attr('fill', 'none')
+        // @ts-ignore
+        .attr('d', lineGenerator);
 
-    // points
-    svgContent
-      .selectAll('.myDot')
-      .data(state.data)
-      .join('circle')
-      .attr('class', 'myDot')
-      .attr('stroke', 'black')
-      .attr('r', 2)
-      .attr('fill', 'orange')
-      // @ts-ignore
-      .attr('cx', (val) => xScale(val[0]))
-      // @ts-ignore
-      .attr('cy', (val) => yScale(val[1]))
-      .on('mouseover', (event, d) => {
-        tooltip.style('opacity', 0.9);
-        tooltip
-          .html(`${state.xLabelShort}: ${d[0]}<br>${state.yLabelShort}: ${d[1]}`)
-          .style('left', `${event.pageX - 80}px`)
-          .style('top', `${event.pageY - 64}px`);
-      })
-      .on('mouseout', () => {
-        tooltip.style('opacity', 0);
-      });
+      // points
+      svgContent
+        .selectAll(`.d3Dot-${idx}`)
+        .data(data)
+        .join('circle')
+        .attr('class', `d3Dot-${idx}`)
+        .attr('stroke', 'none')
+        .attr('r', 2)
+        .attr('fill', colors[idx % 10])
+        // @ts-ignore
+        .attr('cx', (val) => xScale(val[0]))
+        // @ts-ignore
+        .attr('cy', (val) => yScale(val[1]))
+        .on('mouseover', (event, d) => {
+          tooltip.style('opacity', 0.9);
+          tooltip
+            .html(
+              `
+            ${state.xLabelShort}${getUnitRef(dataseries['x-axis'], idx)}: ${d[0]}
+            <br>
+            ${state.yLabelShort}${getUnitRef(dataseries['y-axis'], idx)}: ${d[1]}
+          `,
+            )
+            .style('left', `${event.pageX - 80}px`)
+            .style('top', `${event.pageY - 64}px`);
+        })
+        .on('mouseout', () => {
+          tooltip.style('opacity', 0);
+        });
+    });
 
     // x-axis
     const xAxis = axisBottom(xScale);
@@ -185,8 +234,12 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     state.data,
     state.xLabel,
     state.xLabelShort,
+    state.xMin,
+    state.xMax,
     state.yLabel,
     state.yLabelShort,
+    state.yMin,
+    state.yMax,
     state.reverseData,
     dimensions,
   ]);
@@ -207,7 +260,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
             <text className="x-axis-text" fill={theme.palette.text.primary} />
             <text className="y-axis-text" fill={theme.palette.text.primary} />
           </svg>
-          <div ref={tooltipRef} className="d3-tip" />
+          <D3Tooltip ref={tooltipRef} />
         </div>
       </Wrapper>
       <CardActions sx={{ justifyContent: 'space-around', borderTop: `3px solid ${theme.palette.divider}` }}>

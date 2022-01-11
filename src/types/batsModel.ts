@@ -65,7 +65,7 @@ export interface Parameter {
   [key: string]: any;
   property: string;
   quantity: string;
-  numericValueArray: ValueArray;
+  numericValueArray: ValueArray[];
 }
 
 export interface ValueArray {
@@ -73,6 +73,6 @@ export interface ValueArray {
    * dynamic values
    */
   [key: string]: any;
-  unitRef: string;
+  unitRef?: string;
   numberArray: number[];
 }

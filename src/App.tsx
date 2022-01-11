@@ -24,10 +24,11 @@ const queryClient = new QueryClient({
 });
 
 configure({
-  enforceActions: 'always',
+  enforceActions: 'never',
+  // enforceActions: 'always',
   computedRequiresReaction: true,
   reactionRequiresObservable: true,
-  observableRequiresReaction: true,
+  // observableRequiresReaction: true,
   // disableErrorBoundaries: true,
 });
 const App = () => {

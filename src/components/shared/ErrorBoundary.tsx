@@ -14,8 +14,8 @@ interface IErrorBoundaryState {
  * NOTE: Since 'ComponentDidCatch' is not implemented in React FunctionalComponents, and since we are using a paired-down version of MobX which only uses FunctionComponents, there may be some issues when dealing with Observers.
  */
 class ErrorBoundary extends Component<Record<string, unknown>, IErrorBoundaryState> {
-  constructor() {
-    super({});
+  constructor(props: Record<string, unknown>) {
+    super(props);
     this.state = { error: undefined, errorInfo: undefined };
   }
 

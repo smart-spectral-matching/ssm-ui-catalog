@@ -4,6 +4,8 @@ import { Close, Search } from '@mui/icons-material';
 import { ButtonBase, IconButton, Input, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
+import { transientOptions } from 'utils/jss-utils';
+
 const Root = styled(Paper)(({ theme }) => ({
   height: theme.spacing(6),
   display: 'flex',
@@ -17,7 +19,7 @@ const SearchIconBase = styled(ButtonBase)(({ theme }) => ({
   opacity: 0.66,
 }));
 
-const SearchIcon = styled(Search)(({ theme }) => ({
+const SearchIcon = styled(Search, { shouldForwardProp: (v) => v !== 'disableRipple' })(({ theme }) => ({
   transition: theme.transitions.create(['opacity'], {
     duration: theme.transitions.duration.shorter,
     easing: theme.transitions.easing.easeInOut,
@@ -39,7 +41,10 @@ const ClearIconButton = styled(IconButton)(({ disabled, theme }) => ({
   }),
 }));
 
-const ClearIcon = styled(Close)<{ $enabled?: boolean }>(({ $enabled, theme }) => ({
+const ClearIcon = styled(
+  Close,
+  transientOptions,
+)<{ $enabled?: boolean }>(({ $enabled, theme }) => ({
   opacity: $enabled ? 1 : 0,
   transition: theme.transitions.create(['opacity'], {
     duration: theme.transitions.duration.shorter,

@@ -49,7 +49,6 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
             throw new Error(`Could not load model from API: ${(json as ApiProblem).detail}`);
           }
           store.model.syncCacheAndUpdate(json as BatsModel);
-          window.console.log(json);
           state.loadState = LoadState.LOADED;
         })
         .catch((err: Error) => {
