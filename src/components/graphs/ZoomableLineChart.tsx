@@ -88,20 +88,14 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     },
     // for both x and y:
     // include 0 in all graphs, either as minimum or as maximum
-    get alldata() {
-      return state.data.flat();
-    },
-    get xMax() {
-      return Math.max(0, max(state.alldata, (d) => d[0]) ?? 0);
-    },
-    get xMin() {
-      return Math.min(0, min(state.alldata, (d) => d[0]) ?? 0);
-    },
-    get yMax() {
-      return Math.max(0, max(state.alldata, (d) => d[1]) ?? 0);
-    },
-    get yMin() {
-      return Math.min(0, min(state.alldata, (d) => d[1]) ?? 0);
+    get boundaries() {
+      const alldata = state.data.flat();
+      return {
+        xMax: Math.max(0, max(alldata, (d) => d[0]) ?? 0),
+        xMin: Math.min(0, min(alldata, (d) => d[0]) ?? 0),
+        yMax: Math.max(0, max(alldata, (d) => d[1]) ?? 0),
+        yMin: Math.min(0, min(alldata, (d) => d[1]) ?? 0),
+      };
     },
   }));
 
@@ -120,7 +114,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
 
     // x-scale
     const xScale = scaleLinear()
-      .domain([state.xMin, state.xMax])
+      .domain([state.boundaries.xMin, state.boundaries.xMax])
       .range(state.reverseData ? [width - 10, 10] : [10, width - 10])
       .nice();
 
@@ -132,7 +126,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
 
     // y-scale
     const yScale = scaleLinear()
-      .domain([state.yMin, state.yMax])
+      .domain([state.boundaries.yMin, state.boundaries.yMax])
       .range([height - 10, 15])
       .nice();
 
@@ -232,14 +226,11 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
   }, [
     state.currentXZoomState,
     state.data,
+    state.boundaries,
     state.xLabel,
     state.xLabelShort,
-    state.xMin,
-    state.xMax,
     state.yLabel,
     state.yLabelShort,
-    state.yMin,
-    state.yMax,
     state.reverseData,
     dimensions,
   ]);
