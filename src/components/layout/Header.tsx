@@ -7,7 +7,7 @@ import { API_DOCS_URL, MACHINE_LEARNING_NOTEBOOKS_URL, MACHINE_LEARNING_UI_URL }
 import { ImageContainer } from 'theme/GlobalComponents';
 import { RouteHref } from 'types';
 
-import LOGO from 'assets/logo.png';
+import LOGO from 'assets/logo.svg';
 
 const ML_MENU_ID = 'ml-menu-id';
 const DOCS_MENU_ID = 'docs-menu-id';
@@ -49,9 +49,9 @@ const Header = () => {
   return (
     <AppBar sx={{ mb: 3, py: 1 }} color="secondary" position="static" component="header">
       <HeaderToolbar>
-        <ImageContainer>
+        <ImageContainer sx={{ marginRight: '.5rem' }}>
           <Link sx={{ maxWidth: '15%' }} component={RouterLink} to={RouteHref.HOME}>
-            <img src={LOGO} alt="Smart Spectral Matching - Home" width="100" height="67" />
+            <img src={LOGO} alt="Smart Spectral Matching - Home" width="200" height="80" />
           </Link>
         </ImageContainer>
         <WrapperContainer>

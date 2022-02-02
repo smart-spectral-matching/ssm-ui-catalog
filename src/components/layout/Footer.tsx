@@ -11,6 +11,6 @@ const CustomFooter = styled('footer')(({ theme }) => ({
   zIndex: 2,
 }));
 
-const Footer = () => <CustomFooter>&copy;2019-2021 Smart Spectral Matching</CustomFooter>;
+const Footer = () => <CustomFooter>&copy;2019-2022 Smart Spectral Matching</CustomFooter>;
 
 export default Footer;
