@@ -27,7 +27,7 @@ nodebuild:
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
     - docker push $NODE_URL/$CI_COMMIT_REF_NAME:latest
   tags:
-    - rse-nds-builder
+    - rse-multi-builder
 
 # fail if auditing returns 'high' or 'critical' vulnerabilities, report all vulnerabilities
 test_audit:
@@ -44,7 +44,7 @@ test_audit:
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "bin/audit.js" > $AUDIT_OUTFILE
   tags:
-    - rse-nds-builder
+    - rse-multi-builder
 
 test_lint:
   stage: test
@@ -54,7 +54,7 @@ test_lint:
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "yarn run assert-no-warnings"
   tags:
-    - rse-nds-builder
+    - rse-multi-builder
 
 test_jest:
   stage: test
@@ -64,7 +64,7 @@ test_jest:
     - docker pull $NODE_URL/$CI_COMMIT_REF_NAME
     - docker run --name $NODE_IMAGE_NAME $NODE_URL/$CI_COMMIT_REF_NAME sh -c "yarn test"
   tags:
-    - rse-nds-builder
+    - rse-multi-builder
 
 nginxbuild:
   stage: nginxbuild
@@ -87,4 +87,4 @@ nginxbuild:
     - qa
     - main
   tags:
-    - rse-nds-builder
+    - rse-multi-builder
