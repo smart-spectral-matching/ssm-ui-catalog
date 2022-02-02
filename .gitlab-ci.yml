@@ -7,13 +7,14 @@ include:
   remote: https://code.ornl.gov/rse-deployment/rse-sharables/raw/master/.gitlab-ci-before_script.yml
 
 variables:
-  REGISTRY: 'code.ornl.gov:4567/rse/datastreams/ssm/frontend/search-upload-ui'
-  NODE_URL: '${REGISTRY}/ssm-fe-node'
-  NGINX_URL: '${REGISTRY}/ssm-fe-nginx'
+  NODE_URL: '${CI_REGISTRY_IMAGE}/ssm-fe-node'
+  NGINX_URL: '${CI_REGISTRY_IMAGE}/ssm-fe-nginx'
   NODE_IMAGE_NAME: 'ssm-fe-node'
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
 after_script:
+  - curl https://code.ornl.gov/rse-deployment/rse-sharables/raw/master/rse-bash-modules.sh -O
+  - source rse-bash-modules.sh
   - func_rse_docker_cleanup
   - sudo chown -R gitlab-runner .
 
