@@ -2,7 +2,7 @@
 
 # FOR CI ONLY - update nginx config files before building NGINX container
 
-set -euo pipefail
+set -eu
 
 cd "$(dirname "$0")/.." || exit 1
 
