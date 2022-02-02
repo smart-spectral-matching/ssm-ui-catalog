@@ -13,8 +13,6 @@ variables:
   DOCKER_APP_WORKDIR: '/usr/local/src'
 
 after_script:
-  - curl https://code.ornl.gov/rse-deployment/rse-sharables/raw/master/rse-bash-modules.sh -O
-  - source rse-bash-modules.sh
   - func_rse_docker_cleanup
   - sudo chown -R gitlab-runner .
 
