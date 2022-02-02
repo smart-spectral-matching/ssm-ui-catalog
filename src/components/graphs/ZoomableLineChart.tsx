@@ -2,7 +2,7 @@ import { FC, PropsWithChildren, useEffect, useRef } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { Button, CardActions, Checkbox, FormControlLabel, styled, useTheme } from '@mui/material';
 import type { ZoomTransform } from 'd3';
-import { axisBottom, axisLeft, curveCatmullRom, line, max, min, scaleLinear, schemeCategory10, select, zoom, zoomIdentity } from 'd3';
+import { axisBottom, axisLeft, curveCatmullRom, line, scaleLinear, schemeCategory10, select, zoom, zoomIdentity } from 'd3';
 
 import { Axis, DataSeries, ValueArray } from 'types';
 import { sanitizeHTML } from 'utils';
@@ -58,6 +58,17 @@ function getUnitRef(axis: Axis, valueArrIdx: number) {
 }
 
 /**
+ * Reduce an array of numbers to [minimum, maximum] format. Callback function of Array.prototype.reduce
+ *
+ * @param acc last state of [min, max]
+ * @param curr value in the number[] array to iterate over
+ * @returns [min, max]
+ */
+function minMaxReducer(acc: [number, number], curr: number): [number, number] {
+  return [Math.min(acc[0], curr), Math.max(acc[1], curr)];
+}
+
+/**
  * Component that renders a ZoomableLineChart
  */
 
@@ -110,11 +121,13 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     // include 0 in all graphs, either as minimum or as maximum
     get boundaries() {
       const alldata = state.data.flat();
+      const xMinMax = alldata.map((d) => d[0]).reduce(minMaxReducer, [0, 0]);
+      const yMinMax = alldata.map((d) => d[1]).reduce(minMaxReducer, [0, 0]);
       return {
-        xMax: Math.max(0, max(alldata, (d) => d[0]) ?? 0),
-        xMin: Math.min(0, min(alldata, (d) => d[0]) ?? 0),
-        yMax: Math.max(0, max(alldata, (d) => d[1]) ?? 0),
-        yMin: Math.min(0, min(alldata, (d) => d[1]) ?? 0),
+        xMax: xMinMax[1],
+        xMin: xMinMax[0],
+        yMax: yMinMax[1],
+        yMin: yMinMax[0],
       };
     },
   }));
