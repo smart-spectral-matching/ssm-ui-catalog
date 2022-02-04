@@ -21,6 +21,7 @@ const Wrapper = styled('div')(({ theme }) => ({
     overflow: 'visible',
     display: 'block',
     height: '600px', // TODO maybe provide this from a parent component instead
+    maxHeight: `calc(100vh - ${margin.top + margin.bottom}px)`,
     width: '100%',
     '& .axis-label': {
       textAnchor: 'middle',
@@ -214,6 +215,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
 
     state.data.forEach((data, idx) => {
       // TODO optimize selection here, while also not creating hiccups when zooming or panning
+      const color = colors[idx % colors.length];
 
       // line graph
       svgContent
@@ -221,7 +223,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
         .data([data])
         .join('path')
         .attr('class', `d3Line-${idx}`)
-        .attr('stroke', colors[idx % colors.length])
+        .attr('stroke', color)
         .attr('fill', 'none')
         // @ts-ignore
         .attr('d', lineGenerator);
@@ -234,7 +236,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
         .attr('class', `d3Dot-${idx}`)
         .attr('stroke', 'none')
         .attr('r', 2)
-        .attr('fill', colors[idx % colors.length])
+        .attr('fill', color)
         .attr('cx', (val) => xScale(val[0]))
         .attr('cy', (val) => yScale(val[1]))
         .on('mouseover', (event, d) => {
@@ -252,14 +254,14 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     });
 
     // x-axis
-    const xAxis = axisBottom(xScale);
+    const xAxis = axisBottom(xScale).ticks(Math.floor(width / 45));
     svg
       .selectChild('.x-axis')
       // @ts-ignore
       .call(xAxis);
 
     // y-axis
-    const yAxis = axisLeft(yScale);
+    const yAxis = axisLeft(yScale).ticks(Math.floor(height / 30));
     // @ts-ignore
     svg.selectChild('.y-axis').call(yAxis);
   }, [state.zoomTransform, state.data, state.boundaries, state.xLabelShort, state.yLabelShort, state.reverseData, dimensions]);
