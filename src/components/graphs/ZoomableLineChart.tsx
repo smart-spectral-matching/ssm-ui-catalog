@@ -44,6 +44,8 @@ const D3Tooltip = styled('div')(({ theme }) => ({
 // used for SVG definitions if not defined by the parent component.
 const RANDOM_ID = `${Math.random()}`;
 
+const TRANSLATION_X_RATE = 10;
+
 function dataMapper(xValueArr: ValueArray, yValueArr: ValueArray) {
   const xData = xValueArr.numberArray;
   const yData = yValueArr.numberArray;
@@ -91,7 +93,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
     refreshZoomBehavior: (width: number, height: number) => {
       // zoom
       const newBehavior = zoom()
-        .scaleExtent([1, 50]) // 1 = default zoom, > 1 = zoom in, < 1 = zoom out
+        .scaleExtent([1, 128]) // 1 = default zoom, > 1 = zoom in, < 1 = zoom out
         .translateExtent([
           [0, 0],
           [width, height],
@@ -104,6 +106,45 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
       const buttonEle = select(resetButtonRef.current!);
       // @ts-ignore
       buttonEle.on('click', () => svg.transition().call(newBehavior.transform, zoomIdentity));
+      // eslint-disable-next-line complexity
+      svg.on('keydown', (e) => {
+        switch (e.key.toLowerCase()) {
+          // zoom in
+          case 'w':
+          case '=':
+          case '+':
+          case 'arrowup':
+            e.preventDefault();
+            // @ts-ignore
+            svg.call(newBehavior.scaleBy, 2);
+            break;
+          // zoom out
+          case 's':
+          case '-':
+          case '_':
+          case 'arrowdown':
+            e.preventDefault();
+            // @ts-ignore
+            svg.call(newBehavior.scaleBy, 0.5);
+            break;
+          // pan left
+          case 'a':
+          case 'arrowleft':
+            e.preventDefault();
+            // @ts-ignore
+            svg.call(newBehavior.translateBy, TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
+            break;
+          // pan right
+          case 'd':
+          case 'arrowright':
+            e.preventDefault();
+            // @ts-ignore
+            svg.call(newBehavior.translateBy, -TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
+            break;
+          default:
+            break;
+        }
+      });
     },
     get xLabelShort() {
       return dataseries['x-axis'].parameter.property;
@@ -236,7 +277,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
   return (
     <>
       <Wrapper ref={wrapperRef}>
-        <svg ref={svgRef}>
+        <svg ref={svgRef} tabIndex={0} aria-label="Visualization Chart">
           <defs>
             <clipPath id={id}>
               <rect x="0" y="0" width="100%" height="100%" />
