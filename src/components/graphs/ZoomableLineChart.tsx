@@ -92,7 +92,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
      */
     refreshZoomBehavior: (width: number, height: number) => {
       // zoom
-      const newBehavior = zoom()
+      const zoomBehavior = zoom()
         .scaleExtent([1, 128]) // 1 = default zoom, > 1 = zoom in, < 1 = zoom out
         .translateExtent([
           [0, 0],
@@ -102,10 +102,10 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
           state.zoomTransform = event.transform;
         });
       // @ts-ignore
-      const svg = select(svgRef.current!).call(newBehavior);
+      const svg = select(svgRef.current!).call(zoomBehavior);
       const buttonEle = select(resetButtonRef.current!);
       // @ts-ignore
-      buttonEle.on('click', () => svg.transition().call(newBehavior.transform, zoomIdentity));
+      buttonEle.on('click', () => svg.transition().call(zoomBehavior.transform, zoomIdentity));
       // eslint-disable-next-line complexity
       svg.on('keydown', (e) => {
         switch (e.key.toLowerCase()) {
@@ -116,7 +116,7 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
           case 'arrowup':
             e.preventDefault();
             // @ts-ignore
-            svg.call(newBehavior.scaleBy, 2);
+            svg.call(zoomBehavior.scaleBy, 2);
             break;
           // zoom out
           case 's':
@@ -125,21 +125,21 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
           case 'arrowdown':
             e.preventDefault();
             // @ts-ignore
-            svg.call(newBehavior.scaleBy, 0.5);
+            svg.call(zoomBehavior.scaleBy, 0.5);
             break;
           // pan left
           case 'a':
           case 'arrowleft':
             e.preventDefault();
             // @ts-ignore
-            svg.call(newBehavior.translateBy, TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
+            svg.call(zoomBehavior.translateBy, TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
             break;
           // pan right
           case 'd':
           case 'arrowright':
             e.preventDefault();
             // @ts-ignore
-            svg.call(newBehavior.translateBy, -TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
+            svg.call(zoomBehavior.translateBy, -TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
             break;
           default:
             break;
