@@ -45,7 +45,7 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
   # Step 4: add frontend configuration from Docker environment variables here
   cat<<!EOF! | tr -d '\n' > /usr/share/nginx/html/config.js
 'use strict';window['config']={
-apiUrl: '${API_URL_RESOLVED}',
+apiUrl: '${API_URL_RESOLVED%/}',
 mlUiUrl: '${ML_UI_URL_RESOLVED}',
 mlNotebooksUrl: '${ML_NOTEBOOKS_URL_RESOLVED}',
 };
