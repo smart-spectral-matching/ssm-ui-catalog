@@ -62,3 +62,5 @@ To test the program in a fake production environment (for example: Content-Secur
 -   (if you are in a Docker environment, exit it here)
 -   `bin/build-nginx-env.sh`
 -   `docker run [OPTIONS] ssm-fe-nginx [COMMAND] [ARG...]`
+
+Note that in both this 'fake production environment' and the real production environment, any ENV variables mentioned in `deployment-ctx/Dockerfile` which do not set a value need to be set at runtime.

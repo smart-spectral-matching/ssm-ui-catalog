@@ -17,5 +17,11 @@ ENV NGINX_ENTRYPOINT_WORKER_PROCESSES_AUTOTUNE=1
 # execute this before the other NGINX entrypoint scripts.
 # see: https://github.com/nginxinc/docker-nginx/tree/master/mainline/alpine for the complete scripts list, and the behavior of the default entrypoint script
 COPY 11-environment-variables.sh /docker-entrypoint.d/
+
+# IMPORTANT: these are the business domain ENV variables which MUST be set at runtime
+ENV API_URL=
+ENV ML_UI_URL=
+ENV ML_NOTEBOOKS_URL=
+
 # we store the create-react-app build in this directory
 COPY build/ /usr/share/nginx/html
