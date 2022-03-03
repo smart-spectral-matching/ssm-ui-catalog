@@ -26,7 +26,6 @@ build
 dist
 */build
 */dist
-.ci/build
 
 # logs/backups
 npm-debug.log*

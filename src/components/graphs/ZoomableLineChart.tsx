@@ -133,14 +133,14 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
           case 'arrowleft':
             e.preventDefault();
             // @ts-ignore
-            svg.call(zoomBehavior.translateBy, TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
+            svg.call(zoomBehavior.translateBy, TRANSLATION_X_RATE / (state.zoomTransform?.k || 1), 0);
             break;
           // pan right
           case 'd':
           case 'arrowright':
             e.preventDefault();
             // @ts-ignore
-            svg.call(zoomBehavior.translateBy, -TRANSLATION_X_RATE / state.zoomTransform?.k || 1, 0);
+            svg.call(zoomBehavior.translateBy, -TRANSLATION_X_RATE / (state.zoomTransform?.k || 1), 0);
             break;
           default:
             break;

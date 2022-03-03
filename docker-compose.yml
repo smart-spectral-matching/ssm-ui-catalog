@@ -5,7 +5,6 @@ services:
   app:
     build:
       context: .
-      dockerfile: node.Dockerfile
     image: ssm-fe-node # don't push this image, for local caching only
     container_name: ssm-fe-node
     restart: unless-stopped

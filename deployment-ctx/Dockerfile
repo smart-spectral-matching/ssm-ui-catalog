@@ -1,0 +1,21 @@
+# You can use this file in development if you'd like (mostly for Content-Security-Policy testing)
+# the docker build context should be the "deployment-ctx" directory, not the project root
+FROM code.ornl.gov:4567/rse/images/nginx:alpine
+
+# remove the 'listen-for-IPV6' script, we will listen there by default
+RUN rm -f /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+
+# remove all NGINX default HTML and .conf files
+RUN rm -rf /usr/share/nginx/html/*
+RUN rm -rf /etc/nginx/conf.d/*
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-conf/* /etc/nginx/conf.d/
+
+# autotune worker processes, see https://github.com/nginxinc/docker-nginx/blob/master/mainline/alpine/30-tune-worker-processes.sh
+ENV NGINX_ENTRYPOINT_WORKER_PROCESSES_AUTOTUNE=1
+
+# execute this before the other NGINX entrypoint scripts.
+# see: https://github.com/nginxinc/docker-nginx/tree/master/mainline/alpine for the complete scripts list, and the behavior of the default entrypoint script
+COPY 11-environment-variables.sh /docker-entrypoint.d/
+# we store the create-react-app build in this directory
+COPY build/ /usr/share/nginx/html

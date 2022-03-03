@@ -16,9 +16,9 @@ if [ ! -d "build" ] ; then
     exit 1
 fi
 
-rm -rf .ci/build || true
+rm -rf deployment-ctx/build || true
 # TODO sloppy handling for Docker users' volumes
-mv build .ci/build || { sudo chown -R "$USERNAME" . && mv build .ci/build; }
-docker build -f .ci/nginx.Dockerfile -t ssm-fe-nginx .ci
+mv build deployment-ctx/build || { sudo chown -R "$USERNAME" . && mv build deployment-ctx/build; }
+docker build -f deployment-ctx/Dockerfile -t ssm-fe-nginx deployment-ctx
 echo "You can now run 'docker run [OPTIONS] ssm-fe-nginx:latest [COMMAND] [ARG...]'"
 echo "One flag you will probably want to include is '-p 80:80'"

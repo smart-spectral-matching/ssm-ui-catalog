@@ -1,5 +1,5 @@
 # covers node context, which is built from root
-# nginx context is built from .ci directory
+# nginx context is built from deployment-ctx directory
 node_modules
 # TODO: we want to ignore .git in CI/CD, but not in development
 .git
@@ -7,5 +7,5 @@ build
 dist
 .cache
 
-# ignore .ci directory - production context
-.ci/
+# ignore deployment-ctx directory - production context
+deployment-ctx/

@@ -3,7 +3,7 @@ import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { AppBar, Link, List, ListItem, ListItemText, Menu, MenuItem, styled, Toolbar, Typography } from '@mui/material';
 
 import SearchBar from 'components/SearchBar';
-import { API_DOCS_URL, MACHINE_LEARNING_NOTEBOOKS_URL, MACHINE_LEARNING_UI_URL } from 'ssm-constants';
+import { API_URL, ML_NOTEBOOKS_URL, ML_UI_URL } from 'ssm-constants';
 import { ImageContainer } from 'theme/GlobalComponents';
 import { RouteHref } from 'types';
 
@@ -90,10 +90,10 @@ const Header = () => {
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
               transformOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-              <MenuItem component={Link} href={MACHINE_LEARNING_UI_URL} onClick={() => setMlMenu(null)} color="inherit">
+              <MenuItem component={Link} href={ML_UI_URL} onClick={() => setMlMenu(null)} color="inherit">
                 UI
               </MenuItem>
-              <MenuItem component={Link} href={MACHINE_LEARNING_NOTEBOOKS_URL} onClick={() => setMlMenu(null)} color="inherit">
+              <MenuItem component={Link} href={ML_NOTEBOOKS_URL} onClick={() => setMlMenu(null)} color="inherit">
                 JUPYTER NOTEBOOKS
               </MenuItem>
             </Menu>
@@ -118,7 +118,7 @@ const Header = () => {
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
               transformOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-              <MenuItem component={Link} href={API_DOCS_URL} onClick={() => setDocsMenu(null)} color="inherit">
+              <MenuItem component={Link} href={`${API_URL}/swagger-ui/`} onClick={() => setDocsMenu(null)} color="inherit">
                 API
               </MenuItem>
             </Menu>
