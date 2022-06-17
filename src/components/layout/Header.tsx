@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
-import { AppBar, Link, List, ListItem, ListItemText, Menu, MenuItem, styled, Toolbar, Typography } from '@mui/material';
+import { observer } from 'mobx-react-lite';
+import { DarkMode, LightMode } from '@mui/icons-material';
+import { AppBar, IconButton, Link, List, ListItem, ListItemText, Menu, MenuItem, styled, Toolbar, Typography } from '@mui/material';
 
 import LoginPanel from 'components/LoginPanel';
 import SearchBar from 'components/SearchBar';
 import { API_URL, ML_NOTEBOOKS_URL, ML_UI_URL } from 'ssm-constants';
+import { useStore } from 'store/providers';
 import { ImageContainer } from 'theme/GlobalComponents';
 import { RouteHref } from 'types';
 
@@ -43,8 +46,9 @@ const SearchBarContainer = styled('div')(({ theme }) => ({
   },
 }));
 
-const Header = () => {
+const Header = observer(() => {
   const history = useHistory();
+  const store = useStore();
 
   const [mlMenu, setMlMenu] = useState<(EventTarget & HTMLElement) | null>(null);
   const [docsMenu, setDocsMenu] = useState<(EventTarget & HTMLElement) | null>(null);
@@ -153,10 +157,13 @@ const Header = () => {
             </ListItem>
             <LoginPanel id={LOGIN_MENU_ID} open={!!loginMenu} onClose={() => setLoginMenu(null)} />
           </List>
+          <IconButton aria-label="switch theme" onClick={() => store.toggleTheme()}>
+            {store.darkTheme ? <LightMode /> : <DarkMode />}
+          </IconButton>
         </WrapperContainer>
       </HeaderToolbar>
     </AppBar>
   );
-};
+});
 
 export default Header;

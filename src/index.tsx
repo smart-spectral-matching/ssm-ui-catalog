@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom';
 
 import reportWebVitals from 'reportWebVitals';
 import * as serviceWorkerRegistration from 'serviceWorkerRegistration';
+import { RootStoreProvider } from 'store/providers';
 import App from './App';
 
 ReactDOM.render(
   <StrictMode>
-    <App />
+    <RootStoreProvider>
+      <App />
+    </RootStoreProvider>
   </StrictMode>,
   document.getElementById('root'),
 );
