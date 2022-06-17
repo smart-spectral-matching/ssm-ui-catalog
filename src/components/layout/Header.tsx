@@ -158,7 +158,7 @@ const Header = observer(() => {
             <LoginPanel id={LOGIN_MENU_ID} open={!!loginMenu} onClose={() => setLoginMenu(null)} />
           </List>
           <IconButton aria-label="switch theme" onClick={() => store.toggleTheme()}>
-            {store.darkTheme ? <LightMode /> : <DarkMode />}
+            {store.darkTheme ? <LightMode sx={{ fill: 'yellow' }} /> : <DarkMode sx={{ fill: 'yellow' }} />}
           </IconButton>
         </WrapperContainer>
       </HeaderToolbar>
