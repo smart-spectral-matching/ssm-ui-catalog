@@ -66,6 +66,15 @@
       "pre-commit": "lint-staged"
     }
   },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": ["./src/**"],
+    "coverageThreshold": {
+      "global": {
+        "lines": 10
+      }
+    }
+  },
   "lint-staged": {
     "**/*.{html,md,css,sass,scss,json,yaml,yml}": [
       "prettier --write"
