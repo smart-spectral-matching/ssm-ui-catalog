@@ -1,0 +1,307 @@
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Input, InputProps } from '@mui/material';
+
+interface InputNumberChangeParams {
+  originalEvent: React.SyntheticEvent<HTMLInputElement>;
+  /**
+   * if "props.disallowEmpty" is "true", you can safely force cast this to a number
+   */
+  value: number | null;
+}
+
+interface NumberFieldProps extends Omit<InputProps /* React.InputHTMLAttributes<HTMLInputElement> */, 'value'> {
+  /**
+   * bind this value to your reactive state
+   */
+  value?: number | null;
+  /**
+   * minimum value, will be set to MAX_SAFE_INTEGER if not set
+   */
+  min?: number;
+  /**
+   * maximum value, will be set to MAX_SAFE_INTEGER if not set
+   */
+  max?: number;
+  /**
+   * If true - onValueChange will emit the number 0 if there is no number in the input field
+   * If false/undefined - onValueChange will emit null if there is no number in the input field
+   *
+   * If the range of props.min and props.max does not include 0, do not set this to true
+   */
+  disallowEmpty?: boolean;
+  /**
+   * true for integers only, false/undefined to allow for floating point values
+   */
+  disableFloatingPoints?: boolean;
+  /**
+   * use to update your reactive state
+   *
+   * @param e event
+   */
+  onValueChange?(e: InputNumberChangeParams): void;
+}
+
+const NumberField = (props: NumberFieldProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [selectionState, setSelectionState] = useState<number | null>(null);
+
+  const emptyValue = useMemo(() => (props.disallowEmpty ? 0 : null), [props.disallowEmpty]);
+  const maxValue = props.max ?? Number.MAX_SAFE_INTEGER;
+  const minValue = props.min ?? Number.MIN_SAFE_INTEGER;
+
+  if (maxValue < minValue) throw new Error(`NumberField: props.maxValue (${maxValue}) is less than props.minValue (${minValue})`);
+
+  const isCharValid = (char: string) => {
+    if (!Number.isNaN(Number.parseFloat(char))) return true;
+    if (!props.disableFloatingPoints && (char === '.' || char === '-')) return true;
+    return false;
+  };
+
+  // the update function guarantees that the state will be updated
+  const update = (
+    event: React.SyntheticEvent<HTMLInputElement>,
+    inputValue: string,
+    numberValue: number | null,
+    selectionIndex: number,
+  ) => {
+    // validate the number for safety purposes
+    // this has some problems with enormous values
+    // other alternatives:
+    //   A) store any Javascript values as a string (tricky with JSON schema or JSON-LD, may need to use special JSON parsing logic)
+    //   B) use a BigInt library (expensive wrt memory, not supported before ES2020...)
+    let finalNumberValue = numberValue;
+    let finalStringValue = inputValue;
+    if (finalNumberValue != null) {
+      if (finalNumberValue < minValue) {
+        finalNumberValue = minValue;
+        finalStringValue = `${finalNumberValue}`;
+      } else if (finalNumberValue > maxValue) {
+        finalNumberValue = maxValue;
+        finalStringValue = `${finalNumberValue}`;
+      }
+    }
+    // update state binding
+    props.onValueChange?.({
+      originalEvent: event,
+      value: finalNumberValue,
+    });
+    // keypress and paste events automatically update the input, keydown events do not
+    // decimal places in the final position also may not trigger
+    if (event.type === 'keydown' || inputValue.endsWith('.') || inputValue === '-') {
+      // update input
+      inputRef.current!.value = finalStringValue;
+      // update cursor last
+      inputRef.current!.setSelectionRange(selectionIndex, selectionIndex);
+    } else {
+      // manage selection state for reactive context later on
+      setSelectionState(selectionIndex);
+    }
+  };
+
+  /**
+   * @param text value inserted from user (either on key press or on paste)
+   * @returns
+   *   object.result the value the input field would have if we weren't performing validation
+   *   object.cursorPosition the cursor position the input field would have if we weren't performing validation
+   */
+  const getProposedInsertValue = (text: string) => {
+    const inputValue = inputRef.current!.value;
+    const fullLength = inputValue.length;
+    const start = inputRef.current!.selectionStart ?? 0;
+    const end = inputRef.current!.selectionEnd ?? fullLength;
+
+    let result!: string;
+    let cursorPosition!: number;
+    if (end - start === inputValue.length) {
+      // replace entire text
+      result = text;
+      cursorPosition = text.length;
+    } else if (start === 0) {
+      // append to beginning
+      result = `${text}${inputValue.slice(end)}`;
+      cursorPosition = text.length;
+    } else if (end === fullLength) {
+      // append to end
+      result = `${inputValue.slice(0, start)}${text}`;
+      cursorPosition = end + text.length;
+    } else {
+      // append between two points
+      result = `${inputValue.slice(0, start)}${text}${inputValue.slice(end)}`;
+      cursorPosition = start + text.length;
+    }
+
+    return { result, cursorPosition };
+  };
+
+  const tryInsert = (event: React.SyntheticEvent<HTMLInputElement>, textToInsert: string) => {
+    // at this point, we have validated that the string will only contain
+    // numbers / hyphens (if floating point not disabled) / decimals (if floating point not disabled)
+    const { result, cursorPosition } = getProposedInsertValue(textToInsert);
+    event.preventDefault();
+
+    const numberValue = Number.parseFloat(result);
+    const isNumber = !Number.isNaN(numberValue) && result !== '';
+
+    // handle possibility of more than one decimal sign
+    const decimals = result.split('.');
+    if (decimals.length > 2) {
+      return false;
+    }
+
+    // handle possibility of more than one minus sign, or a minus sign being after a numerical value
+    const hyphens = result.split('-');
+    if (hyphens.length > 2 || (hyphens.length === 2 && hyphens[0] !== '' && hyphens[0] !== '-')) {
+      return false;
+    }
+
+    // handle update
+    update(event, result, isNumber ? numberValue : emptyValue, cursorPosition);
+
+    return true;
+  };
+
+  const deleteRange = (value: string, start: number, end: number) => {
+    if (end - start === value.length)
+      // delete entire value
+      return '';
+    if (start === 0)
+      // delete from start
+      return value.slice(end);
+    if (end === value.length)
+      // delete from end
+      return value.slice(0, start);
+    // delete between two points
+    return value.slice(0, start) + value.slice(end);
+  };
+
+  const deleteChars = (event: React.KeyboardEvent<HTMLInputElement>, backspace: boolean) => {
+    const inputValue = inputRef.current!.value;
+    const selectionStart = inputRef.current!.selectionStart ?? 0;
+    const selectionEnd = inputRef.current!.selectionEnd ?? inputValue.length;
+
+    let strValue!: string;
+    let cursorPosition!: number;
+    if (selectionStart === selectionEnd) {
+      if (backspace) {
+        strValue = inputValue.slice(0, selectionStart - 1) + inputValue.slice(selectionStart);
+        cursorPosition = selectionStart - 1;
+      } else {
+        strValue = inputValue.slice(0, selectionStart) + inputValue.slice(selectionStart + 1);
+        cursorPosition = selectionStart;
+      }
+    } else {
+      strValue = deleteRange(inputValue, selectionStart, selectionEnd);
+      cursorPosition = selectionStart;
+    }
+    const numberValue = Number.parseFloat(strValue);
+    const isNumber = !Number.isNaN(numberValue) && strValue !== '';
+
+    update(event, strValue, isNumber ? numberValue : emptyValue, cursorPosition);
+  };
+
+  const onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (props.disabled || props.readOnly) {
+      return;
+    }
+    // never override browser/OS defaults
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'Backspace':
+        event.preventDefault();
+        // it's not possible to transform a valid value to an invalid value, so just update
+        deleteChars(event, true);
+        break;
+      case 'Delete':
+        event.preventDefault();
+        // it's not possible to transform a valid value to an invalid value, so just update
+        deleteChars(event, false);
+        break;
+      default:
+        break;
+    }
+
+    props.onKeyDown?.(event);
+  };
+
+  const onInputKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (props.disabled || props.readOnly) return;
+
+    const char = event.key;
+
+    // length > 1 means character is not an input character, so return early
+    if (char.length !== 1) return;
+
+    if (!isCharValid(char)) {
+      event.preventDefault();
+      return;
+    }
+
+    if (tryInsert(event, char)) props.onKeyPress?.(event);
+  };
+
+  /**
+   * Note: this does NOT fire in Firefox if "dom.event.clipboardevents.enabled" is set to "false" from about:config
+   * It will instead go into the InputKeyDown function, then exit out immediately (since ctrl key input is ignored)
+   */
+  const onPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    if (props.disabled || props.readOnly) return;
+    const clipboard = event.clipboardData.getData('Text');
+    if (!clipboard) {
+      event.preventDefault();
+      return;
+    }
+
+    // loop over each letter pasted and if any fail prevent the paste
+    for (let i = 0; i < clipboard.length; i++) {
+      const char = clipboard.charAt(i);
+      if (!isCharValid(char)) {
+        event.preventDefault();
+        return;
+      }
+    }
+
+    if (tryInsert(event, clipboard)) props.onPaste?.(event);
+    event.preventDefault();
+  };
+
+  // update input value if model state is changed from props
+  useEffect(() => {
+    const stringValue = inputRef.current!.value;
+    const numberValue = Number.parseFloat(stringValue);
+    if (!props.value) {
+      // "NaN" values should just equal "-", "-.", or ".", which should be parsed as the empty value
+      if (numberValue !== emptyValue || !Number.isNaN(numberValue)) {
+        inputRef.current!.value = props.disallowEmpty ? `${emptyValue}` : '';
+        if (typeof selectionState === 'number') {
+          inputRef.current!.setSelectionRange(selectionState, selectionState);
+          setSelectionState(null);
+        }
+      }
+    } else if (props.value && numberValue !== props.value) {
+      inputRef.current!.value = `${props.value}`;
+      if (typeof selectionState === 'number') {
+        inputRef.current!.setSelectionRange(selectionState, selectionState);
+        setSelectionState(null);
+      }
+    }
+  }, [props.value]);
+
+  return (
+    <Input
+      {...props}
+      value={undefined} // don't manage value in a reactive state
+      inputProps={{
+        ref: inputRef,
+        inputMode: props.disableFloatingPoints ? 'numeric' : 'decimal',
+        onPaste,
+        onKeyPress: onInputKeyPress,
+        onKeyDown: onInputKeyDown,
+      }}
+    />
+  );
+};
+
+export default NumberField;

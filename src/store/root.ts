@@ -4,6 +4,8 @@ import makeTheme from 'theme';
 import { DatasetStore } from './dataset';
 import { ModelStore } from './model';
 
+const THEME_STORAGE_KEY = 'dark-theme';
+
 export class RootStore {
   dataset: DatasetStore;
 
@@ -18,18 +20,21 @@ export class RootStore {
     this.dataset = new DatasetStore(this);
     this.model = new ModelStore(this);
 
-    let savedTheme: string | null | boolean = localStorage.getItem('dark-theme');
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
     if (typeof savedTheme === 'string') {
-      savedTheme = savedTheme === 'true';
+      // value already exists in local storage
+      this.darkTheme = savedTheme === 'true';
+    } else {
+      // get theme from user browser. Don't save to local storage unless user changes theme directly
+      this.darkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
-    this.darkTheme = savedTheme == null ? window.matchMedia('(prefers-color-scheme: dark)').matches : savedTheme;
     makeAutoObservable(this);
   }
 
   toggleTheme() {
     this.darkTheme = !this.darkTheme;
-    localStorage.setItem('dark-theme', `${this.darkTheme}`);
+    localStorage.setItem(THEME_STORAGE_KEY, `${this.darkTheme}`);
   }
 
   get muiTheme() {
