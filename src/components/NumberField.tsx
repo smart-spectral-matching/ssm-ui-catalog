@@ -1,5 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Input, InputProps } from '@mui/material';
+
+import mergeRefs from './utils/merge-refs';
 
 interface InputNumberChangeParams {
   originalEvent: React.SyntheticEvent<HTMLInputElement>;
@@ -9,13 +11,13 @@ interface InputNumberChangeParams {
   value: number | null;
 }
 
-interface NumberFieldProps extends Omit<InputProps /* React.InputHTMLAttributes<HTMLInputElement> */, 'value'> {
+interface NumberFieldProps extends Omit<InputProps, 'value'> {
   /**
    * bind this value to your reactive state
    */
   value?: number | null;
   /**
-   * minimum value, will be set to MAX_SAFE_INTEGER if not set
+   * minimum value, will be set to MIN_SAFE_INTEGER if not set
    */
   min?: number;
   /**
@@ -41,7 +43,14 @@ interface NumberFieldProps extends Omit<InputProps /* React.InputHTMLAttributes<
   onValueChange?(e: InputNumberChangeParams): void;
 }
 
-const NumberField = (props: NumberFieldProps) => {
+/**
+ * Component for enforcing numerical input into a text field, and allowing users to bind that value to a number type instead of a string.
+ *
+ * This component exposes an external ref for the input element (who cares about the div wrapper?), but you should generally only use it
+ * to programatically focus/blur from the element. Don't update the value or the selection-state from
+ */
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.ForwardedRef<HTMLInputElement>) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectionState, setSelectionState] = useState<number | null>(null);
 
@@ -87,11 +96,12 @@ const NumberField = (props: NumberFieldProps) => {
     });
     // keypress and paste events automatically update the input, keydown events do not
     // decimal places in the final position also may not trigger
-    if (event.type === 'keydown' || inputValue.endsWith('.') || inputValue === '-') {
+    if (event.type === 'keydown' || inputValue === '-' || inputValue.endsWith('.')) {
       // update input
       inputRef.current!.value = finalStringValue;
-      // update cursor last
+      // update input cursor
       inputRef.current!.setSelectionRange(selectionIndex, selectionIndex);
+      setSelectionState(null);
     } else {
       // manage selection state for reactive context later on
       setSelectionState(selectionIndex);
@@ -199,6 +209,9 @@ const NumberField = (props: NumberFieldProps) => {
     update(event, strValue, isNumber ? numberValue : emptyValue, cursorPosition);
   };
 
+  /**
+   * Manage keyboard events for Enter and Backspace
+   */
   const onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (props.disabled || props.readOnly) {
       return;
@@ -226,6 +239,9 @@ const NumberField = (props: NumberFieldProps) => {
     props.onKeyDown?.(event);
   };
 
+  /**
+   * manage *most* keyboard inputs, except for "Enter" and "Backspace"
+   */
   const onInputKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (props.disabled || props.readOnly) return;
 
@@ -243,6 +259,8 @@ const NumberField = (props: NumberFieldProps) => {
   };
 
   /**
+   * Manage paste attempts into the text input
+   *
    * Note: this does NOT fire in Firefox if "dom.event.clipboardevents.enabled" is set to "false" from about:config
    * It will instead go into the InputKeyDown function, then exit out immediately (since ctrl key input is ignored)
    */
@@ -294,7 +312,7 @@ const NumberField = (props: NumberFieldProps) => {
       {...props}
       value={undefined} // don't manage value in a reactive state
       inputProps={{
-        ref: inputRef,
+        ref: mergeRefs([inputRef, externalRef]),
         inputMode: props.disableFloatingPoints ? 'numeric' : 'decimal',
         onPaste,
         onKeyPress: onInputKeyPress,
@@ -302,6 +320,6 @@ const NumberField = (props: NumberFieldProps) => {
       }}
     />
   );
-};
+});
 
-export default NumberField;
+export default memo(NumberField);

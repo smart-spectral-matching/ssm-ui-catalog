@@ -79,7 +79,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
   return (
     <Container component="main">
       {state.loadState === LoadState.LOADED ? (
-        <Detail data={store.model.cachedModel!} />
+        <Detail />
       ) : state.loadState === LoadState.ERROR ? (
         <>
           <h3>The following error was found:</h3>

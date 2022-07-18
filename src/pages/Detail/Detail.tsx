@@ -1,24 +1,13 @@
-import { FC, PropsWithChildren, ReactElement, ReactNode, Suspense } from 'react';
+import { FC, Suspense, useEffect, useRef, useState } from 'react';
+import { observable, toJS } from 'mobx';
 import { observer, useLocalObservable } from 'mobx-react-lite';
-import { ExpandMore, KeyboardArrowLeft, KeyboardArrowRight, MultilineChart, People } from '@mui/icons-material';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  ButtonGroup,
-  Card,
-  Grid,
-  IconButton,
-  styled,
-  SvgIcon,
-  Typography,
-} from '@mui/material';
-import { nanoid } from 'nanoid';
+import { KeyboardArrowLeft, KeyboardArrowRight, MultilineChart, People } from '@mui/icons-material';
+import { Button, ButtonGroup, Card, Grid, IconButton, styled, SvgIcon, TextField, Typography } from '@mui/material';
 
 import ZoomableLineChart from 'components/graphs/ZoomableLineChart';
-import { BatsModel } from 'types';
-import { isNonEmptyArray, isNonEmptyObject } from 'utils';
-import { transientOptions } from 'utils/jss-utils';
+import DynamicAccordion from 'components/tree/DynamicAccordion';
+import { useStore } from 'store/providers';
+import { isNonEmptyArray, isNonEmptyObject, setNestedKey } from 'utils';
 
 import { ReactComponent as AtomIcon } from 'assets/atom.svg';
 import { ReactComponent as FlaskIcon } from 'assets/flask.svg';
@@ -27,125 +16,148 @@ const AccordionsContainer = styled('section')(({ theme }) => ({
   margin: theme.spacing(3, 0),
 }));
 
-const AccordionLabel = styled('span')(() => ({
-  marginRight: '1em',
-}));
-
-const AccordionList = styled(
-  'ul',
-  transientOptions,
-)<{ $needsScroll?: boolean }>(({ $needsScroll }) => ({
-  margin: '0.5rem 0 1rem',
-  border: '1px solid #e0e0e0',
-  borderRadius: '10px',
-  maxHeight: $needsScroll ? '25vh' : 'unset',
-  overflowY: 'auto',
-  position: 'relative',
-  '&:not(.browserDefault)': {
-    paddingLeft: 0,
-    listStyleType: 'none',
-    '&>li': {
-      padding: '10px',
-      borderBottom: '1px solid #dddddd',
-      '&:last-child': {
-        border: 0,
-      },
-    },
-  },
-}));
-
 const DataseriesDisplay = styled('span')(() => ({
   display: 'inline-flex',
   alignItems: 'center',
 }));
 
-/**
- * Display simple object
- */
-const AccordionListItem: FC<PropsWithChildren<{ objKey: string }>> = ({ objKey, children }) => (
-  <>
-    <b>{objKey}:</b> {children}
-  </>
-);
+const TextFieldEditor: FC<{
+  defaultValue: string;
+  propPath: Array<string | number>;
+  handleFieldUpdate: (newValue: string | number | boolean, path: Array<string | number>) => void;
+  allowEditing: boolean;
+  textArea?: boolean;
+}> = ({ defaultValue, propPath, handleFieldUpdate, allowEditing, textArea }) => {
+  window.console.log(propPath);
+  // keep editing localized to this component
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editValue, setEditValue] = useState<string>(defaultValue);
+  const fieldRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
-/**
- *
- * Creates an accordion
- *
- */
-const TopLevelAccordion: FC<PropsWithChildren<{ label: string; icon?: ReactElement<any, any> }>> = ({ label, icon, children }) => (
-  <Accordion>
-    <AccordionSummary expandIcon={<ExpandMore />}>
-      <AccordionLabel>{label}</AccordionLabel>
-      {icon}
-    </AccordionSummary>
-    <AccordionDetails sx={{ flexDirection: 'column' }}>
-      <AccordionList>{children}</AccordionList>
-    </AccordionDetails>
-  </Accordion>
-);
+  const focus = () => {
+    setEditing(true);
+    // timeout removes focus background of "fake" field
+    setTimeout(() => {
+      fieldRef?.current?.focus();
+    }, 0);
+  };
 
-/**
- *
- * Dynamically generate a component based on the type of "value" . Recursive function.
- *
- * Icon is an optional property, but it will not be passed recursively down the tree. If "icon" is defined, it assumes the highest-level accordion.
- *
- */
-const DynamicAccordionProps: FC<{ label: string; value: unknown; icon?: ReactElement<any, any> }> = ({ label, value, icon }) => {
-  if (Array.isArray(value)) {
-    const arrayChildren = value.map((arrayValue, idx) => (
-      <li key={`${label}-${nanoid()}`}>
-        <DynamicAccordionProps label={`${label} (${idx + 1})`} value={arrayValue} />
-      </li>
-    ));
-    return icon ? (
-      <TopLevelAccordion label={label} icon={icon}>
-        {arrayChildren}
-      </TopLevelAccordion>
-    ) : (
-      <AccordionList $needsScroll={arrayChildren.length > 10}>{arrayChildren}</AccordionList>
-    );
-  }
-  if (typeof value === 'object' && value !== null) {
-    // MUST check array before object - "null" is also an object
+  // "useCallback" with editValue as a dependency isn't needed and causes the entire component tree to be rerendered...
+  // const blur = useCallback(() => {
+  //   setEditing(false);
+  //   handleFieldUpdate(editValue, propPath);
+  // }, [editValue]);
 
+  const blur = () => {
+    setEditing(false);
+    if (editValue !== defaultValue) handleFieldUpdate(editValue, propPath);
+  };
+
+  // needed to reset input field if dynamically updated (i.e. from "cancel")
+  useEffect(() => {
+    if (editValue !== defaultValue) setEditValue(defaultValue);
+  }, [defaultValue]);
+
+  if (editing) {
     return (
-      <TopLevelAccordion label={label} icon={icon}>
-        {Object.entries(value)
-          .sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase(), 'en'))
-          .map(([objLabel, objValue]) => (
-            <li key={objLabel}>
-              <DynamicAccordionProps label={objLabel} value={objValue} />
-            </li>
-          ))}
-      </TopLevelAccordion>
+      <span style={{ display: 'flex' }}>
+        <TextField
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={() => blur()}
+          multiline={textArea}
+          inputProps={{ ref: fieldRef }}
+        />
+      </span>
     );
   }
-  if (typeof value === 'boolean') {
-    // React cannot render boolean values, so convert value to a string
-    return <AccordionListItem objKey={label}>{value.toString()}</AccordionListItem>;
-  }
-  // indicates string, number, or null
-  return <AccordionListItem objKey={label}>{value as ReactNode}</AccordionListItem>;
+  return (
+    <span
+      style={{ cursor: allowEditing ? 'pointer' : 'inherit' }}
+      role="textbox"
+      tabIndex={0}
+      onFocus={
+        allowEditing
+          ? () => {
+              focus();
+            }
+          : undefined
+      }
+    >
+      {editValue}
+    </span>
+  );
 };
 
-const Detail: FC<{ data: BatsModel }> = ({ data }) => {
+// eslint-disable-next-line complexity
+const Detail: FC = () => {
+  const store = useStore();
   const state = useLocalObservable(() => ({
+    /**
+     * Clone of the provided BatsModel, used when users are editing fields in EditMode
+     */
+    workingData: observable.object(toJS(store.model.cachedModel!)),
+    /**
+     * did user modify form
+     */
+    dirty: false,
+    /**
+     * selected dataseries index for chart
+     */
     activeDataseriesIdx: 0,
+    /**
+     * selected dataseries for chart
+     *
+     * Note that this will NOT be changed as the user edits the form (ONLY once the form is actually saved)
+     */
     get selectedDataseries() {
-      const dataseries = data.scidata.dataseries;
+      const dataseries = store.model.cachedModel!.scidata.dataseries;
       if (!isNonEmptyArray(dataseries)) return null;
       return dataseries![state.activeDataseriesIdx];
+    },
+    /**
+     * user wishes to persist their changes
+     */
+    save: () => {
+      // TODO
+      // validate, probably needs to be done on the backend
+      window.console.log('save');
+      // if successful, update the model in the store to equal what we already have and switch back to View Mode
+      store.model.syncCacheAndUpdate(observable.object(toJS(state.workingData)));
+      state.dirty = false;
+    },
+    /**
+     * user cancels from edit mode
+     */
+    cancel: () => {
+      // reset "editable" model back to initial saved state
+      state.workingData = observable.object(toJS(store.model.cachedModel!));
+      state.dirty = false;
+    },
+    /**
+     * User has blurred from editable field, so working data needs to be updated.
+     *
+     * @param newValue
+     * @param path path from the root of the BatsModel to the value which will be changed (as an array of object keys or array indexes)
+     */
+    handleFieldUpdate: (newValue: string | number | boolean, path: Array<string | number>) => {
+      if (!path.length) return;
+      setNestedKey(state.workingData, path, newValue);
+      state.dirty = true;
     },
   }));
 
   return (
     <>
       <Grid container spacing={4}>
-        <Grid item sm={12} component="section">
+        <Grid item sm={12} component="section" sx={{ width: '100%' }}>
           <Typography variant="h3" align="center">
-            {data.title}
+            <TextFieldEditor
+              defaultValue={state.workingData.title ?? ''}
+              propPath={['title']}
+              handleFieldUpdate={state.handleFieldUpdate}
+              allowEditing={store.model.allowEdits}
+            />
           </Typography>
         </Grid>
         <Grid
@@ -156,20 +168,28 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-evenly',
+            width: '100%',
           }}
         >
-          {data.scidata.property && (
-            <>
-              <Typography variant="h4">Property</Typography>
-              <Typography variant="body1">{data.scidata.property}</Typography>
-            </>
-          )}
-          {data.scidata.description && (
-            <>
-              <Typography variant="h4">Description</Typography>
-              <Typography variant="body1">{data.scidata.description}</Typography>
-            </>
-          )}
+          <Typography variant="h4">Property</Typography>
+          <Typography variant="body1">
+            <TextFieldEditor
+              defaultValue={state.workingData.scidata.property ?? ''}
+              propPath={['scidata', 'property']}
+              handleFieldUpdate={state.handleFieldUpdate}
+              allowEditing={store.model.allowEdits}
+            />
+          </Typography>
+          <Typography variant="h4">Description</Typography>
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+            <TextFieldEditor
+              defaultValue={state.workingData.scidata.description ?? ''}
+              propPath={['scidata', 'description']}
+              handleFieldUpdate={state.handleFieldUpdate}
+              allowEditing={store.model.allowEdits}
+              textArea
+            />
+          </Typography>
         </Grid>
         <Grid item md={8} component="section" sx={{ width: '100%' }}>
           <Card>
@@ -186,12 +206,12 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => {
                       <KeyboardArrowLeft />
                     </IconButton>
                     <DataseriesDisplay>
-                      {`Dataseries ${state.activeDataseriesIdx + 1} of ${data.scidata.dataseries!.length}`}
+                      {`Dataseries ${state.activeDataseriesIdx + 1} of ${store.model.cachedModel!.scidata.dataseries!.length}`}
                     </DataseriesDisplay>
                     <IconButton
                       aria-label="next"
                       title="Go to next dataset"
-                      disabled={state.activeDataseriesIdx === data.scidata.dataseries!.length - 1}
+                      disabled={state.activeDataseriesIdx === store.model.cachedModel!.scidata.dataseries!.length - 1}
                       onClick={() => (state.activeDataseriesIdx += 1)}
                     >
                       <KeyboardArrowRight />
@@ -206,21 +226,69 @@ const Detail: FC<{ data: BatsModel }> = ({ data }) => {
         </Grid>
       </Grid>
       <AccordionsContainer>
-        {isNonEmptyArray(data.scidata.dataseries) && (
-          <DynamicAccordionProps label="Dataseries" value={data.scidata.dataseries} icon={<MultilineChart />} />
-        )}
-        {isNonEmptyObject(data.scidata.methodology) && (
-          <DynamicAccordionProps
-            label="Method"
-            value={data.scidata.methodology}
-            icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
+        {isNonEmptyArray(state.workingData.scidata.dataseries) && (
+          <DynamicAccordion
+            label="Dataseries"
+            value={state.workingData.scidata.dataseries}
+            icon={<MultilineChart />}
+            onFieldChange={state.handleFieldUpdate}
+            path={['scidata', 'dataseries']}
+            allowEditing={store.model.allowEdits}
           />
         )}
-        {isNonEmptyObject(data.scidata.system) && (
-          <DynamicAccordionProps label="System" value={data.scidata.system} icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />} />
+        {isNonEmptyObject(state.workingData.scidata.methodology) && (
+          <DynamicAccordion
+            label="Method"
+            value={state.workingData.scidata.methodology}
+            icon={<SvgIcon component={FlaskIcon} viewBox="0 0 512 512" />}
+            onFieldChange={state.handleFieldUpdate}
+            path={['scidata', 'methodology']}
+            allowEditing={store.model.allowEdits}
+          />
         )}
-        {isNonEmptyObject(data.scidata.sources) && <DynamicAccordionProps label="Authors" value={data.scidata.sources} icon={<People />} />}
+        {isNonEmptyObject(state.workingData.scidata.system) && (
+          <DynamicAccordion
+            label="System"
+            value={state.workingData.scidata.system}
+            icon={<SvgIcon component={AtomIcon} viewBox="0 0 512 512" />}
+            onFieldChange={state.handleFieldUpdate}
+            path={['scidata', 'system']}
+            allowEditing={store.model.allowEdits}
+          />
+        )}
+        {isNonEmptyObject(state.workingData.scidata.sources) && (
+          <DynamicAccordion
+            label="Authors"
+            value={state.workingData.scidata.sources}
+            icon={<People />}
+            onFieldChange={state.handleFieldUpdate}
+            path={['scidata', 'sources']}
+            allowEditing={store.model.allowEdits}
+          />
+        )}
       </AccordionsContainer>
+      {store.model.allowEdits && (
+        <ButtonGroup sx={{ width: '100%', justifyContent: 'space-evenly', marginBottom: '1rem' }}>
+          <Button
+            disabled={!state.dirty}
+            variant="contained"
+            color="secondary"
+            onClick={() => state.cancel()}
+            title="Reset your data changes back to their original state on page load."
+          >
+            Reset Changes
+          </Button>
+          <Button
+            disabled={!state.dirty}
+            variant="contained"
+            color="success"
+            onClick={() => state.save()}
+            title="Permanently save your data changes and update the plot chart."
+          >
+            Save Changes
+          </Button>
+        </ButtonGroup>
+      )}
     </>
   );
 };

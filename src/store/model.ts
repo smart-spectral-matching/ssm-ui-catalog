@@ -34,6 +34,15 @@ export class ModelStore {
   }
 
   /**
+   * Determine whether or not editing on the model is allowed
+   *
+   * TODO - derive from user roles
+   */
+  get allowEdits() {
+    return !!this.cachedModel;
+  }
+
+  /**
    * @param model new model
    *
    * Updates model and resyncs cache
