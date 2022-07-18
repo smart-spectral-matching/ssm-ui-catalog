@@ -28,7 +28,6 @@ const TextFieldEditor: FC<{
   allowEditing: boolean;
   textArea?: boolean;
 }> = ({ defaultValue, propPath, handleFieldUpdate, allowEditing, textArea }) => {
-  window.console.log(propPath);
   // keep editing localized to this component
   const [editing, setEditing] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(defaultValue);

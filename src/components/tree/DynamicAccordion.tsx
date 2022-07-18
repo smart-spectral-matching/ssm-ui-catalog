@@ -177,7 +177,6 @@ export const AccordionListItemNumber: FC<{
         type="text"
         value={editValue}
         onValueChange={(e) => {
-          window.console.log(e);
           setEditValue(e.value!);
         }}
         disallowEmpty

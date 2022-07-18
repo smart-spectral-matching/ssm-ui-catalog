@@ -14,7 +14,6 @@ export const isNonEmptyArray = (array: Array<unknown> | null | undefined) => !!a
 // recursive portion of "setNestedKey"
 function setNestedKeyPrivate<T extends Record<string | number | symbol, any>>(obj: T, path: Array<string | number | symbol>, value: any) {
   if (path.length === 1) {
-    window.console.log(obj[path[0]], value);
     // @ts-ignore
     // eslint-disable-next-line no-param-reassign
     obj[path[0]] = value;
