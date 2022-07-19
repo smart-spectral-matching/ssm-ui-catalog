@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 import { Input, InputProps } from '@mui/material';
 
 import mergeRefs from './utils/merge-refs';
@@ -17,11 +17,13 @@ interface NumberFieldProps extends Omit<InputProps, 'value'> {
    */
   value?: number | null;
   /**
-   * minimum value, will be set to MIN_SAFE_INTEGER if not set
+   * INCLUSIVE minimum value, will be set to MIN_SAFE_INTEGER if not set
+   * note that entering values smaller than this will automatically set the value to this
    */
   min?: number;
   /**
-   * maximum value, will be set to MAX_SAFE_INTEGER if not set
+   * INCLUSIVE maximum value, will be set to MAX_SAFE_INTEGER if not set
+   * note that entering values larger than this will automatically set the value to this
    */
   max?: number;
   /**
@@ -47,12 +49,11 @@ interface NumberFieldProps extends Omit<InputProps, 'value'> {
  * Component for enforcing numerical input into a text field, and allowing users to bind that value to a number type instead of a string.
  *
  * This component exposes an external ref for the input element (who cares about the div wrapper?), but you should generally only use it
- * to programatically focus/blur from the element. Don't update the value or the selection-state from
+ * to programatically focus/blur from the element. Don't update the value or the selection-state from the external ref, that's managed internally.
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.ForwardedRef<HTMLInputElement>) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectionState, setSelectionState] = useState<number | null>(null);
 
   const emptyValue = useMemo(() => (props.disallowEmpty ? 0 : null), [props.disallowEmpty]);
   const maxValue = props.max ?? Number.MAX_SAFE_INTEGER;
@@ -94,18 +95,11 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
       originalEvent: event,
       value: finalNumberValue,
     });
-    // keypress and paste events automatically update the input, keydown events do not
-    // decimal places in the final position also may not trigger
-    if (event.type === 'keydown' || inputValue === '-' || inputValue.endsWith('.')) {
-      // update input
-      inputRef.current!.value = finalStringValue;
-      // update input cursor
-      inputRef.current!.setSelectionRange(selectionIndex, selectionIndex);
-      setSelectionState(null);
-    } else {
-      // manage selection state for reactive context later on
-      setSelectionState(selectionIndex);
-    }
+    window.console.log(finalStringValue, finalNumberValue);
+    // update input
+    inputRef.current!.value = finalStringValue;
+    // update input cursor
+    inputRef.current!.setSelectionRange(selectionIndex, selectionIndex);
   };
 
   /**
@@ -193,6 +187,11 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
     let cursorPosition!: number;
     if (selectionStart === selectionEnd) {
       if (backspace) {
+        if (!selectionStart) {
+          // backspace at beginning of input field must be ignored
+          event.preventDefault();
+          return;
+        }
         strValue = inputValue.slice(0, selectionStart - 1) + inputValue.slice(selectionStart);
         cursorPosition = selectionStart - 1;
       } else {
@@ -203,6 +202,8 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
       strValue = deleteRange(inputValue, selectionStart, selectionEnd);
       cursorPosition = selectionStart;
     }
+    event.preventDefault();
+
     const numberValue = Number.parseFloat(strValue);
     const isNumber = !Number.isNaN(numberValue) && strValue !== '';
 
@@ -210,7 +211,7 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
   };
 
   /**
-   * Manage keyboard events for Enter and Backspace
+   * Manage keyboard events for Del and Backspace
    */
   const onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (props.disabled || props.readOnly) {
@@ -240,7 +241,7 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
   };
 
   /**
-   * manage *most* keyboard inputs, except for "Enter" and "Backspace"
+   * manage *most* keyboard inputs, except for "Delete" and "Backspace"
    */
   const onInputKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (props.disabled || props.readOnly) return;
@@ -282,28 +283,15 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
     }
 
     if (tryInsert(event, clipboard)) props.onPaste?.(event);
-    event.preventDefault();
   };
 
   // update input value if model state is changed from props
   useEffect(() => {
     const stringValue = inputRef.current!.value;
-    const numberValue = Number.parseFloat(stringValue);
-    if (!props.value) {
-      // "NaN" values should just equal "-", "-.", or ".", which should be parsed as the empty value
-      if (numberValue !== emptyValue || !Number.isNaN(numberValue)) {
-        inputRef.current!.value = props.disallowEmpty ? `${emptyValue}` : '';
-        if (typeof selectionState === 'number') {
-          inputRef.current!.setSelectionRange(selectionState, selectionState);
-          setSelectionState(null);
-        }
-      }
-    } else if (props.value && numberValue !== props.value) {
-      inputRef.current!.value = `${props.value}`;
-      if (typeof selectionState === 'number') {
-        inputRef.current!.setSelectionRange(selectionState, selectionState);
-        setSelectionState(null);
-      }
+    const parsedValue = Number.parseFloat(stringValue);
+    const numberValue = Number.isNaN(parsedValue) || stringValue === '' ? emptyValue : parsedValue;
+    if (props.value !== numberValue) {
+      inputRef.current!.value = `${props.value ?? ''}`;
     }
   }, [props.value]);
 
