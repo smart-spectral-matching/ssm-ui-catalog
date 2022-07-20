@@ -62,8 +62,8 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
   if (maxValue < minValue) throw new Error(`NumberField: props.maxValue (${maxValue}) is less than props.minValue (${minValue})`);
 
   const isCharValid = (char: string) => {
-    if (!Number.isNaN(Number.parseFloat(char))) return true;
-    if (!props.disableFloatingPoints && (char === '.' || char === '-')) return true;
+    if (!Number.isNaN(Number.parseFloat(char)) || char === '-') return true;
+    if (!props.disableFloatingPoints && char === '.') return true;
     return false;
   };
 
@@ -95,7 +95,6 @@ const NumberField = forwardRef((props: NumberFieldProps, externalRef: React.Forw
       originalEvent: event,
       value: finalNumberValue,
     });
-    window.console.log(finalStringValue, finalNumberValue);
     // update input
     inputRef.current!.value = finalStringValue;
     // update input cursor

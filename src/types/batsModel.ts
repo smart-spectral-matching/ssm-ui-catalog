@@ -36,7 +36,7 @@ export interface SciData {
   /**
    * dynamically generated property value, may be null
    */
-  sources: Nullable<Record<string, unknown>>;
+  sources: Nullable<Array<Record<string, unknown>>>;
   /**
    * dynamically generated property value, may be null
    */

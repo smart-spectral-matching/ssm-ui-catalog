@@ -107,7 +107,7 @@ export const AccordionListItemString: FC<{
   const blur = () => {
     setEditing(false);
     // TODO "value" does not seem to update
-    onFieldChange(editValue, path);
+    if (editValue !== value) onFieldChange(editValue, path);
   };
 
   // needed to reset input field if dynamically updated (i.e. from "cancel")
@@ -159,7 +159,7 @@ export const AccordionListItemNumber: FC<{
   const blur = () => {
     setEditing(false);
     // TODO "value" does not seem to update
-    onFieldChange(editValue, path);
+    if (editValue !== value) onFieldChange(editValue, path);
   };
 
   // needed to reset input field if dynamically updated (i.e. from "cancel")
@@ -214,7 +214,7 @@ export const AccordionListItemBoolean: FC<{
   };
 
   // unlike a text-field, we trigger the update immediately on change
-  // so blurring is only there to mask the
+  // so blurring is only there to mask the checkbox itself, not to update
   const blur = () => {
     setEditing(false);
   };

@@ -14,7 +14,7 @@ export class ModelStore {
   cachedModel: BatsModel | undefined = undefined;
 
   /**
-   * Do NOT directly modify this property - call setSecondaryCache(uuid, model) instead
+   * Do NOT directly modify this property - call setSecondaryCache(uuid, modified) instead
    */
   secondaryCacheKey = '';
 
