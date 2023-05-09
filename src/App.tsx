@@ -1,6 +1,7 @@
 import './App.scss';
 
 import { Suspense, useMemo } from 'react';
+import { AuthProvider } from 'react-oidc-context';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { configure } from 'mobx';
 import { Backdrop, CircularProgress, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
@@ -11,6 +12,13 @@ import { RootStoreProvider } from 'store/providers';
 import makeTheme from 'theme';
 import Routes from './Routes';
 
+const oidcConfig = {
+  authority: 'http://localhost:8082/realms/master',
+  client_id: 'client_id',
+  client_secret: 'secret',
+  redirect_uri: 'http://localhost:3000/',
+  autoSignIn: false,
+};
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -36,24 +44,26 @@ const App = () => {
   const theme = useMemo(() => makeTheme(prefersDarkMode ? 'dark' : 'light'), [prefersDarkMode]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <RootStoreProvider>
-            <Suspense
-              fallback={
-                <Backdrop open>
-                  <CircularProgress />
-                </Backdrop>
-              }
-            >
-              <Routes />
-            </Suspense>
-          </RootStoreProvider>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </ThemeProvider>
+    <AuthProvider {...oidcConfig}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ErrorBoundary>
+          <QueryClientProvider client={queryClient}>
+            <RootStoreProvider>
+              <Suspense
+                fallback={
+                  <Backdrop open>
+                    <CircularProgress />
+                  </Backdrop>
+                }
+              >
+                <Routes />
+              </Suspense>
+            </RootStoreProvider>
+          </QueryClientProvider>
+        </ErrorBoundary>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
