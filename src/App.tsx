@@ -7,15 +7,15 @@ import { configure } from 'mobx';
 import { Backdrop, CircularProgress, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
 
 import ErrorBoundary from 'components/shared/ErrorBoundary';
-import { API_URL } from 'ssm-constants';
+import { API_URL, OIDC_AUTH_URL, OIDC_CLIENT_ID, OIDC_REDIRECT_URL } from 'ssm-constants';
 import { RootStoreProvider } from 'store/providers';
 import makeTheme from 'theme';
 import Routes from './Routes';
 
 const oidcConfig = {
-  authority: 'http://localhost:8082/realms/master',
-  client_id: 'ssm-local',
-  redirect_uri: 'http://localhost:3000/',
+  authority: OIDC_AUTH_URL,
+  client_id: OIDC_CLIENT_ID,
+  redirect_uri: OIDC_REDIRECT_URL,
   autoSignIn: false,
 };
 const queryClient = new QueryClient({

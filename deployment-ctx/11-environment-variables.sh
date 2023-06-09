@@ -27,7 +27,6 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
   API_URL_RESOLVED=${API_URL:-"/api"}
   ML_UI_URL_RESOLVED=${ML_UI_URL:-"/machine-learning"}
   ML_NOTEBOOKS_URL_RESOLVED=${ML_NOTEBOOKS_URL:-"/machine-learning/notebooks/"}
-
   # Step 3: resolve Content-Security-Policy variables in NGINX files
   readonly SECURITY_CONF_FILE="/etc/nginx/conf.d/security.conf"
   case $API_URL_RESOLVED in
@@ -48,6 +47,9 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
 apiUrl: '${API_URL_RESOLVED%/}',
 mlUiUrl: '${ML_UI_URL_RESOLVED}',
 mlNotebooksUrl: '${ML_NOTEBOOKS_URL_RESOLVED}',
+oidcAuthUrl: '${OIDC_AUTH_URL}',
+oidcClientId: '${OIDC_CLIENT_ID}',
+oidcRedirctUrl: '${OIDC_REDIRECT_URL}',
 };
 !EOF!
   ########### END ENV HANDLING ######################

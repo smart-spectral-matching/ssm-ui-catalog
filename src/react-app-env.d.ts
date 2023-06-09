@@ -29,4 +29,16 @@ export interface ConfigKeys {
    * link to the Jupyter Notebooks
    */
   mlNotebooksUrl: string;
+  /**
+   * authority url for OIDC config. for keycloak, it's the realm url
+   */
+  oidcAuthUrl: string;
+  /**
+   * Client ID registered for this app
+   */
+  oidcClientId: string;
+  /**
+   * Redirect URL registered for this app. Recommended to just be the root url for this app.
+   */
+  oidcRedirectUrl: string;
 }
