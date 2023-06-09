@@ -14,8 +14,7 @@ import Routes from './Routes';
 
 const oidcConfig = {
   authority: 'http://localhost:8082/realms/master',
-  client_id: 'client_id',
-  client_secret: 'secret',
+  client_id: 'ssm-local',
   redirect_uri: 'http://localhost:3000/',
   autoSignIn: false,
 };
