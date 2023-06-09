@@ -52,23 +52,6 @@ const Header = () => {
 
   const auth = useAuth();
 
-  const loginLink = auth.isAuthenticated ? (
-    <ListItemText
-      primary={
-        <Typography variant="body2" color="inherit">
-          LOG OUT&nbsp;
-        </Typography>
-      }
-    />
-  ) : (
-    <ListItemText
-      primary={
-        <Typography variant="body2" color="inherit">
-          LOG IN&nbsp;
-        </Typography>
-      }
-    />
-  );
   useEffect(() => {
     setLoginMenu(null);
   }, [auth.isAuthenticated]);
@@ -154,7 +137,19 @@ const Header = () => {
               aria-owns={loginMenu ? LOGIN_MENU_ID : undefined}
               onClick={(e) => loginMenu !== e.currentTarget && setLoginMenu(e.currentTarget)}
             >
-              {loginLink}
+              <ListItemText
+                primary={
+                  auth.isAuthenticated ? (
+                    <Typography variant="body2" color="inherit">
+                      LOG OUT&nbsp;
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2" color="inherit">
+                      LOG IN&nbsp;
+                    </Typography>
+                  )
+                }
+              />
             </ListItem>
             <LoginPanel id={LOGIN_MENU_ID} open={!!loginMenu} onClose={() => setLoginMenu(null)} />
           </List>

@@ -19,23 +19,20 @@ export interface LoginPanelProps {
   open: boolean;
   onClose: (value: string) => void;
 }
-const LoginPanel = (props: LoginPanelProps) => {
+const LoginPanel = ({ id, open, onClose }: LoginPanelProps) => {
   const auth = useAuth();
-  const { id, open, onClose } = props;
   const handleClose = (value: string) => {
     onClose(value);
   };
 
-  const dialogButton = auth.isAuthenticated ? (
-    <Button onClick={() => auth.removeUser()}>Confirm Logout.</Button>
-  ) : (
-    <Button onClick={() => auth.signinPopup()}>Sign in with Keycloak.</Button>
-  );
-
   return (
     <LoginDialog id={id} open={open} onClose={handleClose}>
       <LoginPaper variant="outlined" elevation={1}>
-        {dialogButton}
+        {auth.isAuthenticated ? (
+          <Button onClick={() => auth.removeUser()}>Confirm Logout.</Button>
+        ) : (
+          <Button onClick={() => auth.signinPopup()}>Sign in with Keycloak.</Button>
+        )}
       </LoginPaper>
     </LoginDialog>
   );
