@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { AppBar, Link, List, ListItem, ListItemText, Menu, MenuItem, styled, Toolbar, Typography } from '@mui/material';
 
+import LoginPanel from 'components/LoginPanel';
 import SearchBar from 'components/SearchBar';
 import { API_URL, ML_NOTEBOOKS_URL, ML_UI_URL } from 'ssm-constants';
 import { ImageContainer } from 'theme/GlobalComponents';
@@ -11,6 +13,7 @@ import LOGO from 'assets/logo.svg';
 
 const ML_MENU_ID = 'ml-menu-id';
 const DOCS_MENU_ID = 'docs-menu-id';
+const LOGIN_MENU_ID = 'login-menu-id';
 
 const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
   justifyContent: 'space-around',
@@ -45,6 +48,13 @@ const Header = () => {
 
   const [mlMenu, setMlMenu] = useState<(EventTarget & HTMLElement) | null>(null);
   const [docsMenu, setDocsMenu] = useState<(EventTarget & HTMLElement) | null>(null);
+  const [loginMenu, setLoginMenu] = useState<(EventTarget & HTMLElement) | null>(null);
+
+  const auth = useAuth();
+
+  useEffect(() => {
+    setLoginMenu(null);
+  }, [auth.isAuthenticated]);
 
   return (
     <AppBar sx={{ mb: 3, py: 1 }} color="secondary" position="static" component="header">
@@ -122,6 +132,26 @@ const Header = () => {
                 API
               </MenuItem>
             </Menu>
+            <ListItem
+              button
+              aria-owns={loginMenu ? LOGIN_MENU_ID : undefined}
+              onClick={(e) => loginMenu !== e.currentTarget && setLoginMenu(e.currentTarget)}
+            >
+              <ListItemText
+                primary={
+                  auth.isAuthenticated ? (
+                    <Typography variant="body2" color="inherit">
+                      LOG OUT&nbsp;
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2" color="inherit">
+                      LOG IN&nbsp;
+                    </Typography>
+                  )
+                }
+              />
+            </ListItem>
+            <LoginPanel id={LOGIN_MENU_ID} open={!!loginMenu} onClose={() => setLoginMenu(null)} />
           </List>
         </WrapperContainer>
       </HeaderToolbar>

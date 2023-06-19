@@ -22,6 +22,9 @@ COPY 11-environment-variables.sh /docker-entrypoint.d/
 ENV API_URL=
 ENV ML_UI_URL=
 ENV ML_NOTEBOOKS_URL=
+ENV OIDC_AUTH_URL=
+ENV OIDC_CLIENT_ID=
+ENV OIDC_REDIRECT_URL=
 
 # we store the create-react-app build in this directory
 COPY build/ /usr/share/nginx/html
