@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { CloudUpload, Refresh } from '@mui/icons-material';
@@ -40,6 +41,7 @@ const Row = styled('section')(({ theme }) => ({
 
 const Home = () => {
   const store = useStore();
+  const auth = useAuth();
   const state = useLocalObservable(() => ({
     modelErr: '',
     modelsLoaded: false,
@@ -73,7 +75,10 @@ const Home = () => {
    */
   useEffect(() => {
     if (store.dataset.datasetsLoaded) return;
-    fetch(`${API_URL}/datasets`)
+    fetch(`${API_URL}/datasets`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+    })
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
@@ -92,7 +97,10 @@ const Home = () => {
    */
   useEffect(() => {
     if (!store.dataset.selectedDataset) return;
-    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`)
+    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${auth.user?.access_token}` },
+    })
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
