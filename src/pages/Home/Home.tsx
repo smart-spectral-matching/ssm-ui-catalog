@@ -42,6 +42,11 @@ const Row = styled('section')(({ theme }) => ({
 const Home = () => {
   const store = useStore();
   const auth = useAuth();
+  const authHeaders = new Headers();
+  if (auth.user?.access_token) {
+    authHeaders.append('Authorization', `Bearer ${auth.user!.access_token}`);
+  }
+  const fetchParams = { method: 'GET', headers: authHeaders };
   const state = useLocalObservable(() => ({
     modelErr: '',
     modelsLoaded: false,
@@ -75,10 +80,7 @@ const Home = () => {
    */
   useEffect(() => {
     if (store.dataset.datasetsLoaded) return;
-    fetch(`${API_URL}/datasets`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${auth.user?.access_token}` },
-    })
+    fetch(`${API_URL}/datasets`, fetchParams)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
@@ -97,10 +99,7 @@ const Home = () => {
    */
   useEffect(() => {
     if (!store.dataset.selectedDataset) return;
-    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${auth.user?.access_token}` },
-    })
+    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`, fetchParams)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();

@@ -20,6 +20,11 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
   const { dataset, model } = props.match.params;
 
   const auth = useAuth();
+  const authHeaders = new Headers();
+  if (auth.user?.access_token) {
+    authHeaders.append('Authorization', `Bearer ${auth.user!.access_token}`);
+  }
+  const fetchParams = { method: 'GET', headers: authHeaders };
   const store = useStore();
   const state = useLocalObservable(() => ({
     loadState:
@@ -40,10 +45,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
    */
   useEffect(() => {
     if (state.loadState === LoadState.LOADING) {
-      fetch(`${API_URL}/datasets/${dataset}/models/${model}`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${auth.user?.access_token}` },
-      })
+      fetch(`${API_URL}/datasets/${dataset}/models/${model}`, fetchParams)
         .then((res) => {
           if (res.status >= 500)
             throw new Error(`Could not load model from API: Server messed up. Status ${res.status}: ${res.statusText}`);
