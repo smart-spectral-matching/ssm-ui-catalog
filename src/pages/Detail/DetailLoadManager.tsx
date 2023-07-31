@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { RouteComponentProps } from 'react-router-dom';
 import { observer, useLocalObservable } from 'mobx-react-lite';
@@ -20,11 +20,13 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
   const { dataset, model } = props.match.params;
 
   const auth = useAuth();
-  const authHeaders = new Headers();
-  if (auth.user?.access_token) {
-    authHeaders.append('Authorization', `Bearer ${auth.user!.access_token}`);
-  }
-  const fetchParams = { method: 'GET', headers: authHeaders };
+  const fetchParams = useMemo(() => {
+    const authHeaders = new Headers();
+    if (auth.user?.access_token) {
+      authHeaders.append('Authorization', `Bearer ${auth.user!.access_token}`);
+    }
+    return { method: 'GET', headers: authHeaders };
+  }, [auth.user?.access_token]);
   const store = useStore();
   const state = useLocalObservable(() => ({
     loadState:
@@ -63,7 +65,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
           state.loadState = LoadState.ERROR;
         });
     }
-  }, [state.loadState]);
+  }, [state.loadState, fetchParams]);
 
   /**
    * retrigger load if cache is not in sync
