@@ -1,4 +1,5 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useMemo } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { RouteComponentProps } from 'react-router-dom';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { Container, Skeleton } from '@mui/material';
@@ -18,6 +19,14 @@ interface DetailsUrlProps {
 const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
   const { dataset, model } = props.match.params;
 
+  const auth = useAuth();
+  const fetchParams = useMemo(() => {
+    const authHeaders = new Headers();
+    if (auth.user?.access_token) {
+      authHeaders.append('Authorization', `Bearer ${auth.user!.access_token}`);
+    }
+    return { method: 'GET', headers: authHeaders };
+  }, [auth.user?.access_token]);
   const store = useStore();
   const state = useLocalObservable(() => ({
     loadState:
@@ -38,7 +47,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
    */
   useEffect(() => {
     if (state.loadState === LoadState.LOADING) {
-      fetch(`${API_URL}/datasets/${dataset}/models/${model}`)
+      fetch(`${API_URL}/datasets/${dataset}/models/${model}`, fetchParams)
         .then((res) => {
           if (res.status >= 500)
             throw new Error(`Could not load model from API: Server messed up. Status ${res.status}: ${res.statusText}`);
@@ -56,7 +65,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
           state.loadState = LoadState.ERROR;
         });
     }
-  }, [state.loadState]);
+  }, [state.loadState, fetchParams]);
 
   /**
    * retrigger load if cache is not in sync

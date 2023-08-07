@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useAuth } from 'react-oidc-context';
 import { Link as RouterLink } from 'react-router-dom';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { CloudUpload, Refresh } from '@mui/icons-material';
@@ -40,6 +41,14 @@ const Row = styled('section')(({ theme }) => ({
 
 const Home = () => {
   const store = useStore();
+  const auth = useAuth();
+  const fetchParams = useMemo(() => {
+    const authHeaders = new Headers();
+    if (auth.user?.access_token) {
+      authHeaders.append('Authorization', `Bearer ${auth.user!.access_token}`);
+    }
+    return { method: 'GET', headers: authHeaders };
+  }, [auth.user?.access_token]);
   const state = useLocalObservable(() => ({
     modelErr: '',
     modelsLoaded: false,
@@ -73,7 +82,7 @@ const Home = () => {
    */
   useEffect(() => {
     if (store.dataset.datasetsLoaded) return;
-    fetch(`${API_URL}/datasets`)
+    fetch(`${API_URL}/datasets`, fetchParams)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
@@ -84,7 +93,7 @@ const Home = () => {
         window.console.error(err);
       })
       .finally(() => (store.dataset.datasetsLoaded = true));
-  }, [store.dataset.datasetsLoaded]);
+  }, [store.dataset.datasetsLoaded, fetchParams]);
 
   /**
    * this is local because we should refetch every time the Home page is re-rendered,
@@ -92,7 +101,7 @@ const Home = () => {
    */
   useEffect(() => {
     if (!store.dataset.selectedDataset) return;
-    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`)
+    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`, fetchParams)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
@@ -102,7 +111,7 @@ const Home = () => {
         state.modelErr = 'Could not fetch models';
         window.console.error(err);
       });
-  }, [store.dataset.selectedDataset, state.oneBasedPage]);
+  }, [store.dataset.selectedDataset, state.oneBasedPage, fetchParams]);
 
   return (
     <Container component="main" sx={{ mt: 8 }}>
