@@ -25,6 +25,7 @@ ENV ML_NOTEBOOKS_URL=
 ENV OIDC_AUTH_URL=
 ENV OIDC_CLIENT_ID=
 ENV OIDC_REDIRECT_URL=
+ENV FILE_CONVERTER_URL=
 
 # we store the create-react-app build in this directory
 COPY build/ /usr/share/nginx/html

@@ -30,3 +30,7 @@ export const OIDC_CLIENT_ID = window.config?.oidcClientId || (process.env.REACT_
  * Redirect URL registered for this app. Recommended to just be the root url for this app.
  */
 export const OIDC_REDIRECT_URL = window.config?.oidcRedirectUrl || (process.env.REACT_APP_OIDC_REDIRECT_URL as string);
+/**
+ *File Converter Service URL.
+ */
+export const FILE_CONVERTER_URL = window.config?.fileConverterUrl || (process.env.REACT_APP_FILE_CONVERTER_URL as string);

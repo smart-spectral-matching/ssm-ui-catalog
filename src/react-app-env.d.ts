@@ -41,4 +41,8 @@ export interface ConfigKeys {
    * Redirect URL registered for this app. Recommended to just be the root url for this app.
    */
   oidcRedirectUrl: string;
+  /**
+   * File Converter Service URL
+   */
+  fileConverterUrl: string;
 }

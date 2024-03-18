@@ -48,6 +48,7 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
   warn_missing "OIDC_AUTH_URL" "$OIDC_AUTH_URL"
   warn_missing "OIDC_CLIENT_ID" "$OIDC_CLIENT_ID"
   warn_missing "OIDC_REDIRECT_URL" "$OIDC_REDIRECT_URL"
+  warn_missing "FILE_CONVERTER_URL" "$OIDC_REDIRECT_URL"
 
   # Step 2: resolve variables here - resort to default values if runtime environment variables not set
   API_URL_RESOLVED=${API_URL:-"/api"}
@@ -57,6 +58,7 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
   # Step 3: resolve Content-Security-Policy variables in NGINX files
   edit_security_conf "API_URL" "$API_URL_RESOLVED"
   edit_security_conf "OIDC_AUTH_URL" "$OIDC_AUTH_URL" 
+  edit_security_conf "FILE_CONVERTER_URL" "$FILE_CONVERTER_URL" 
 
   # Step 4: add frontend configuration from Docker environment variables here
   cat<<!EOF! | tr -d '\n' > /usr/share/nginx/html/config.js
@@ -67,6 +69,7 @@ mlNotebooksUrl: '${ML_NOTEBOOKS_URL_RESOLVED}',
 oidcAuthUrl: '${OIDC_AUTH_URL}',
 oidcClientId: '${OIDC_CLIENT_ID}',
 oidcRedirctUrl: '${OIDC_REDIRECT_URL}',
+fileConverterUrl: '${FILE_CONVERTER_URL}',
 };
 !EOF!
   ########### END ENV HANDLING ######################

@@ -6,6 +6,7 @@ import { Button, ButtonGroup, Card, Grid, IconButton, styled, SvgIcon, TextField
 
 import ZoomableLineChart from 'components/graphs/ZoomableLineChart';
 import DynamicAccordion from 'components/tree/DynamicAccordion';
+import { API_URL, FILE_CONVERTER_URL } from 'ssm-constants';
 import { useStore } from 'store/providers';
 import { isNonEmptyArray, isNonEmptyObject, setNestedKey } from 'utils';
 
@@ -20,6 +21,11 @@ const DataseriesDisplay = styled('span')(() => ({
   display: 'inline-flex',
   alignItems: 'center',
 }));
+
+interface DetailsUrlProps {
+  dataset?: string;
+  model?: string;
+}
 
 const TextFieldEditor: FC<{
   defaultValue: string;
@@ -89,7 +95,7 @@ const TextFieldEditor: FC<{
 };
 
 // eslint-disable-next-line complexity
-const Detail: FC = () => {
+const Detail: FC<DetailsUrlProps> = (props) => {
   const store = useStore();
   const state = useLocalObservable(() => ({
     /**
@@ -112,6 +118,16 @@ const Detail: FC = () => {
     get selectedDataseries() {
       const dataseries = store.model.cachedModel!.scidata.dataseries;
       if (!isNonEmptyArray(dataseries)) return null;
+      if (dataseries != null) {
+        if (state.activeDataseriesIdx === 1) {
+          const axis = dataseries![0]['x-axis'];
+          dataseries[1]['x-axis'] = axis;
+        }
+        if (state.activeDataseriesIdx === 0) {
+          const axis = dataseries![1]['y-axis'];
+          dataseries[0]['y-axis'] = axis;
+        }
+      }
       return dataseries![state.activeDataseriesIdx];
     },
     /**
@@ -124,6 +140,37 @@ const Detail: FC = () => {
       // if successful, update the model in the store to equal what we already have and switch back to View Mode
       store.model.syncCacheAndUpdate(observable.object(toJS(state.workingData)));
       state.dirty = false;
+
+      const convertUrl = `${FILE_CONVERTER_URL}convert/jsonld`;
+      const multipartData = new FormData();
+      const encoder = new TextEncoder();
+      const file = new File([encoder.encode(JSON.stringify(state.workingData))], `${state.workingData.title}.json`);
+      multipartData.append('upload_file', file);
+      const modelApiUrl = `${API_URL}/datasets/${props.dataset}/models/${props.model}`;
+      fetch(convertUrl, {
+        method: 'POST',
+        headers: {
+          accept: 'application/ld+json',
+        },
+        body: multipartData,
+      })
+        .then((res) => {
+          if (res.status >= 400) {
+            throw new Error(`Could not convert to JSON ld model with API. Status ${res.status}: ${res.statusText}`);
+          }
+          return res.json();
+        })
+        .then((json) => {
+          const jsonVal = { ...json };
+          jsonVal['@graph'].title = state.workingData.title;
+          fetch(modelApiUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonVal),
+          });
+        });
     },
     /**
      * user cancels from edit mode
@@ -255,7 +302,7 @@ const Detail: FC = () => {
             allowEditing={store.model.allowEdits}
           />
         )}
-        {isNonEmptyObject(state.workingData.scidata.sources) && (
+        {isNonEmptyArray(state.workingData.scidata.sources) && (
           <DynamicAccordion
             label="Authors"
             value={state.workingData.scidata.sources}

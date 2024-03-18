@@ -84,7 +84,6 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
   const resetButtonRef = useRef<HTMLButtonElement>(null);
 
   const dimensions = useResizeObserver(wrapperRef);
-
   const state = useLocalObservable(() => ({
     reverseData: false,
     zoomTransform: undefined as ZoomTransform | undefined,
