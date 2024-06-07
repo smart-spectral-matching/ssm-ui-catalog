@@ -8,6 +8,7 @@ import ZoomableLineChart from 'components/graphs/ZoomableLineChart';
 import DynamicAccordion from 'components/tree/DynamicAccordion';
 import { API_URL, FILE_CONVERTER_URL } from 'ssm-constants';
 import { useStore } from 'store/providers';
+import { DataSeries } from 'types/batsModel';
 import { isNonEmptyArray, isNonEmptyObject, setNestedKey } from 'utils';
 
 import { ReactComponent as AtomIcon } from 'assets/atom.svg';
@@ -119,16 +120,14 @@ const Detail: FC<DetailsUrlProps> = (props) => {
       const dataseries = store.model.cachedModel!.scidata.dataseries;
       if (!isNonEmptyArray(dataseries)) return null;
       if (dataseries != null) {
-        if (state.activeDataseriesIdx === 1) {
-          const axis = dataseries![0]['x-axis'];
-          dataseries[1]['x-axis'] = axis;
-        }
-        if (state.activeDataseriesIdx === 0) {
-          const axis = dataseries![1]['y-axis'];
-          dataseries[0]['y-axis'] = axis;
-        }
+        const d = {
+          'x-axis': dataseries![0]['x-axis'],
+          'y-axis': dataseries![1]['y-axis'],
+        };
+
+        return Object.create(d) as DataSeries;
       }
-      return dataseries![state.activeDataseriesIdx];
+      return null;
     },
     /**
      * user wishes to persist their changes
@@ -146,6 +145,15 @@ const Detail: FC<DetailsUrlProps> = (props) => {
       const encoder = new TextEncoder();
       const file = new File([encoder.encode(JSON.stringify(state.workingData))], `${state.workingData.title}.json`);
       multipartData.append('upload_file', file);
+      const reader = new FileReader();
+      // reader.onload = (evt) => {
+      //   if (evt != null && evt.target != null) {
+      //     console.log(evt.target.result);
+
+      //   }
+      // };
+      reader.readAsText(file);
+      // console.log(file);
       const modelApiUrl = `${API_URL}/datasets/${props.dataset}/models/${props.model}`;
       fetch(convertUrl, {
         method: 'POST',
@@ -162,7 +170,7 @@ const Detail: FC<DetailsUrlProps> = (props) => {
         })
         .then((json) => {
           const jsonVal = { ...json };
-          jsonVal['@graph'].title = state.workingData.title;
+          // console.log(JSON.stringify(jsonVal));
           fetch(modelApiUrl, {
             method: 'PUT',
             headers: {
