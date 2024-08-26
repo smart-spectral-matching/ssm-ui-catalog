@@ -82,7 +82,7 @@ const Home = () => {
    */
   useEffect(() => {
     if (store.dataset.datasetsLoaded) return;
-    fetch(`${API_URL}/datasets`, fetchParams)
+    fetch(`${API_URL}/collections`, fetchParams)
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
@@ -101,7 +101,10 @@ const Home = () => {
    */
   useEffect(() => {
     if (!store.dataset.selectedDataset) return;
-    fetch(`${API_URL}/datasets/${store.dataset.selectedDataset}/models?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`, fetchParams)
+    fetch(
+      `${API_URL}/collections/${store.dataset.selectedDataset}/datasets?pageNumber=${state.oneBasedPage}&pageSize=${PAGE_SIZE}`,
+      fetchParams,
+    )
       .then((res) => {
         if (!res.ok) throw new Error(res.statusText);
         return res.json();

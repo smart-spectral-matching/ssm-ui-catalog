@@ -154,7 +154,7 @@ const Detail: FC<DetailsUrlProps> = (props) => {
       // };
       reader.readAsText(file);
       // console.log(file);
-      const modelApiUrl = `${API_URL}/datasets/${props.dataset}/models/${props.model}`;
+      const modelApiUrl = `${API_URL}/collections/${props.dataset}/datasets/${props.model}`;
       fetch(convertUrl, {
         method: 'POST',
         headers: {
@@ -170,7 +170,7 @@ const Detail: FC<DetailsUrlProps> = (props) => {
         })
         .then((json) => {
           const jsonVal = { ...json };
-          // console.log(JSON.stringify(jsonVal));
+          // jsonVal["@id"] = modelApiUrl;
           fetch(modelApiUrl, {
             method: 'PUT',
             headers: {
