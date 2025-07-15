@@ -11,6 +11,10 @@
  */
 export const API_URL = window.config?.apiUrl || (process.env.REACT_APP_API_URL as string);
 /**
+ * GATEWAY URL. This is the GATEWAY that is in front of this proxy.
+ */
+export const GATEWAY_URL = window.config?.gatewayUrl || (process.env.REACT_APP_GATEWAY_URL as string);
+/**
  * Link to the Machine Learning UI Hub. If frontend and ML-hub are behind same proxy, should be absolute path.
  */
 export const ML_UI_URL = window.config?.mlUiUrl || (process.env.REACT_APP_ML_UI_URL as string);

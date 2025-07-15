@@ -1,6 +1,6 @@
 # You can use this file in development if you'd like (mostly for Content-Security-Policy testing)
 # the docker build context should be the "deployment-ctx" directory, not the project root
-FROM code.ornl.gov:4567/rse/images/nginx:alpine
+FROM nginx:alpine
 
 # remove the 'listen-for-IPV6' script, we will listen there by default
 RUN rm -f /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
@@ -20,6 +20,7 @@ COPY 11-environment-variables.sh /docker-entrypoint.d/
 
 # IMPORTANT: these are the business domain ENV variables which MUST be set at runtime
 ENV API_URL=
+ENV GATEWAY_URL=
 ENV ML_UI_URL=
 ENV ML_NOTEBOOKS_URL=
 ENV OIDC_AUTH_URL=

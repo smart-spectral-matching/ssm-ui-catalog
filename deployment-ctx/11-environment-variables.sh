@@ -43,6 +43,7 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
 
   # Step 1: Log out any unset variables - WRT deployment, this is probably an error. If testing locally, you can ignore this (as the defaults should be mimicing the config).
   warn_missing "API_URL" "$API_URL"
+  warn_missing "GATEWAY_URL" "$GATEWAY_URL"
   warn_missing "ML_UI_URL" "$ML_UI_URL"
   warn_missing "ML_NOTEBOOKS_URL" "$ML_NOTEBOOKS_URL"
   warn_missing "OIDC_AUTH_URL" "$OIDC_AUTH_URL"
@@ -52,18 +53,21 @@ if [ ! -f $SCRIPT_CACHE_FILE ]; then
 
   # Step 2: resolve variables here - resort to default values if runtime environment variables not set
   API_URL_RESOLVED=${API_URL:-"/api"}
+  GATEWAY_URL_RESOLVED=${GATEWAY_URL:-"http://localhost:8080"}
   ML_UI_URL_RESOLVED=${ML_UI_URL:-"/machine-learning"}
   ML_NOTEBOOKS_URL_RESOLVED=${ML_NOTEBOOKS_URL:-"/machine-learning/notebooks/"}
- 
+
   # Step 3: resolve Content-Security-Policy variables in NGINX files
   edit_security_conf "API_URL" "$API_URL_RESOLVED"
-  edit_security_conf "OIDC_AUTH_URL" "$OIDC_AUTH_URL" 
-  edit_security_conf "FILE_CONVERTER_URL" "$FILE_CONVERTER_URL" 
+  edit_security_conf "GATEWAY_URL" "$GATEWAY_URL_RESOLVED"
+  edit_security_conf "OIDC_AUTH_URL" "$OIDC_AUTH_URL"
+  edit_security_conf "FILE_CONVERTER_URL" "$FILE_CONVERTER_URL"
 
   # Step 4: add frontend configuration from Docker environment variables here
   cat<<!EOF! | tr -d '\n' > /usr/share/nginx/html/config.js
 'use strict';window['config']={
 apiUrl: '${API_URL_RESOLVED%/}',
+gatewayUrl: '${GATEWAY_URL_RESOLVED%/}',
 mlUiUrl: '${ML_UI_URL_RESOLVED}',
 mlNotebooksUrl: '${ML_NOTEBOOKS_URL_RESOLVED}',
 oidcAuthUrl: '${OIDC_AUTH_URL}',

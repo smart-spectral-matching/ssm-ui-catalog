@@ -22,6 +22,10 @@ export interface ConfigKeys {
    */
   apiUrl: string;
   /**
+   * link to the GATEWAY
+   */
+  gatewayUrl: string;
+  /**
    * link to the frontend Machine Learning UI
    */
   mlUiUrl: string;

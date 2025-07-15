@@ -140,7 +140,7 @@ const Detail: FC<DetailsUrlProps> = (props) => {
       store.model.syncCacheAndUpdate(observable.object(toJS(state.workingData)));
       state.dirty = false;
 
-      const convertUrl = `${FILE_CONVERTER_URL}convert/jsonld`;
+      const convertUrl = `${FILE_CONVERTER_URL}/convert/jsonld`;
       const multipartData = new FormData();
       const encoder = new TextEncoder();
       const file = new File([encoder.encode(JSON.stringify(state.workingData))], `${state.workingData.title}.json`);
@@ -155,6 +155,7 @@ const Detail: FC<DetailsUrlProps> = (props) => {
       reader.readAsText(file);
       // console.log(file);
       const modelApiUrl = `${API_URL}/collections/${props.dataset}/datasets/${props.model}`;
+      window.console.log(convertUrl);
       fetch(convertUrl, {
         method: 'POST',
         headers: {
