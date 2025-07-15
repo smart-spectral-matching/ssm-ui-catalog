@@ -14,7 +14,7 @@ export class ModelStore {
   cachedModel: BatsModel | undefined = undefined;
 
   /**
-   * Do NOT directly modify this property - call setSecondaryCache(uuid, model) instead
+   * Do NOT directly modify this property - call setSecondaryCache(uuid, modified) instead
    */
   secondaryCacheKey = '';
 
@@ -31,6 +31,15 @@ export class ModelStore {
   get isCacheInSync() {
     if (!this.cachedModel) return true;
     return this.secondaryCacheKey === `${this.cachedModel.uuid}_${this.cachedModel.modified}`;
+  }
+
+  /**
+   * Determine whether or not editing on the model is allowed
+   *
+   * TODO - derive from user roles
+   */
+  get allowEdits() {
+    return !!this.cachedModel;
   }
 
   /**

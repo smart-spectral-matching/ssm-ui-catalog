@@ -22,6 +22,10 @@ export interface ConfigKeys {
    */
   apiUrl: string;
   /**
+   * link to the GATEWAY
+   */
+  gatewayUrl: string;
+  /**
    * link to the frontend Machine Learning UI
    */
   mlUiUrl: string;
@@ -41,4 +45,8 @@ export interface ConfigKeys {
    * Redirect URL registered for this app. Recommended to just be the root url for this app.
    */
   oidcRedirectUrl: string;
+  /**
+   * File Converter Service URL
+   */
+  fileConverterUrl: string;
 }

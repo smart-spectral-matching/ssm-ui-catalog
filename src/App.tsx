@@ -1,15 +1,15 @@
 import './App.scss';
 
-import { Suspense, useMemo } from 'react';
+import { Suspense } from 'react';
 import { AuthProvider } from 'react-oidc-context';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { configure } from 'mobx';
-import { Backdrop, CircularProgress, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
+import { observer } from 'mobx-react-lite';
+import { Backdrop, CircularProgress, CssBaseline, ThemeProvider } from '@mui/material';
 
 import ErrorBoundary from 'components/shared/ErrorBoundary';
 import { API_URL, OIDC_AUTH_URL, OIDC_CLIENT_ID, OIDC_REDIRECT_URL } from 'ssm-constants';
-import { RootStoreProvider } from 'store/providers';
-import makeTheme from 'theme';
+import { RootStoreProvider, useStore } from 'store/providers';
 import Routes from './Routes';
 
 const oidcConfig = {
@@ -38,13 +38,12 @@ configure({
   // observableRequiresReaction: true,
   // disableErrorBoundaries: true,
 });
-const App = () => {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const theme = useMemo(() => makeTheme(prefersDarkMode ? 'dark' : 'light'), [prefersDarkMode]);
+const App = observer(() => {
+  const store = useStore();
 
   return (
     <AuthProvider {...oidcConfig}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={store.muiTheme}>
         <CssBaseline />
         <ErrorBoundary>
           <QueryClientProvider client={queryClient}>
@@ -64,6 +63,6 @@ const App = () => {
       </ThemeProvider>
     </AuthProvider>
   );
-};
+});
 
 export default App;

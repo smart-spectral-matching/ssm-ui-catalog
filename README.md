@@ -28,6 +28,49 @@ docker login code.ornl.gov:4567
 docker-compose up --build
 ```
 
+### Build deployment container instructions
+
+To build the container image using the deployment method:
+
+1. Build the build / prep container image
+
+```
+docker build  -t ssm-fe-node .
+```
+
+2. Run the build of the site in the build container image
+
+```
+docker run --name ssm-fe-node-build ssm-fe-node sh -c "echo '' > .env && yarn run build"
+```
+
+3. Copy the site build out of the build container back to host
+
+```
+docker cp ssm-fe-node-build:/usr/local/src/build deployment-ctx/build
+```
+
+4. Build the NGINX-based deployment container image
+
+```
+docker build -f deployment-ctx/Dockerfile -t ssm-fe-nginx deployment-ctx/
+```
+
+5. Run the deployment container image (where the catalog API is running with local host on port 8080
+
+```
+docker run -p 8081:80 -e API_URL=http://localhost:8080/catalog/api ssm-fe-nginx
+```
+
+6. Cleanup build containers
+
+```
+docker container stop ssm-fe-node-build
+docker container remove ssm-fe-node-build
+```
+
+The UI will be avabaible at http://localhost:8081
+
 ## Adding dependencies
 
 `yarn add <dependency>` (dependencies) or `yarn add -D <dependency>` (devDependencies)

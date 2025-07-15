@@ -47,7 +47,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
    */
   useEffect(() => {
     if (state.loadState === LoadState.LOADING) {
-      fetch(`${API_URL}/datasets/${dataset}/models/${model}`, fetchParams)
+      fetch(`${API_URL}/collections/${dataset}/datasets/${model}`, fetchParams)
         .then((res) => {
           if (res.status >= 500)
             throw new Error(`Could not load model from API: Server messed up. Status ${res.status}: ${res.statusText}`);
@@ -79,7 +79,7 @@ const DetailLoadManager: FC<RouteComponentProps<DetailsUrlProps>> = (props) => {
   return (
     <Container component="main">
       {state.loadState === LoadState.LOADED ? (
-        <Detail data={store.model.cachedModel!} />
+        <Detail dataset={dataset} model={model} />
       ) : state.loadState === LoadState.ERROR ? (
         <>
           <h3>The following error was found:</h3>

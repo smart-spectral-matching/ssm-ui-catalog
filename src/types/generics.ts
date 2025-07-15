@@ -20,3 +20,17 @@ export enum LoadState {
   LOADED,
   ERROR,
 }
+
+export class HttpError extends Error {
+  statusCode?: number;
+
+  body: string;
+
+  constructor(message: string, body: string, statusCode?: number) {
+    super(message);
+    this.name = 'HttpError';
+    this.statusCode = statusCode;
+    this.body = body;
+    Error.captureStackTrace(this, HttpError);
+  }
+}

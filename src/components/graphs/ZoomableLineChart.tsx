@@ -84,7 +84,6 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
   const resetButtonRef = useRef<HTMLButtonElement>(null);
 
   const dimensions = useResizeObserver(wrapperRef);
-
   const state = useLocalObservable(() => ({
     reverseData: false,
     zoomTransform: undefined as ZoomTransform | undefined,
@@ -108,7 +107,9 @@ const ZoomableLineChart: FC<PropsWithChildren<{ dataseries: DataSeries; id?: str
       // @ts-ignore
       buttonEle.on('click', () => svg.transition().call(zoomBehavior.transform, zoomIdentity));
       // eslint-disable-next-line complexity
-      svg.on('keydown', (e) => {
+      svg.on('keydown', (e: KeyboardEvent) => {
+        // do not override any browser defaults
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
         switch (e.key.toLowerCase()) {
           // zoom in
           case 'w':

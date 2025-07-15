@@ -1,5 +1,5 @@
 # reusable for both developers and CI/CD
-FROM code.ornl.gov:4567/rse/images/node:lts-alpine
+FROM node:lts-alpine
 
 # build flag for CI (set to "true" in CI/CD) - used by react-scripts. Don't set for development.
 # If 'true', will fail on warnings
@@ -20,6 +20,8 @@ COPY yarn.lock .
 RUN if [ -n "$CI" ] ; then yarn --non-interactive --no-progress --frozen-lockfile ; else yarn --non-interactive ; fi
 
 # add `node_modules/.bin` to $PATH for CI/CD
-ENV PATH /usr/local/src/node_modules/.bin:$PATH
+ENV PATH=/usr/local/src/node_modules/.bin:$PATH
 
 COPY . .
+
+CMD ["yarn", "start"]
