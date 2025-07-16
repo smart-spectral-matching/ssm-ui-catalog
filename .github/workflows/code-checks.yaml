@@ -64,15 +64,6 @@ jobs:
           name: 'yarn-build'
           path: deployment-ctx/build
 
-      - name: DEBUG checking workspace artifact download
-        run: |
-          echo "===workspace==="
-          ls ${{ github.workspace }}
-          echo "===deployment-ctx==="
-          ls ${{ github.workspace }}/deployment-ctx
-          echo "===build==="
-          ls ${{ github.workspace }}/deployment-ctx/build
-
       - name: Build and push ui ml image
         uses: docker/build-push-action@v4
         with:
