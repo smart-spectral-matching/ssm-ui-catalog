@@ -19,8 +19,11 @@ jobs:
       - name: Build development container image
         run: docker build  -t ssm-fe-node .
 
-      - name: Run build in the development container image
+      - name: Run build in a development container
         run: docker run --name ssm-fe-node-build ssm-fe-node sh -c "echo '' > .env && yarn run build"
+
+      - name: Copy build out of development container onto host
+        run: docker cp ssm-fe-node-build:/usr/local/src/build deployment-ctx/build
 
       - name: Build production container image using build artifact from previous step
         run: docker build -f deployment-ctx/Dockerfile -t ssm-fe-nginx deployment-ctx/
